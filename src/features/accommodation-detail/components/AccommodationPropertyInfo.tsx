@@ -22,20 +22,20 @@ export const AccommodationPropertyInfo = ({
     amenities,
 }: AccommodationPropertyInfoProps) => {
     return (
-        <div className="bg-card rounded-3xl p-8 border shadow-sm space-y-6">
+        <div className="bg-card rounded-3xl p-6 md:p-8 border shadow-sm space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-black">{title}</h1>
+                    <h1 className="text-2xl md:text-3xl font-black leading-tight">{title}</h1>
                     <div className="flex items-center gap-2 text-muted-foreground">
-                        <MapPin className="w-5 h-5 text-primary" />
-                        <span className="text-lg">{location}</span>
-                        <span className="text-primary font-bold">({distance} كم من الجامعة)</span>
+                        <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
+                        <span className="text-base md:text-lg line-clamp-1">{location}</span>
+                        <span className="text-primary font-bold text-xs md:text-sm whitespace-nowrap">({distance} كم)</span>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-2xl">
-                    <Star className="w-6 h-6 text-accent fill-accent" />
-                    <span className="text-2xl font-black text-foreground">{rating}</span>
-                    <span className="text-muted-foreground text-sm">(12 تقييم)</span>
+                <div className="flex items-center gap-2 bg-accent/10 px-3 py-1.5 md:px-4 md:py-2 rounded-2xl w-fit">
+                    <Star className="w-5 h-5 md:w-6 md:h-6 text-accent fill-accent" />
+                    <span className="text-xl md:text-2xl font-black text-foreground">{rating}</span>
+                    <span className="text-muted-foreground text-xs md:text-sm">(12 تقييم)</span>
                 </div>
             </div>
 

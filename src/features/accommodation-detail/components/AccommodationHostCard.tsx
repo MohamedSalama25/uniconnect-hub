@@ -8,7 +8,7 @@ interface AccommodationHostCardProps {
 
 export const AccommodationHostCard = ({ hostName, hostAvatar }: AccommodationHostCardProps) => {
     return (
-        <div className="bg-card rounded-3xl p-6 border shadow-sm space-y-4">
+        <div className="bg-card rounded-3xl p-5 md:p-6 border shadow-sm space-y-4">
             <h3 className="font-bold">معلومات المالك</h3>
             <div className="flex items-center gap-4">
                 <img

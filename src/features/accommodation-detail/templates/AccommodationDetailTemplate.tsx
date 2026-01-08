@@ -41,12 +41,12 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
 
     return (
         <DashboardLayout>
-            <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-12">
+            <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 animate-fade-in pb-12 px-4 md:px-6">
                 {/* Breadcrumbs / Back */}
                 <div className="flex items-center justify-between">
                     <Button
                         variant="ghost"
-                        className="group hover:text-primary pl-4"
+                        className="group hover:text-primary pl-4 -ml-2 h-auto py-2"
                         onClick={() => navigate("/accommodations")}
                     >
                         <ChevronRight className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-1" />
@@ -56,26 +56,27 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
                         <Button
                             variant="outline"
                             size="sm"
-                            className="rounded-full flex items-center gap-2"
+                            className="rounded-full flex items-center gap-1.5 md:gap-2 px-3 md:px-4"
                             onClick={handleShare}
                         >
-                            <Share2 className="w-4 h-4" /> مشاركة
+                            <Share2 className="w-4 h-4" />
+                            <span className="hidden xs:inline">مشاركة</span>
                         </Button>
                         <Button
                             variant="outline"
                             size="sm"
-                            className={cn("rounded-full flex items-center gap-2", isFavorite && "text-destructive border-destructive")}
+                            className={cn("rounded-full flex items-center gap-1.5 md:gap-2 px-3 md:px-4", isFavorite && "text-destructive border-destructive")}
                             onClick={() => setIsFavorite(!isFavorite)}
                         >
                             <Heart className={cn("w-4 h-4", isFavorite && "fill-current")} />
-                            {isFavorite ? 'محفوظ' : 'حفظ'}
+                            <span className="hidden xs:inline">{isFavorite ? 'محفوظ' : 'حفظ'}</span>
                         </Button>
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-12 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
                     {/* Left Column: Media & Details */}
-                    <div className="lg:col-span-8 space-y-8">
+                    <div className="lg:col-span-8 space-y-6 md:space-y-8">
                         <AccommodationImageSlider
                             images={accommodation.images}
                             type={accommodation.type}

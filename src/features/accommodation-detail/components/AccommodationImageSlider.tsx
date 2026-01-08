@@ -31,7 +31,7 @@ export const AccommodationImageSlider = ({ images, type, title }: AccommodationI
     const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
     return (
-        <div className="relative group rounded-3xl overflow-hidden bg-muted aspect-[16/9] shadow-lg">
+        <div className="relative group rounded-2xl md:rounded-3xl overflow-hidden bg-muted aspect-[4/3] md:aspect-[16/9] shadow-lg">
             <div className="embla overflow-hidden h-full" ref={emblaRef}>
                 <div className="embla__container flex h-full">
                     {images.map((img, index) => (
@@ -46,22 +46,22 @@ export const AccommodationImageSlider = ({ images, type, title }: AccommodationI
                 </div>
             </div>
 
-            <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute inset-x-2 md:inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 <Button
                     size="icon"
                     variant="secondary"
-                    className="rounded-full shadow-lg pointer-events-auto"
+                    className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg pointer-events-auto bg-white/80 backdrop-blur-sm"
                     onClick={scrollPrev}
                 >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                 </Button>
                 <Button
                     size="icon"
                     variant="secondary"
-                    className="rounded-full shadow-lg pointer-events-auto"
+                    className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg pointer-events-auto bg-white/80 backdrop-blur-sm"
                     onClick={scrollNext}
                 >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                 </Button>
             </div>
 
