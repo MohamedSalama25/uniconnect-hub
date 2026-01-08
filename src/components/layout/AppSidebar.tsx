@@ -1,10 +1,10 @@
-import { 
-  Home, 
-  Building, 
-  MapPin, 
-  Briefcase, 
-  MessageCircle, 
-  HelpCircle, 
+import {
+  Home,
+  Building,
+  MapPin,
+  Briefcase,
+  MessageCircle,
+  HelpCircle,
   User,
   ChevronLeft,
   ChevronRight,
@@ -13,7 +13,7 @@ import {
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useSidebarStore } from '@/store/useSidebarStore';
 
 const navItems = [
   { to: '/', icon: Home, label: 'الرئيسية' },
@@ -26,7 +26,7 @@ const navItems = [
 ];
 
 export function AppSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, toggle } = useSidebarStore();
   const location = useLocation();
 
   return (
@@ -60,8 +60,8 @@ export function AppSidebar() {
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
                 'hover:bg-sidebar-accent',
-                isActive 
-                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md' 
+                isActive
+                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md'
                   : 'text-sidebar-foreground',
                 collapsed && 'justify-center px-3'
               )}
@@ -78,7 +78,7 @@ export function AppSidebar() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={toggle}
           className="text-sidebar-foreground hover:bg-sidebar-accent rounded-xl"
         >
           {collapsed ? (

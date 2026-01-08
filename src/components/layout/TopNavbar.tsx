@@ -1,16 +1,18 @@
-import { Search, Bell, Moon, Sun, Menu } from 'lucide-react';
+import { Search, Bell, Moon, Sun, Menu, LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { currentStudent } from '@/data/mockData';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
 
 interface TopNavbarProps {
   onMenuClick?: () => void;
@@ -18,10 +20,17 @@ interface TopNavbarProps {
 
 export function TopNavbar({ onMenuClick }: TopNavbarProps) {
   const [darkMode, setDarkMode] = useState(false);
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/welcome');
   };
 
   return (
@@ -103,9 +112,18 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>الملف الشخصي</DropdownMenuItem>
-              <DropdownMenuItem>الإعدادات</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">تسجيل الخروج</DropdownMenuItem>
+              <DropdownMenuItem className="gap-2">
+                <UserIcon className="w-4 h-4" />
+                <span>الملف الشخصي</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="gap-2">
+                <Settings className="w-4 h-4" />
+                <span>الإعدادات</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive gap-2">
+                <LogOut className="w-4 h-4" />
+                <span>تسجيل الخروج</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

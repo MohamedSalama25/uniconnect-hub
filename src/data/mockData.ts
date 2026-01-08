@@ -12,6 +12,7 @@ export interface Accommodation {
   id: string;
   title: string;
   image: string;
+  images: string[];
   price: number;
   distance: number;
   type: 'shared' | 'private';
@@ -20,6 +21,9 @@ export interface Accommodation {
   bedrooms: number;
   bathrooms: number;
   amenities: string[];
+  description: string;
+  hostName: string;
+  hostAvatar: string;
 }
 
 export interface Service {
@@ -73,7 +77,13 @@ export const accommodations: Accommodation[] = [
   {
     id: '1',
     title: 'شقة مفروشة قرب الجامعة',
-    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&height=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1522770179533-24471fcdba45?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&height=600&fit=crop'
+    ],
     price: 3500,
     distance: 0.5,
     type: 'private',
@@ -81,12 +91,20 @@ export const accommodations: Accommodation[] = [
     location: 'الدقي، الجيزة',
     bedrooms: 2,
     bathrooms: 1,
-    amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز'],
+    amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز', 'أمن 24 ساعة'],
+    description: 'شقة واسعة ومجهزة بالكامل تقع في قلب منطقة الدقي، على بعد دقائق معدودة من جامعة القاهرة. تتميز الشقة بتصميم عصري وإطلالة رائعة، وهي مثالية للطلاب الذين يبحثون عن الراحة والخصوصية.',
+    hostName: 'محمود خليل',
+    hostAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
   },
   {
     id: '2',
     title: 'غرفة مشتركة للطلاب',
-    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&height=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1505693357370-58cbe84a7a91?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800&height=600&fit=crop'
+    ],
     price: 1500,
     distance: 1.2,
     type: 'shared',
@@ -94,12 +112,20 @@ export const accommodations: Accommodation[] = [
     location: 'المهندسين، الجيزة',
     bedrooms: 1,
     bathrooms: 1,
-    amenities: ['واي فاي', 'مكيف', 'مطبخ مشترك'],
+    amenities: ['واي فاي', 'مكيف', 'مطبخ مشترك', 'منطقة دراسة'],
+    description: 'غرفة مرتبة ونظيفة في شقة سكنية هادئة مخصصة للطلاب. الموقع ممتاز بالقرب من وسائل المواصلات والخدمات العامة. بيئة دراسية محفزة ورفقاء سكن متعاونون.',
+    hostName: 'أحمد سعيد',
+    hostAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop'
   },
   {
     id: '3',
     title: 'استوديو حديث التجهيز',
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&height=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1502672023488-70e25813efdf?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1536376074432-84426582920b?w=800&height=600&fit=crop'
+    ],
     price: 4000,
     distance: 0.8,
     type: 'private',
@@ -107,12 +133,19 @@ export const accommodations: Accommodation[] = [
     location: 'الزمالك، القاهرة',
     bedrooms: 1,
     bathrooms: 1,
-    amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز', 'تراس'],
+    amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز', 'تراس', 'مصعد'],
+    description: 'استوديو أنيق بتصميم مودرن في أرقى أحياء القاهرة. مجهز بذكاء لاستغلال المساحات، ويحتوي على كل المرافق التي قد يحتاجها الطالب لحياة مريحة ومستقلة.',
+    hostName: 'هالة منصور',
+    hostAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
   },
   {
     id: '4',
     title: 'شقة طلابية مشتركة',
-    image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&height=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1522770179533-24471fcdba45?w=800&height=600&fit=crop'
+    ],
     price: 2000,
     distance: 1.5,
     type: 'shared',
@@ -120,12 +153,20 @@ export const accommodations: Accommodation[] = [
     location: 'مدينة نصر، القاهرة',
     bedrooms: 3,
     bathrooms: 2,
-    amenities: ['واي فاي', 'مكيف', 'مطبخ مشترك', 'غرفة معيشة'],
+    amenities: ['واي فاي', 'مكيف', 'مطبخ مشترك', 'غرفة معيشة', 'شرفة'],
+    description: 'شقة فسيحة تضم عدة غرف للطلاب. تقع بمنطقة حيوية قريبة من مراكز التسوق والمطاعم. مساحات مشتركة واسعة تسمح بالتواصل والراحة.',
+    hostName: 'ياسين علي',
+    hostAvatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop'
   },
   {
     id: '5',
     title: 'شقة فاخرة بإطلالة مميزة',
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&height=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1515263487990-61b07816b324?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&height=600&fit=crop'
+    ],
     price: 6000,
     distance: 2.0,
     type: 'private',
@@ -133,12 +174,19 @@ export const accommodations: Accommodation[] = [
     location: 'المعادي، القاهرة',
     bedrooms: 3,
     bathrooms: 2,
-    amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز', 'حمام سباحة', 'جيم'],
+    amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز', 'حمام سباحة', 'جيم', 'حديقة'],
+    description: 'تجربة سكنية استثنائية في أرقى كمبوندات المعادي. إطلالة بانورامية ومرافق ترفيهية متكاملة لضمان أعلى مستويات الرفاهية والتركيز.',
+    hostName: 'سارة فريد',
+    hostAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop'
   },
   {
     id: '6',
     title: 'غرفة مريحة قرب المترو',
-    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&height=600&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&height=600&fit=crop',
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&height=600&fit=crop'
+    ],
     price: 1800,
     distance: 0.3,
     type: 'shared',
@@ -146,7 +194,10 @@ export const accommodations: Accommodation[] = [
     location: 'الدقي، الجيزة',
     bedrooms: 1,
     bathrooms: 1,
-    amenities: ['واي فاي', 'مكيف'],
+    amenities: ['واي فاي', 'مكيف', 'قريب من المترو'],
+    description: 'غرفة مؤثثة بعناية في موقع استراتيجي جداً بالقرب من محطة المترو، مما يسهل التنقل إلى الجامعة وأي مكان في القاهرة والجيزة.',
+    hostName: 'مريم الصاوي',
+    hostAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop'
   },
 ];
 

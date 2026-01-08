@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import type { Accommodation } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface AccommodationCardProps {
   accommodation: Accommodation;
@@ -11,24 +12,32 @@ interface AccommodationCardProps {
 
 export function AccommodationCard({ accommodation }: AccommodationCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/accommodation/${accommodation.id}`);
+  };
 
   return (
-    <div className="bg-card rounded-2xl overflow-hidden shadow-card card-hover">
+    <div
+      className="bg-card rounded-2xl overflow-hidden shadow-card card-hover cursor-pointer group"
+      onClick={handleNavigate}
+    >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
           src={accommodation.image}
           alt={accommodation.title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-        
+
         {/* Type Badge */}
-        <Badge 
+        <Badge
           className={cn(
             'absolute top-3 right-3',
-            accommodation.type === 'private' 
-              ? 'bg-primary text-primary-foreground' 
+            accommodation.type === 'private'
+              ? 'bg-primary text-primary-foreground'
               : 'bg-accent text-accent-foreground'
           )}
         >
@@ -58,7 +67,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
       {/* Content */}
       <div className="p-4 space-y-3">
         <h3 className="font-bold text-lg line-clamp-1">{accommodation.title}</h3>
-        
+
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <MapPin className="w-4 h-4" />
           <span>{accommodation.location}</span>
