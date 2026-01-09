@@ -30,6 +30,11 @@ const LocationPrompt = () => {
                                 (error) => {
                                     console.error("Error getting location:", error);
                                     toast.error("حدث خطأ أثناء محاولة الوصول للموقع", { id: toastId });
+                                },
+                                {
+                                    enableHighAccuracy: true,
+                                    timeout: 30000,
+                                    maximumAge: 0
                                 }
                             );
                         } else {

@@ -15,6 +15,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { Plus } from 'lucide-react';
+
 
 const navItems = [
   { to: '/', icon: Home, label: 'الرئيسية' },
@@ -50,6 +52,7 @@ export function AppSidebar() {
           <span className="text-xl font-bold text-sidebar-foreground">يوني كونكت</span>
         )}
       </div>
+
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
@@ -90,6 +93,6 @@ export function AppSidebar() {
           )}
         </Button>
       </div>
-    </aside>
+    </aside >
   );
 }

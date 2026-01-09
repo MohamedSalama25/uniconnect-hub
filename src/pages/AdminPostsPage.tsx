@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UniTable, { Action } from "@/components/globalComponents/UniTable";
+import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -63,6 +64,13 @@ const AdminPostsPage = () => {
         {
             accessorKey: "author",
             header: "صاحب المنشور",
+            cell: ({ row }) => (
+                <UserProfileTrigger name={row.original.author} className="w-fit">
+                    <span className="font-medium hover:text-primary transition-colors cursor-pointer border-b border-dashed border-muted-foreground/50 hover:border-primary">
+                        {row.original.author}
+                    </span>
+                </UserProfileTrigger>
+            )
         },
         {
             accessorKey: "type",

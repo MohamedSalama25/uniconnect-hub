@@ -1,17 +1,19 @@
-import { 
-  Home, 
-  Building, 
-  MapPin, 
-  Briefcase, 
-  MessageCircle, 
-  HelpCircle, 
+import {
+  Home,
+  Building,
+  MapPin,
+  Briefcase,
+  MessageCircle,
+  HelpCircle,
   User,
   X,
-  GraduationCap
+  GraduationCap,
+  FileText
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: Home, label: 'الرئيسية' },
@@ -21,6 +23,7 @@ const navItems = [
   { to: '/chat', icon: MessageCircle, label: 'المحادثات' },
   { to: '/help', icon: HelpCircle, label: 'طلبات المساعدة' },
   { to: '/profile', icon: User, label: 'الملف الشخصي' },
+  { to: '/admin/posts', icon: FileText, label: 'المنشورات' },
 ];
 
 interface MobileSidebarProps {
@@ -36,7 +39,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 z-50 bg-foreground/50 backdrop-blur-sm md:hidden"
         onClick={onClose}
       />
@@ -61,6 +64,10 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           </Button>
         </div>
 
+
+
+
+
         {/* Navigation */}
         <nav className="p-4 space-y-2">
           {navItems.map((item) => {
@@ -73,8 +80,8 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
                   'hover:bg-sidebar-accent',
-                  isActive 
-                    ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md' 
+                  isActive
+                    ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md'
                     : 'text-sidebar-foreground'
                 )}
               >
@@ -84,7 +91,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             );
           })}
         </nav>
-      </aside>
+      </aside >
     </>
   );
 }

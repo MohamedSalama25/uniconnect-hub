@@ -16,9 +16,12 @@ import {
     Pill,
     Hospital,
     Shirt,
-    Bus
+    Bus,
+    User
 } from "lucide-react";
+import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
 import type { Service } from "@/data/mockData";
+import { LocationViewer } from "@/components/globalComponents/LocationViewer";
 import { cn } from "@/lib/utils";
 
 interface ServiceDetailTemplateProps {
@@ -139,26 +142,21 @@ export const ServiceDetailTemplate = ({ service }: ServiceDetailTemplateProps) =
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <div className="h-48 bg-muted rounded-2xl mb-4 flex items-center justify-center border-2 border-dashed">
-                                    <span className="text-muted-foreground">خريطة مصغرة للموقع</span>
-                                </div>
-                                <div className="flex justify-between items-center bg-primary/5 p-4 rounded-2xl">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-primary/10 rounded-lg">
-                                            <Navigation className="w-5 h-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold">{service.address}</p>
-                                            {userLocation && service.lat && service.lng ? (
-                                                <p className="text-sm text-primary font-semibold">
-                                                    📍 {calculateDistance(userLocation.lat, userLocation.lng, service.lat, service.lng)} متر منك
-                                                </p>
-                                            ) : userLocation ? (
-                                                <p className="text-sm text-muted-foreground">المسافة: غير محدد</p>
-                                            ) : null}
-                                        </div>
+                                <LocationViewer
+                                    lat={service.lat || 24.7136}
+                                    lng={service.lng || 46.6753}
+                                    title={service.name}
+                                />
+                                <div className="mt-4 flex flex-col gap-2">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <MapPin className="w-4 h-4" />
+                                        <span>{service.address}</span>
                                     </div>
-                                    <Button className="rounded-xl px-6">الحصول على الاتجاهات</Button>
+                                    {userLocation && service.lat && service.lng && (
+                                        <p className="text-sm text-primary font-semibold">
+                                            📍 {calculateDistance(userLocation.lat, userLocation.lng, service.lat, service.lng)} متر منك
+                                        </p>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -166,6 +164,32 @@ export const ServiceDetailTemplate = ({ service }: ServiceDetailTemplateProps) =
 
                     {/* Sidebar */}
                     <div className="space-y-6">
+                        {/* Service Provider Info - NEW */}
+                        <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
+                            <CardHeader className="p-6 bg-card border-b pb-4">
+                                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                                    <User className="w-5 h-5 text-primary" /> مقدم الخدمة
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                <UserProfileTrigger
+                                    name={(service as any).author || "مسؤول النظام"}
+                                    avatar={(service as any).authorAvatar}
+                                    className="w-full"
+                                >
+                                    <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-2xl hover:bg-muted transition-colors cursor-pointer group">
+                                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                                            {((service as any).author || "م")[0]}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold">{(service as any).author || "مسؤول النظام"}</p>
+                                            <p className="text-xs text-muted-foreground">مالك الخدمة</p>
+                                        </div>
+                                    </div>
+                                </UserProfileTrigger>
+                            </CardContent>
+                        </Card>
+
                         <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
                             <CardHeader className="p-8 bg-card border-b">
                                 <CardTitle className="text-xl font-bold">معلومات التواصل</CardTitle>

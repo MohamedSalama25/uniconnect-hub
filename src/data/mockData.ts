@@ -39,6 +39,8 @@ export interface Service {
   hours: string;
   lat?: number;
   lng?: number;
+  author?: string;
+  authorAvatar?: string;
 }
 
 export interface HelpRequest {
@@ -374,4 +376,18 @@ export const stats = {
   nearbyServices: 42,
   activeChats: 3,
   helpRequests: 28,
+};
+
+export const getUserPosts = (authorName: string) => {
+  const userAccommodations = accommodations
+    .filter((a) => a.hostName === authorName)
+    .map((a) => ({ ...a, type: 'سكن' as const }));
+
+  // Mocking service posts for the user if they have any matches (or just empty for now if no rigid link)
+  // In a real app we'd filter services by authorId/name.
+  const userServices = services
+    .filter((s) => s.name === authorName || (s as any).author === authorName)
+    .map((s) => ({ ...s, type: 'خدمة' as const }));
+
+  return [...userAccommodations, ...userServices];
 };

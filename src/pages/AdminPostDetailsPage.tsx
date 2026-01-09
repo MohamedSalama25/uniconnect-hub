@@ -25,6 +25,8 @@ import {
     CarouselNext,
     CarouselPrevious
 } from "@/components/ui/carousel";
+import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
+import { LocationViewer } from "@/components/globalComponents/LocationViewer";
 import { toast } from "sonner";
 
 // Mock data for posts (in a real app, this would come from an API based on id)
@@ -203,6 +205,26 @@ const AdminPostDetailsPage = () => {
                                 </CardContent>
                             </Card>
                         </div>
+
+                        {/* Location Section */}
+                        <Card className="border-none shadow-lg rounded-3xl overflow-hidden mt-6">
+                            <CardHeader className="p-6 pb-0">
+                                <CardTitle className="flex items-center gap-2">
+                                    <MapPin className="w-5 h-5 text-primary" /> الموقع الجغرافي
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                <LocationViewer
+                                    lat={24.7136}
+                                    lng={46.6753}
+                                    title={post.title}
+                                />
+                                <div className="mt-4 flex items-center gap-2 text-muted-foreground">
+                                    <MapPin className="w-4 h-4" />
+                                    <span>حي النرجس، الرياض</span>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     {/* Sidebar: Author Details */}
@@ -233,10 +255,20 @@ const AdminPostDetailsPage = () => {
                                             <Mail className="w-4 h-4 text-primary" />
                                             <span className="text-sm font-medium">{post.email}</span>
                                         </div>
+                                        <UserProfileTrigger
+                                            userId={post.authorId}
+                                            name={post.author}
+                                            avatar={`https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author}`}
+                                            className="w-full"
+                                        >
+                                            <Button
+                                                variant="outline"
+                                                className="w-full rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5"
+                                            >
+                                                <User className="w-4 h-4" /> فحص الملف الشخصي
+                                            </Button>
+                                        </UserProfileTrigger>
                                     </div>
-                                    <Button variant="outline" className="w-full rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5">
-                                        <User className="w-4 h-4" /> فحص الملف الشخصي
-                                    </Button>
                                 </div>
                             </CardContent>
                             <CardFooter className="bg-muted/30 p-6 flex flex-col gap-4 border-t">
