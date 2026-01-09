@@ -24,6 +24,8 @@ export interface Accommodation {
   description: string;
   hostName: string;
   hostAvatar: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface Service {
@@ -35,6 +37,8 @@ export interface Service {
   address: string;
   phone: string;
   hours: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface HelpRequest {
@@ -94,7 +98,9 @@ export const accommodations: Accommodation[] = [
     amenities: ['واي فاي', 'مكيف', 'غسالة', 'مطبخ مجهز', 'أمن 24 ساعة'],
     description: 'شقة واسعة ومجهزة بالكامل تقع في قلب منطقة الدقي، على بعد دقائق معدودة من جامعة القاهرة. تتميز الشقة بتصميم عصري وإطلالة رائعة، وهي مثالية للطلاب الذين يبحثون عن الراحة والخصوصية.',
     hostName: 'محمود خليل',
-    hostAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
+    hostAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
+    lat: 30.0444,
+    lng: 31.2357
   },
   {
     id: '2',
@@ -115,7 +121,9 @@ export const accommodations: Accommodation[] = [
     amenities: ['واي فاي', 'مكيف', 'مطبخ مشترك', 'منطقة دراسة'],
     description: 'غرفة مرتبة ونظيفة في شقة سكنية هادئة مخصصة للطلاب. الموقع ممتاز بالقرب من وسائل المواصلات والخدمات العامة. بيئة دراسية محفزة ورفقاء سكن متعاونون.',
     hostName: 'أحمد سعيد',
-    hostAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop'
+    hostAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
+    lat: 30.0480,
+    lng: 31.2300
   },
   {
     id: '3',
@@ -211,6 +219,8 @@ export const services: Service[] = [
     address: 'شارع جامعة القاهرة، الجيزة',
     phone: '+20 2 3567 8901',
     hours: '10:00 ص - 12:00 م',
+    lat: 30.0420,
+    lng: 31.2380
   },
   {
     id: '2',
@@ -221,6 +231,8 @@ export const services: Service[] = [
     address: 'شارع الدقي، الجيزة',
     phone: '+20 2 3765 4321',
     hours: '24 ساعة',
+    lat: 30.0460,
+    lng: 31.2330
   },
   {
     id: '3',

@@ -26,14 +26,19 @@ const registerSchema = z.object({
     name: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
     email: z.string().email("يرجى إدخال بريد إلكتروني صحيح"),
     password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
-    role: z.enum(["student", "admin"], {
-        required_error: "يرجى اختيار نوع الحساب",
-    }),
+    university: z.string().min(2, "يرجى إدخال اسم الجامعة").optional(),
+    major: z.string().min(2, "يرجى إدخال التخصص").optional(),
+    serviceType: z.string().min(2, "يرجى إدخال نوع الخدمة").optional(),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export const RegisterForm = () => {
+interface RegisterFormProps {
+    selectedRole: "student" | "provider";
+    onBack: () => void;
+}
+
+export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
     const login = useAuthStore((state) => state.login);
     const navigate = useNavigate();
 
@@ -43,7 +48,9 @@ export const RegisterForm = () => {
             name: "",
             email: "",
             password: "",
-            role: "student",
+            university: "",
+            major: "",
+            serviceType: "",
         },
     });
 
@@ -52,7 +59,7 @@ export const RegisterForm = () => {
             id: Math.random().toString(36).substr(2, 9),
             name: values.name,
             email: values.email,
-            role: values.role as 'student' | 'admin',
+            role: selectedRole === "student" ? "student" : "admin", // Assuming provider maps to admin for now or update store
         });
         toast.success("تم إنشاء الحساب بنجاح");
         navigate("/");
@@ -87,27 +94,52 @@ export const RegisterForm = () => {
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                        <FormItem className="text-right">
-                            <FormLabel>نوع الحساب</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+
+                {selectedRole === "student" ? (
+                    <>
+                        <FormField
+                            control={form.control}
+                            name="university"
+                            render={({ field }) => (
+                                <FormItem className="text-right">
+                                    <FormLabel>الجامعة</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="اسم الجامعة" {...field} className="text-right" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="major"
+                            render={({ field }) => (
+                                <FormItem className="text-right">
+                                    <FormLabel>التخصص</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="تخصصك الدراسي" {...field} className="text-right" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </>
+                ) : (
+                    <FormField
+                        control={form.control}
+                        name="serviceType"
+                        render={({ field }) => (
+                            <FormItem className="text-right">
+                                <FormLabel>نوع الخدمة</FormLabel>
                                 <FormControl>
-                                    <SelectTrigger dir="rtl">
-                                        <SelectValue placeholder="اختر نوع الحساب" />
-                                    </SelectTrigger>
+                                    <Input placeholder="مثال: سكن، مواصلات، نقل" {...field} className="text-right" />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="student">طالب</SelectItem>
-                                    <SelectItem value="admin">مسؤول</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
+
                 <FormField
                     control={form.control}
                     name="password"
@@ -121,9 +153,14 @@ export const RegisterForm = () => {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full py-6 text-lg rounded-xl mt-4">
-                    تسجيل
-                </Button>
+                <div className="flex gap-4 mt-6">
+                    <Button type="button" variant="outline" onClick={onBack} className="flex-1 py-6 text-lg rounded-xl">
+                        رجوع
+                    </Button>
+                    <Button type="submit" className="flex-[2] py-6 text-lg rounded-xl">
+                        تسجيل
+                    </Button>
+                </div>
                 <p className="text-center text-muted-foreground mt-4">
                     لديك حساب بالفعل؟{" "}
                     <Link to="/login" className="text-primary font-bold hover:underline">

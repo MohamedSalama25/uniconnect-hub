@@ -15,7 +15,12 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import AdminPostsPage from "./pages/AdminPostsPage";
+import AdminPostDetailsPage from "./pages/AdminPostDetailsPage";
 import AccommodationDetail from "@/pages/AccommodationDetail";
+import ServiceDetailPage from "./pages/ServiceDetailPage";
+import LocationPrompt from "./components/globalComponents/LocationPrompt";
+import { ScrollToTop } from "./components/layout/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +43,8 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <LocationPrompt />
+          <ScrollToTop />
           <Routes>
             <Route
               path="/welcome"
@@ -55,10 +62,13 @@ const App = () => {
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/accommodations" element={<ProtectedRoute><Accommodations /></ProtectedRoute>} />
             <Route path="/accommodation/:id" element={<AccommodationDetail />} />
+            <Route path="/service/:id" element={<ProtectedRoute><ServiceDetailPage /></ProtectedRoute>} />
             <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
             <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><HelpRequests /></ProtectedRoute>} />
+            <Route path="/admin/posts" element={<ProtectedRoute><AdminPostsPage /></ProtectedRoute>} />
+            <Route path="/admin/post/:id" element={<ProtectedRoute><AdminPostDetailsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
             <Route path="*" element={<ProtectedWrapper><NotFound /></ProtectedWrapper>} />

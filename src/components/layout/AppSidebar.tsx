@@ -8,7 +8,8 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  FileText
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ const navItems = [
   { to: '/chat', icon: MessageCircle, label: 'المحادثات' },
   { to: '/help', icon: HelpCircle, label: 'طلبات المساعدة' },
   { to: '/profile', icon: User, label: 'الملف الشخصي' },
+  { to: '/admin/posts', icon: FileText, label: 'المنشورات' },
 ];
 
 export function AppSidebar() {
