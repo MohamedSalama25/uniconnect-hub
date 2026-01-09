@@ -97,7 +97,7 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
 
                     {/* Right Column: Pricing & Host */}
                     <div className="lg:col-span-4 space-y-6">
-                        <AccommodationPricingCard price={accommodation.price} />
+                        <AccommodationPricingCard price={accommodation.price} id={accommodation.id} />
                         <AccommodationHostCard
                             hostName={accommodation.hostName}
                             hostAvatar={accommodation.hostAvatar}

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const LocationPrompt = () => {
     useEffect(() => {
-        const storedLocation = localStorage.getItem("location");
+        const storedLocation = sessionStorage.getItem("location");
 
         if (!storedLocation) {
             const toastId = toast.info("نحتاج الوصول إلى موقعك", {
@@ -24,7 +24,7 @@ const LocationPrompt = () => {
                                         lng: position.coords.longitude,
                                         timestamp: new Date().getTime(),
                                     };
-                                    localStorage.setItem("location", JSON.stringify(location));
+                                    sessionStorage.setItem("location", JSON.stringify(location));
                                     toast.success("تم حفظ موقعك بنجاح", { id: toastId });
                                 },
                                 (error) => {

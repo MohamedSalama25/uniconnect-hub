@@ -82,21 +82,6 @@ export function LocationPicker({
     }, [position, onLocationSelect]);
 
     const handleGetCurrentLocation = () => {
-        // Try to get from localStorage first
-        const storedLocation = localStorage.getItem("location");
-        if (storedLocation) {
-            try {
-                const parsedLocation = JSON.parse(storedLocation);
-                if (parsedLocation.lat && parsedLocation.lng) {
-                    setPosition({ lat: parsedLocation.lat, lng: parsedLocation.lng });
-                    toast.success("تم تحديد موقعك من البيانات المحفوظة");
-                    return;
-                }
-            } catch (e) {
-                console.error("Error parsing stored location", e);
-            }
-        }
-
         if (!navigator.geolocation) {
             toast.error("المتصفح لا يدعم تحديد الموقع");
             return;
@@ -113,8 +98,8 @@ export function LocationPicker({
                 const newLocation = { lat: latitude, lng: longitude };
                 setPosition(newLocation);
 
-                // Update local storage
-                localStorage.setItem("location", JSON.stringify({
+                // Update session storage
+                sessionStorage.setItem("location", JSON.stringify({
                     ...newLocation,
                     timestamp: new Date().getTime()
                 }));
@@ -126,7 +111,7 @@ export function LocationPicker({
                         "⚠️ دقة الموقع ضعيفة، يفضل تحديد موقعك يدويًا على الخريطة"
                     );
                 } else {
-                    toast.success("✅ تم تحديد موقعك بدقة");
+                    toast.success("✅ تم تحديد موقعك الحالي بنجاح");
                 }
             },
             (error) => {

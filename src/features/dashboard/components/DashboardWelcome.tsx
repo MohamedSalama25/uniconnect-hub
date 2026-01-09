@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { currentStudent } from '@/data/mockData';
+import { CreatePostDialog } from '@/components/globalComponents/CreatePostDialog';
 
 interface DashboardWelcomeProps {
     user: typeof currentStudent;
@@ -20,13 +21,16 @@ export const DashboardWelcome = ({ user }: DashboardWelcomeProps) => {
                 </div>
 
                 {/* Search */}
-                <div className="relative w-full md:w-96">
+                {/* <div className="relative w-full md:w-96">
                     <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <Input
                         type="search"
                         placeholder="ابحث عن سكن، خدمات..."
                         className="pr-12 h-12 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus-visible:ring-primary-foreground/30 text-right"
                     />
+                </div> */}
+                <div className="w-[150px] ">
+                    <CreatePostDialog triggerClassName="bg-foreground hover:bg-foreground/90 text-primary-foreground" />
                 </div>
             </div>
         </div>

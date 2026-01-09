@@ -77,10 +77,18 @@ const formSchema = z.object({
 
 interface CreatePostDialogProps {
     trigger?: React.ReactNode;
+    btnColor?: "primary" | "secondary" | "destructive" | "outline" | "ghost";
+    triggerClassName?: string;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export function CreatePostDialog({ trigger }: CreatePostDialogProps) {
-    const [open, setOpen] = useState(false);
+export function CreatePostDialog({ trigger, btnColor, triggerClassName, open: controlledOpen, onOpenChange: setControlledOpen }: CreatePostDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const setOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
+
     const [images, setImages] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -138,7 +146,7 @@ export function CreatePostDialog({ trigger }: CreatePostDialogProps) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20">
+                    <Button className={cn("w-full gap-2 font-bold shadow-lg shadow-secondary/20", triggerClassName)}>
                         <Plus className="w-5 h-5" />
                         <span>إضافة منشور</span>
                     </Button>

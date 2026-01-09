@@ -198,10 +198,7 @@ const MapPinMarker = ({ item, type, position, color, onNavigate, userLocation }:
                                 <div className="flex items-center gap-1 text-[11px] font-semibold text-primary">
                                     <span>📍</span>
                                     <span>
-                                        {distance < 1000
-                                            ? `${distance} متر منك`
-                                            : `${(distance / 1000).toFixed(1)} كم منك`
-                                        }
+                                        {(distance / 1000).toFixed(1)} كم منك
                                     </span>
                                 </div>
                             )}

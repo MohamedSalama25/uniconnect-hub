@@ -154,7 +154,7 @@ export const ServiceDetailTemplate = ({ service }: ServiceDetailTemplateProps) =
                                     </div>
                                     {userLocation && service.lat && service.lng && (
                                         <p className="text-sm text-primary font-semibold">
-                                            📍 {calculateDistance(userLocation.lat, userLocation.lng, service.lat, service.lng)} متر منك
+                                            📍 {(calculateDistance(userLocation.lat, userLocation.lng, service.lat, service.lng) / 1000).toFixed(1)} كم منك
                                         </p>
                                     )}
                                 </div>

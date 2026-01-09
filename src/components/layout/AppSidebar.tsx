@@ -9,7 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
-  FileText
+  FileText,
+  CalendarCheck
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ const navItems = [
   { to: '/accommodations', icon: Building, label: 'السكن' },
   { to: '/map', icon: MapPin, label: 'الخريطة' },
   { to: '/services', icon: Briefcase, label: 'الخدمات' },
+  { to: '/provider/bookings', icon: CalendarCheck, label: 'الحجوزات' },
   { to: '/chat', icon: MessageCircle, label: 'المحادثات' },
   { to: '/help', icon: HelpCircle, label: 'طلبات المساعدة' },
   { to: '/profile', icon: User, label: 'الملف الشخصي' },

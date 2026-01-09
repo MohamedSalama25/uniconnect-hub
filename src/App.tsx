@@ -18,9 +18,13 @@ import RegisterPage from "./pages/RegisterPage";
 import AdminPostsPage from "./pages/AdminPostsPage";
 import AdminPostDetailsPage from "./pages/AdminPostDetailsPage";
 import AccommodationDetail from "@/pages/AccommodationDetail";
+import BookingPage from "./pages/BookingPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
 import LocationPrompt from "./components/globalComponents/LocationPrompt";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
+
+import ProviderBookingsPage from "./pages/ProviderBookingsPage";
+import BookingDetailPage from "./pages/BookingDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +66,7 @@ const App = () => {
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/accommodations" element={<ProtectedRoute><Accommodations /></ProtectedRoute>} />
             <Route path="/accommodation/:id" element={<AccommodationDetail />} />
+            <Route path="/accommodation/:id/book" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
             <Route path="/service/:id" element={<ProtectedRoute><ServiceDetailPage /></ProtectedRoute>} />
             <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
             <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
@@ -70,6 +75,8 @@ const App = () => {
             <Route path="/admin/posts" element={<ProtectedRoute><AdminPostsPage /></ProtectedRoute>} />
             <Route path="/admin/post/:id" element={<ProtectedRoute><AdminPostDetailsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/provider/bookings" element={<ProtectedRoute><ProviderBookingsPage /></ProtectedRoute>} />
+            <Route path="/provider/booking/:id" element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} />
 
             <Route path="*" element={<ProtectedWrapper><NotFound /></ProtectedWrapper>} />
           </Routes>

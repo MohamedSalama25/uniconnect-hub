@@ -11,6 +11,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
     Select,
     SelectContent,
@@ -147,7 +148,7 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
                         <FormItem className="text-right">
                             <FormLabel>كلمة المرور</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="••••••••" {...field} className="text-right" />
+                                <PasswordInput placeholder="••••••••" {...field} className="text-right" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

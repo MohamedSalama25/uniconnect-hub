@@ -11,6 +11,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -68,7 +69,7 @@ export const LoginForm = () => {
                         <FormItem className="text-right">
                             <FormLabel>كلمة المرور</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="••••••••" {...field} className="text-right" />
+                                <PasswordInput placeholder="••••••••" {...field} className="text-right" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
