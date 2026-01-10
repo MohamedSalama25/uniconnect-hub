@@ -3,7 +3,9 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
+import { useImageViewerStore } from "@/store/useImageViewerStore";
+import { ZoomIn } from "lucide-react";
 
 interface AccommodationImageSliderProps {
     images: string[];
@@ -14,6 +16,7 @@ interface AccommodationImageSliderProps {
 export const AccommodationImageSlider = ({ images, type, title }: AccommodationImageSliderProps) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, direction: 'rtl' });
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const openImageViewer = useImageViewerStore(state => state.open);
 
     const onSelect = useCallback(() => {
         if (!emblaApi) return;
@@ -36,11 +39,19 @@ export const AccommodationImageSlider = ({ images, type, title }: AccommodationI
                 <div className="embla__container flex h-full">
                     {images.map((img, index) => (
                         <div className="embla__slide flex-[0_0_100%] min-w-0" key={index}>
-                            <img
-                                src={img}
-                                alt={`${title} - ${index + 1}`}
-                                className="w-full h-full object-cover"
-                            />
+                            <div
+                                className="relative w-full h-full cursor-zoom-in"
+                                onClick={() => openImageViewer(formatImageUrl(img)!)}
+                            >
+                                <img
+                                    src={formatImageUrl(img)}
+                                    alt={`${title} - ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <ZoomIn className="w-12 h-12 text-white drop-shadow-lg" />
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>

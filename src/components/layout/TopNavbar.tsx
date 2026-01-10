@@ -10,10 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { currentStudent } from '@/data/mockData';
 import { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, formatImageUrl } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { GlobalSearch } from '../globalComponents/GlobalSearch';
+import { API_CONFIG } from '@/lib/api.config';
 
 interface TopNavbarProps {
   onMenuClick?: () => void;
@@ -22,7 +23,7 @@ interface TopNavbarProps {
 export function TopNavbar({ onMenuClick }: TopNavbarProps) {
   const [darkMode, setDarkMode] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const logout = useAuthStore((state) => state.logout);
+  const { user, fullProfile, logout, profileUpdateTick } = useAuthStore();
   const navigate = useNavigate();
 
   const toggleDarkMode = () => {
@@ -45,6 +46,10 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
   }, [])
+
+  const avatarUrl = fullProfile?.profilePictureUrl
+    ? `${formatImageUrl(fullProfile.profilePictureUrl)}?t=${profileUpdateTick}`
+    : currentStudent.avatar;
 
   return (
     <>
@@ -123,18 +128,23 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 rounded-xl pr-2">
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={currentStudent.avatar} alt={currentStudent.name} />
-                    <AvatarFallback>{currentStudent.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage
+                      src={avatarUrl}
+                      alt={fullProfile?.firstName ? `${fullProfile.firstName} ${fullProfile.lastName}` : (user?.displayName || currentStudent.name)}
+                    />
+                    <AvatarFallback>{(fullProfile?.firstName || user?.displayName || currentStudent.name).charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <span className="hidden md:inline font-medium">{currentStudent.name}</span>
+                  <span className="hidden md:inline font-medium">
+                    {fullProfile?.firstName ? `${fullProfile.firstName} ${fullProfile.lastName}` : (user?.displayName || currentStudent.name)}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="gap-2">
+                <DropdownMenuItem className="gap-2" onClick={() => navigate('/profile')}>
                   <UserIcon className="w-4 h-4" />
                   <span>الملف الشخصي</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2">
+                <DropdownMenuItem className="gap-2" onClick={() => navigate('/profile', { state: { tab: 'settings' } })}>
                   <Settings className="w-4 h-4" />
                   <span>الإعدادات</span>
                 </DropdownMenuItem>

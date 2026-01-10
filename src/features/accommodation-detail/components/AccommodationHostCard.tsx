@@ -1,6 +1,7 @@
 import { Shield, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
+import { formatImageUrl } from "@/lib/utils";
 
 interface AccommodationHostCardProps {
     hostName: string;
@@ -11,10 +12,10 @@ export const AccommodationHostCard = ({ hostName, hostAvatar }: AccommodationHos
     return (
         <div className="bg-card rounded-3xl p-5 md:p-6 border shadow-sm space-y-4">
             <h3 className="font-bold">معلومات المالك</h3>
-            <UserProfileTrigger name={hostName} avatar={hostAvatar} className="w-full">
+            <UserProfileTrigger name={hostName} avatar={formatImageUrl(hostAvatar) || hostAvatar} className="w-full">
                 <div className="flex items-center gap-4 p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer">
                     <img
-                        src={hostAvatar}
+                        src={formatImageUrl(hostAvatar)}
                         alt={hostName}
                         className="w-14 h-14 rounded-2xl object-cover"
                     />

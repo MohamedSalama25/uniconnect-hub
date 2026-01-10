@@ -4,7 +4,7 @@ import type { currentStudent } from '@/data/mockData';
 import { CreatePostDialog } from '@/components/globalComponents/CreatePostDialog';
 
 interface DashboardWelcomeProps {
-    user: typeof currentStudent;
+    user: any;
 }
 
 export const DashboardWelcome = ({ user }: DashboardWelcomeProps) => {
@@ -13,10 +13,10 @@ export const DashboardWelcome = ({ user }: DashboardWelcomeProps) => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
                     <h1 className="text-2xl md:text-3xl font-bold">
-                        مرحباً، {user.name} 👋
+                        مرحباً، {user.displayName || (user as any).name} 👋
                     </h1>
                     <p className="text-primary-foreground/80">
-                        {user.university} • {user.city}
+                        {user.universityName || (user as any).university} • {user.currentAddress || (user as any).city}
                     </p>
                 </div>
 

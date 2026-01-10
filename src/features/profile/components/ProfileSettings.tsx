@@ -1,29 +1,81 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User, MapPin, Shield, Bell, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { currentStudent } from '@/data/mockData';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/store/useAuthStore';
+
+import { useNavigate } from 'react-router-dom';
 
 // Import split components
 import { PersonalInfoTab } from './settings/PersonalInfoTab';
 import { LocationTab } from './settings/LocationTab';
 import { SecurityTab } from './settings/SecurityTab';
 import { NotificationsTab } from './settings/NotificationsTab';
+import { authService } from '@/features/auth/services/auth.service';
 
 export const ProfileSettings = () => {
+    const { user, fullProfile, setUserDetails, logout } = useAuthStore();
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+
     const [formData, setFormData] = useState({
-        name: currentStudent.name,
-        email: 'ahmed.m@example.com',
-        phone: currentStudent.phone,
-        university: currentStudent.university,
-        city: currentStudent.city,
-        bio: 'طالب في السنة الثالثة، أهتم بالتكنولوجيا والرياضة واستكشاف أماكن جديدة.',
+        firstName: fullProfile?.firstName || '',
+        lastName: fullProfile?.lastName || '',
+        phone: fullProfile?.phonenumber || fullProfile?.phoneNumber || '',
+        university: fullProfile?.universityName || '',
+        city: fullProfile?.currentAddress || '',
+        introductionNote: fullProfile?.introductionNote || '',
         location: { lat: 30.0444, lng: 31.2357 }
     });
 
-    const handleSave = (section: string) => {
-        toast.success(`تم حفظ ${section} بنجاح`);
+    useEffect(() => {
+        if (fullProfile) {
+            setFormData({
+                firstName: fullProfile.firstName || '',
+                lastName: fullProfile.lastName || '',
+                phone: fullProfile.phonenumber || fullProfile.phoneNumber || '',
+                university: fullProfile.universityName || '',
+                city: fullProfile.currentAddress || '',
+                introductionNote: fullProfile.introductionNote || '',
+                location: { lat: 30.0444, lng: 31.2357 }
+            });
+        }
+    }, [fullProfile, user]);
+
+    const handleSave = async (section: string) => {
+        if (section === 'المعلومات الشخصية') {
+            setIsLoading(true);
+            try {
+                const token = user?.token;
+                if (!token) return;
+
+                // Construct update payload (matching what the backend expects)
+                const updateData = {
+                    FirstName: formData.firstName,
+                    LastName: formData.lastName,
+                    PhoneNumber: formData.phone,
+                    CurrentAddress: formData.city,
+                    IntroductionNote: formData.introductionNote,
+                };
+
+                const updatedProfile = await authService.updateCurrentUser(token, updateData);
+                setUserDetails(updatedProfile);
+                toast.success(`تم حفظ ${section} بنجاح`);
+            } catch (error: any) {
+                toast.error(error.message || "فشل تحديث البيانات");
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            toast.success(`تم حفظ ${section} بنجاح`);
+        }
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/welcome');
     };
 
     return (
@@ -47,7 +99,11 @@ export const ProfileSettings = () => {
                         الإشعارات
                     </TabsTrigger>
                     <div className="mt-4 pt-4 border-t px-2">
-                        <Button variant="ghost" className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 px-4 py-3 rounded-xl">
+                        <Button
+                            variant="ghost"
+                            onClick={handleLogout}
+                            className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 px-4 py-3 rounded-xl"
+                        >
                             <LogOut className="w-4 h-4 ml-2" />
                             تسجيل الخروج
                         </Button>
@@ -72,7 +128,7 @@ export const ProfileSettings = () => {
                     </TabsContent>
 
                     <TabsContent value="security" className="mt-0 focus-visible:outline-none">
-                        <SecurityTab handleSave={handleSave} />
+                        <SecurityTab />
                     </TabsContent>
 
                     <TabsContent value="notifications" className="mt-0 focus-visible:outline-none">

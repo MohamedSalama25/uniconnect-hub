@@ -1,8 +1,7 @@
 import { Building, MapPin, Phone } from 'lucide-react';
-import type { currentStudent } from '@/data/mockData';
 
 interface ProfileInfoCardsProps {
-    user: typeof currentStudent;
+    user: any;
 }
 
 export const ProfileInfoCards = ({ user }: ProfileInfoCardsProps) => {
@@ -14,7 +13,7 @@ export const ProfileInfoCards = ({ user }: ProfileInfoCardsProps) => {
                 </div>
                 <div className="flex-1">
                     <p className="text-sm text-muted-foreground">الجامعة</p>
-                    <p className="font-medium">{user.university}</p>
+                    <p className="font-medium">{user.universityName || (user as any).university}</p>
                 </div>
             </div>
 
@@ -23,8 +22,8 @@ export const ProfileInfoCards = ({ user }: ProfileInfoCardsProps) => {
                     <MapPin className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">المدينة</p>
-                    <p className="font-medium">{user.city}</p>
+                    <p className="text-sm text-muted-foreground">المدينة / العنوان</p>
+                    <p className="font-medium">{user.currentAddress || (user as any).city}</p>
                 </div>
             </div>
 
@@ -34,7 +33,7 @@ export const ProfileInfoCards = ({ user }: ProfileInfoCardsProps) => {
                 </div>
                 <div className="flex-1">
                     <p className="text-sm text-muted-foreground">الهاتف</p>
-                    <p className="font-medium" dir="ltr">{user.phone}</p>
+                    <p className="font-medium" dir="ltr">{user.phonenumber || user.phoneNumber || (user as any).phone}</p>
                 </div>
             </div>
         </div>

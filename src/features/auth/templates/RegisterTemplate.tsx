@@ -10,7 +10,7 @@ export const RegisterTemplate = () => {
         <AuthCard
             title={!selectedRole ? "اختر نوع الحساب" : "إنشاء حساب جديد"}
             subtitle={!selectedRole ? "انضم إلينا كطالب أو كمقدم خدمة" : "يرجى إكمال البيانات التالية"}
-            className={!selectedRole ? "max-w-4xl" : "max-w-xl"}
+            className="max-w-4xl"
         >
             {!selectedRole ? (
                 <RoleSelection onSelect={setSelectedRole} />

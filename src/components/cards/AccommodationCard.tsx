@@ -2,7 +2,8 @@ import { MapPin, Star, Heart, Eye, MessageCircle, Bed, Bath } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Accommodation } from '@/data/mockData';
-import { cn } from '@/lib/utils';
+import { Action } from '@radix-ui/react-toast';
+import { cn, formatImageUrl } from '@/lib/utils';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +27,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={accommodation.image}
+          src={formatImageUrl(accommodation.image)}
           alt={accommodation.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />

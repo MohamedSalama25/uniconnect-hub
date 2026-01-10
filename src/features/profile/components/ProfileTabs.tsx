@@ -8,11 +8,12 @@ import { ProfileSettings } from './ProfileSettings';
 import { CreatePostDialog } from '@/components/globalComponents/CreatePostDialog';
 
 interface ProfileTabsProps {
+    activeTab: string;
+    setActiveTab: (tab: string) => void;
     savedAccommodations: typeof accommodations;
 }
 
-export const ProfileTabs = ({ savedAccommodations }: ProfileTabsProps) => {
-    const [activeTab, setActiveTab] = useState('posts');
+export const ProfileTabs = ({ activeTab, setActiveTab, savedAccommodations }: ProfileTabsProps) => {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
     return (

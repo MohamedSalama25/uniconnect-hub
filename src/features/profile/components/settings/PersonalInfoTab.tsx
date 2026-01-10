@@ -21,26 +21,25 @@ export const PersonalInfoTab = ({ formData, setFormData, handleSave }: PersonalI
             <CardContent className="p-8 space-y-6 text-right" dir="rtl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="text-sm font-bold">الاسم الكامل</Label>
+                        <Label htmlFor="firstName" className="text-sm font-bold">الاسم الأول</Label>
                         <div className="relative">
                             <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
-                                id="name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                id="firstName"
+                                value={formData.firstName}
+                                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right"
                             />
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-sm font-bold">البريد الإلكتروني</Label>
+                        <Label htmlFor="lastName" className="text-sm font-bold">الاسم الأخير</Label>
                         <div className="relative">
-                            <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
-                                id="email"
-                                type="email"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                id="lastName"
+                                value={formData.lastName}
+                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right"
                             />
                         </div>
@@ -65,20 +64,20 @@ export const PersonalInfoTab = ({ formData, setFormData, handleSave }: PersonalI
                             <Input
                                 id="university"
                                 value={formData.university}
-                                onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                                className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right"
+                                readOnly
+                                className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right bg-muted/50"
                             />
                         </div>
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="bio" className="text-sm font-bold">نبذة تعريفية</Label>
+                    <Label htmlFor="introductionNote" className="text-sm font-bold">نبذة تعريفية</Label>
                     <div className="relative">
                         <AlignRight className="absolute right-3 top-3 w-4 h-4 text-muted-foreground" />
                         <Textarea
-                            id="bio"
-                            value={formData.bio}
-                            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                            id="introductionNote"
+                            value={formData.introductionNote}
+                            onChange={(e) => setFormData({ ...formData, introductionNote: e.target.value })}
                             className="pr-10 min-h-[120px] rounded-xl focus-visible:ring-primary resize-none p-3 pt-3 text-right"
                         />
                     </div>

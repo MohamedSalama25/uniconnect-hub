@@ -22,6 +22,7 @@ import BookingPage from "./pages/BookingPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
 import LocationPrompt from "./components/globalComponents/LocationPrompt";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
+import { GlobalImageViewer } from "./components/globalComponents/GlobalImageViewer";
 
 import ProviderBookingsPage from "./pages/ProviderBookingsPage";
 import BookingDetailPage from "./pages/BookingDetailPage";
@@ -48,6 +49,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <LocationPrompt />
+          <GlobalImageViewer />
           <ScrollToTop />
           <Routes>
             <Route
