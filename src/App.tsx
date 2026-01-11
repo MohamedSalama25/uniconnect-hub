@@ -32,9 +32,9 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/welcome" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/welcome" replace />;
+  // }
 
   return <>{children}</>;
 };
@@ -91,7 +91,7 @@ const App = () => {
 // Helper to keep layout for NotFound if authenticated
 const ProtectedWrapper = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  if (!isAuthenticated) return <Navigate to="/welcome" replace />;
+  // if (!isAuthenticated) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
 }
 
