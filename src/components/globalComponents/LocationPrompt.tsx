@@ -3,12 +3,15 @@ import { toast } from "sonner";
 import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const LOCATION_TOAST_ID = "location-permission-prompt";
+
 const LocationPrompt = () => {
     useEffect(() => {
         const storedLocation = sessionStorage.getItem("location");
 
         if (!storedLocation) {
-            const toastId = toast.info("نحتاج الوصول إلى موقعك", {
+            toast.info("نحتاج الوصول إلى موقعك", {
+                id: LOCATION_TOAST_ID,
                 description: "لنساعدك في العثور على الخدمات القريبة منك بشكل أسرع.",
                 icon: <MapPin className="h-5 w-5 text-primary" />,
                 duration: Infinity,
@@ -25,11 +28,11 @@ const LocationPrompt = () => {
                                         timestamp: new Date().getTime(),
                                     };
                                     sessionStorage.setItem("location", JSON.stringify(location));
-                                    toast.success("تم حفظ موقعك بنجاح", { id: toastId });
+                                    toast.success("تم حفظ موقعك بنجاح", { id: LOCATION_TOAST_ID });
                                 },
                                 (error) => {
                                     console.error("Error getting location:", error);
-                                    toast.error("حدث خطأ أثناء محاولة الوصول للموقع", { id: toastId });
+                                    toast.error("حدث خطأ أثناء محاولة الوصول للموقع", { id: LOCATION_TOAST_ID });
                                 },
                                 {
                                     enableHighAccuracy: true,
@@ -38,16 +41,21 @@ const LocationPrompt = () => {
                                 }
                             );
                         } else {
-                            toast.error("متصفحك لا يدعم خاصية الموقع الجغرافي", { id: toastId });
+                            toast.error("متصفحك لا يدعم خاصية الموقع الجغرافي", { id: LOCATION_TOAST_ID });
                         }
                     },
                 },
                 cancel: {
                     label: "لاحقاً",
-                    onClick: () => toast.dismiss(toastId),
+                    onClick: () => toast.dismiss(LOCATION_TOAST_ID),
                 },
             });
         }
+
+        return () => {
+            // Optional: dismiss the toast if the user hasn't interacted with it and the component unmounts
+            // But usually we want it to persist across pages if it's a global component in App.tsx
+        };
     }, []);
 
     return null;

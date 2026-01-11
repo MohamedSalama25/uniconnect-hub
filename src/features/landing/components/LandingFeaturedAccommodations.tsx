@@ -20,10 +20,10 @@ export const LandingFeaturedAccommodations = ({ sectionRef, isVisible, accommoda
             <div className="container mx-auto px-6 text-right">
                 <div className={cn("flex flex-col md:flex-row items-end justify-between mb-16 gap-6 border-r-4 border-primary pr-6", isVisible ? "animate-slide-right" : "opacity-0 translate-x-[-20px]")}>
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 justify-end text-primary font-bold">
+                        {/* <div className="flex items-center gap-2 justify-end text-primary font-bold">
                             <Hotel className="w-6 h-6" />
                             <span className="uppercase tracking-widest text-sm">أفضل العروض</span>
-                        </div>
+                        </div> */}
                         <h2 className="text-4xl md:text-5xl font-black">سكن طلابي متميز</h2>
                         <p className="text-muted-foreground text-lg max-w-lg">مجموعة مختارة من أفضل خيارات السكن المناسبة لميزانية واحتياجات الطلاب.</p>
                     </div>

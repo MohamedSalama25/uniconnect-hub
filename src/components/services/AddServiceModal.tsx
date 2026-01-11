@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,6 +18,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormDescription
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +30,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Plus, Upload, X, Loader2, MapPin, Phone, Clock, Briefcase } from "lucide-react";
+import { LocationPicker } from "@/components/globalComponents/LocationPicker";
 
 const formSchema = z.object({
     name: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
@@ -35,8 +39,13 @@ const formSchema = z.object({
         required_error: "يرجى اختيار القسم",
     }),
     description: z.string().min(10, "الوصف يجب أن يكون 10 أحرف على الأقل"),
-    rating: z.string().transform((val) => Number(val)).refine((n) => n >= 0 && n <= 5, "التقييم يجب أن يكون بين 0 و 5"),
-    image: z.string().url("يرجى إدخال رابط صورة صحيح"),
+    phone: z.string().min(10, "رقم الهاتف غير صحيح"),
+    address: z.string().min(5, "يرجى إدخال العنوان بالتفصيل"),
+    hours: z.string().min(3, "يرجى إدخال مواعيد العمل"),
+    location: z.object({
+        lat: z.number(),
+        lng: z.number()
+    }).optional(),
 });
 
 interface AddServiceModalProps {
@@ -45,80 +54,191 @@ interface AddServiceModalProps {
 }
 
 export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
+    const [images, setImages] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
             description: "",
-            image: "https://images.unsplash.com/photo-1517248135467-4c7ed9d41432?w=800&auto=format&fit=crop&q=60",
+            phone: "",
+            address: "",
+            hours: "",
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
-        toast.success("تم إضافة الخدمة بنجاح (موك)");
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (images.length === 0) {
+            toast.error("يرجى إضافة صورة واحدة على الأقل");
+            return;
+        }
+
+        setIsSubmitting(true);
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        console.log({ ...values, images });
+        toast.success("تم إضافة الخدمة بنجاح!", {
+            description: "سيتم مراجعة طلبك من قبل المشرفين قبل النشر."
+        });
+
+        setIsSubmitting(false);
         onOpenChange(false);
         form.reset();
+        setImages([]);
     }
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files) {
+            const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+            setImages([...images, ...newImages]);
+        }
+    };
+
+    const removeImage = (index: number) => {
+        setImages(images.filter((_, i) => i !== index));
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]" dir="rtl">
+            <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
-                    <DialogTitle className="text-right">إضافة خدمة جديدة</DialogTitle>
-                    <DialogDescription className="text-right">
-                        أدخل تفاصيل الخدمة الجديدة هنا.
+                    <DialogTitle className="text-2xl font-bold text-right">إضافة خدمة جديدة</DialogTitle>
+                    <DialogDescription className="text-right text-base">
+                        شارك خدماتك مع الطلاب الآخرين. يرجى تعبئة جميع المعلومات بدقة.
                     </DialogDescription>
                 </DialogHeader>
+
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem className="text-right">
+                                        <FormLabel>اسم الخدمة / الشركة <span className="text-red-500">*</span></FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="مثال: مطعم النور للحنيذ" {...field} className="h-12 text-right text-base" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="category"
+                                render={({ field }) => (
+                                    <FormItem className="text-right">
+                                        <FormLabel>القسم <span className="text-red-500">*</span></FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-12 text-base" dir="rtl">
+                                                    <SelectValue placeholder="اختر القسم" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="restaurant">مطاعم</SelectItem>
+                                                <SelectItem value="pharmacy">صيدليات</SelectItem>
+                                                <SelectItem value="hospital">مستشفيات</SelectItem>
+                                                <SelectItem value="laundry">مغاسل</SelectItem>
+                                                <SelectItem value="transportation">مواصلات</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="bg-purple-50/50 p-6 rounded-2xl border border-purple-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2 flex items-center gap-2 text-purple-700 font-bold border-b border-purple-200 pb-2 mb-2">
+                                <Briefcase className="w-5 h-5" />
+                                تفاصيل الخدمة
+                            </div>
+
+                            <FormField
+                                control={form.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem className="text-right">
+                                        <FormLabel>رقم التواصل</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                <Input placeholder="01xxxxxxxxx" className="h-12 bg-white pr-10 dir-ltr" style={{ direction: 'ltr', textAlign: 'right' }} {...field} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="hours"
+                                render={({ field }) => (
+                                    <FormItem className="text-right">
+                                        <FormLabel>مواعيد العمل</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                <Input placeholder="مثال: 8:00 ص - 10:00 م" className="h-12 bg-white pr-10" {...field} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="address"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-2 text-right">
+                                        <FormLabel>العنوان بالتفصيل</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                <Input placeholder="المكان بالتحديد..." className="h-12 bg-white pr-10" {...field} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
                         <FormField
                             control={form.control}
-                            name="name"
+                            name="location"
                             render={({ field }) => (
                                 <FormItem className="text-right">
-                                    <FormLabel>اسم الخدمة</FormLabel>
+                                    <FormLabel>الموقع الجغرافي على الخريطة</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="مثال: مطعم النور" {...field} className="text-right" />
+                                        <LocationPicker
+                                            onLocationSelect={(loc) => field.onChange(loc)}
+                                            defaultLocation={field.value as { lat: number; lng: number } | undefined}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="category"
-                            render={({ field }) => (
-                                <FormItem className="text-right">
-                                    <FormLabel>القسم</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger dir="rtl">
-                                                <SelectValue placeholder="اختر القسم" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="restaurant">مطاعم</SelectItem>
-                                            <SelectItem value="pharmacy">صيدليات</SelectItem>
-                                            <SelectItem value="hospital">مستشفيات</SelectItem>
-                                            <SelectItem value="laundry">مغاسل</SelectItem>
-                                            <SelectItem value="transportation">مواصلات</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+
                         <FormField
                             control={form.control}
                             name="description"
                             render={({ field }) => (
                                 <FormItem className="text-right">
-                                    <FormLabel>الوصف</FormLabel>
+                                    <FormLabel>وصف الخدمة <span className="text-red-500">*</span></FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="وصف مختصر للخدمة..."
-                                            className="resize-none text-right"
+                                            placeholder="اشرح ما تقدمه هذه الخدمة للطلاب..."
+                                            className="min-h-[100px] resize-none text-base bg-muted/20"
                                             {...field}
                                         />
                                     </FormControl>
@@ -126,37 +246,44 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
                                 </FormItem>
                             )}
                         />
-                        <div className="grid grid-cols-2 gap-4 text-right">
-                            <FormField
-                                control={form.control}
-                                name="rating"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>التقييم (0-5)</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" step="0.1" {...field} className="text-right" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="image"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>رابط الصورة</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} className="text-right" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+
+                        <div>
+                            <FormLabel className="block mb-3 text-right">صور الخدمة <span className="text-red-500">*</span></FormLabel>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {images.map((img, idx) => (
+                                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
+                                        <img src={img} alt="preview" className="w-full h-full object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeImage(idx)}
+                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <label className="flex flex-col items-center justify-center aspect-square rounded-xl border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all focus-within:ring-2 focus-within:ring-primary">
+                                    <Upload className="w-6 h-6 text-muted-foreground mb-2" />
+                                    <span className="text-xs text-muted-foreground">رفع صور</span>
+                                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                </label>
+                            </div>
                         </div>
-                        <DialogFooter className="mt-6 flex gap-2">
-                            <Button type="submit" className="flex-1">حفظ الخدمة</Button>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>إلغاء</Button>
+
+                        <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t flex-row-reverse">
+                            <Button type="submit" className="flex-1 h-12 text-lg font-bold" disabled={isSubmitting}>
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                                        جاري الحفظ...
+                                    </>
+                                ) : (
+                                    "إضافة الخدمة"
+                                )}
+                            </Button>
+                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-12 text-lg">
+                                إلغاء
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

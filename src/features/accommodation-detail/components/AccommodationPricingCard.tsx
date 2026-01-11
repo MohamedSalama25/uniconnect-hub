@@ -12,7 +12,7 @@ export const AccommodationPricingCard = ({ price, id }: AccommodationPricingCard
     const navigate = useNavigate();
 
     return (
-        <div className="bg-card rounded-3xl p-6 md:p-8 border shadow-lg space-y-6 lg:sticky lg:top-24">
+        <div className="bg-card rounded-3xl p-6 md:p-8 border shadow-lg space-y-6">
             <div className="space-y-2">
                 <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-primary">{price}</span>
