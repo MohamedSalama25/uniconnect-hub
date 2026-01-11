@@ -2,31 +2,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UniTable, { Action } from "@/components/globalComponents/UniTable";
 import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
     CheckCircle,
     Clock,
     XCircle,
-    LayoutGrid,
-    Filter,
-    Search,
-    MoreVertical
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
-interface Post {
-    id: string;
-    title: string;
-    author: string;
-    date: string;
-    status: "pending" | "completed" | "rejected";
-    type: string;
-}
+// Feature Imports
+import { Post } from "@/features/admin-posts/types";
+import AdminPostsHeader from "@/features/admin-posts/components/AdminPostsHeader";
+import AdminStatsCards from "@/features/admin-posts/components/AdminStatsCards";
+import AdminPostsFilter from "@/features/admin-posts/components/AdminPostsFilter";
 
 const AdminPostsPage = () => {
     const navigate = useNavigate();
@@ -120,97 +110,17 @@ const AdminPostsPage = () => {
     return (
         <DashboardLayout>
             <div className="p-8 space-y-8 bg-muted/30 min-h-screen" dir="rtl">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">إدارة المنشورات</h1>
-                        <p className="text-muted-foreground mt-1">مراجعة والتحكم في المنشورات قبل ظهورها للمستخدمين</p>
-                    </div>
-                    <div className="flex bg-background rounded-xl p-1 border shadow-sm">
-                        <button
-                            onClick={() => setFilterStatus("all")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === "all" ? "bg-primary text-white shadow-md" : "hover:bg-muted"}`}
-                        >
-                            الكل
-                        </button>
-                        <button
-                            onClick={() => setFilterStatus("pending")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === "pending" ? "bg-amber-500 text-white shadow-md" : "hover:bg-muted"}`}
-                        >
-                            قيد المراجعة
-                        </button>
-                        <button
-                            onClick={() => setFilterStatus("completed")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === "completed" ? "bg-green-500 text-white shadow-md" : "hover:bg-muted"}`}
-                        >
-                            المقبولة
-                        </button>
-                        <button
-                            onClick={() => setFilterStatus("rejected")}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === "rejected" ? "bg-red-500 text-white shadow-md" : "hover:bg-muted"}`}
-                        >
-                            المرفوضة
-                        </button>
-                    </div>
-                </div>
+                <AdminPostsHeader />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <Card className="border-none shadow-lg bg-gradient-to-br from-primary/10 to-primary/5">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">إجمالي المنشورات</CardTitle>
-                            <LayoutGrid className="h-4 w-4 text-primary" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.total}</div>
-                            <p className="text-xs text-muted-foreground mt-1">منشور في النظام</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-lg bg-gradient-to-br from-amber-500/10 to-amber-500/5">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">قيد المراجعة</CardTitle>
-                            <Clock className="h-4 w-4 text-amber-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.pending}</div>
-                            <p className="text-xs text-muted-foreground mt-1 text-amber-600">تحتاج اتخاذ إجراء</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-lg bg-gradient-to-br from-green-500/10 to-green-500/5">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">المنشورات المقبولة</CardTitle>
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.completed}</div>
-                            <p className="text-xs text-muted-foreground mt-1 text-green-600">تظهر حالياً للجميع</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-none shadow-lg bg-gradient-to-br from-red-500/10 to-red-500/5">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">المرفوضة</CardTitle>
-                            <XCircle className="h-4 w-4 text-red-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.rejected}</div>
-                            <p className="text-xs text-muted-foreground mt-1 text-red-600">تم استبعادها</p>
-                        </CardContent>
-                    </Card>
-                </div>
+                <AdminStatsCards stats={stats} />
 
                 <div className="space-y-6">
-                    <div className="flex gap-4 items-center bg-background p-4 rounded-2xl shadow-sm border">
-                        <div className="relative flex-1">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="البحث في المنشورات أو أصحابها..."
-                                className="pr-10 bg-muted/50 border-none rounded-xl"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <Button variant="outline" className="rounded-xl gap-2 font-bold">
-                            <Filter className="w-4 h-4" /> تصفية متقدمة
-                        </Button>
-                    </div>
+                    <AdminPostsFilter
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        filterStatus={filterStatus}
+                        setFilterStatus={setFilterStatus}
+                    />
 
                     <UniTable
                         columns={columns}
