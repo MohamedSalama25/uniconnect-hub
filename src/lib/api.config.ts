@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-    BASE_URL:`${localStorage.getItem("baseUrl")}`||import.meta.env.VITE_API_BASE_URL || "https://v5xb32vv-7012.uks1.devtunnels.ms",
+    BASE_URL: localStorage.getItem("baseUrl") || import.meta.env.VITE_API_BASE_URL || "https://v5xb32vv-7012.uks1.devtunnels.ms",
     ENDPOINTS: {
         ACCOUNTS: {
             LOGIN: "/api/Accounts/login",

@@ -4,6 +4,10 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 const clientAxios = axios.create({
   baseURL: API_CONFIG.BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+  },
 });
 
 // Request interceptor: add auth token
@@ -12,6 +16,11 @@ clientAxios.interceptors.request.use(
     const token = useAuthStore.getState().user?.token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // If data is FormData, let browser set Content-Type with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
     return config;
   },
