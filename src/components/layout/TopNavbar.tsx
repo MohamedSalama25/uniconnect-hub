@@ -15,6 +15,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { GlobalSearch } from '../globalComponents/GlobalSearch';
 import { API_CONFIG } from '@/lib/api.config';
+import { authService } from '@/features/auth/services/auth.service';
 
 interface TopNavbarProps {
   onMenuClick?: () => void;
@@ -31,9 +32,17 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
     document.documentElement.classList.toggle('dark');
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/welcome');
+  const handleLogout = async () => {
+    try {
+      if (user?.token) {
+        await authService.logout(user?.token)
+      }
+    } catch (error) {
+      console.error("Logout error:", error)
+    } finally {
+      logout();
+      navigate('/welcome');
+    }
   };
 
   useEffect(() => {

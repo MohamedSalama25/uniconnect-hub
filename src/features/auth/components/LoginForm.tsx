@@ -40,38 +40,37 @@ export const LoginForm = () => {
     });
 
     async function onSubmit(values: LoginFormValues) {
-        navigate("/");
-        // setIsLoading(true);
-        // try {
-        //     const data = await authService.login({
-        //         emailORUsername: values.emailORUsername,
-        //         password: values.password
-        //     });
+        setIsLoading(true);
+        try {
+            const data = await authService.login({
+                emailORUsername: values.emailORUsername,
+                password: values.password
+            });
 
-        //     // Store initial login data (including token)
-        //     login({
-        //         email: data.email,
-        //         displayName: data.displayName,
-        //         token: data.token,
-        //         roles: data.roles
-        //     });
+            // Store initial login data (including token)
+            login({
+                email: data.email,
+                displayName: data.displayName,
+                token: data.token,
+                roles: data.roles
+            });
 
-        //     // Fetch full profile immediately
-        //     try {
-        //         const fullProfile = await authService.getCurrentUser(data.token);
-        //         useAuthStore.getState().setUserDetails(fullProfile);
-        //     } catch (profileError) {
-        //         console.error("Failed to fetch full profile:", profileError);
-        //         // We still proceed since the login itself was successful
-        //     }
+            // Fetch full profile immediately
+            try {
+                const fullProfile = await authService.getCurrentUser(data.token);
+                useAuthStore.getState().setUserDetails(fullProfile);
+            } catch (profileError) {
+                console.error("Failed to fetch full profile:", profileError);
+                // We still proceed since the login itself was successful
+            }
 
-        //     toast.success("تم تسجيل الدخول بنجاح");
-        //     navigate("/");
-        // } catch (error: any) {
-        //     toast.error(error.message || "فشل تسجيل الدخول، يرجى التأكد من البيانات");
-        // } finally {
-        //     setIsLoading(false);
-        // }
+            toast.success("تم تسجيل الدخول بنجاح");
+            navigate("/");
+        } catch (error: any) {
+            toast.error(error.message || "فشل تسجيل الدخول، يرجى التأكد من البيانات");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (

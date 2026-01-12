@@ -1,8 +1,9 @@
 export const API_CONFIG = {
-    BASE_URL: import.meta.env.VITE_API_BASE_URL || "https://4mrkc8vc-7012.uks1.devtunnels.ms/",
+    BASE_URL:`${localStorage.getItem("baseUrl")}`||import.meta.env.VITE_API_BASE_URL || "https://v5xb32vv-7012.uks1.devtunnels.ms",
     ENDPOINTS: {
         ACCOUNTS: {
             LOGIN: "/api/Accounts/login",
+            LOGOUT: "/api/Accounts/logout",
             REGISTER_STUDENT: "/api/Accounts/registerAsStudent",
             REGISTER_SERVICE: "/api/Accounts/registerAsService",
             GET_CURRENT_USER: "/api/Accounts/getCurrentUser",
@@ -14,6 +15,13 @@ export const API_CONFIG = {
             CHANGE_PASSWORD: "/api/Accounts/changePassword",
             SEND_OTP: "/api/Accounts/sendOTP",
             VERIFY_OTP: "/api/Accounts/verifyOTP",
+        },
+        USERS: {
+            GET_ALL: "/api/Users/users",
+            ASSIGN_ROLE: "/api/Users/assignRole",
+            REMOVE_ROLE: "/api/Users/removeRole",
+            ACCEPT: (userId: string) => `/api/Users/${userId}/accept`,
+            BLOCK: (userId: string) => `/api/Users/${userId}/block`,
         },
     },
 };

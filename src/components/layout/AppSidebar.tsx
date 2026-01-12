@@ -16,6 +16,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Plus } from 'lucide-react';
 
 
@@ -33,7 +34,15 @@ const navItems = [
 
 export function AppSidebar() {
   const { collapsed, toggle } = useSidebarStore();
+  const { user } = useAuthStore();
   const location = useLocation();
+
+  const isAdmin = user?.roles?.includes('Admin')|| "";
+  
+  const finalNavItems = [
+    ...navItems,
+    ...(isAdmin ? [{ to: '/admin/users', icon: User, label: 'المستخدمين' }] : [])
+  ];
 
   return (
     <aside
@@ -58,7 +67,7 @@ export function AppSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        {navItems.map((item) => {
+        {finalNavItems.map((item) => {
           const isActive = location.pathname === item.to;
           return (
             <NavLink

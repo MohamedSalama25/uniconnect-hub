@@ -26,15 +26,17 @@ import { GlobalImageViewer } from "./components/globalComponents/GlobalImageView
 
 import ProviderBookingsPage from "./pages/ProviderBookingsPage";
 import BookingDetailPage from "./pages/BookingDetailPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/welcome" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/welcome" replace />;
+  }
 
   return <>{children}</>;
 };
@@ -76,6 +78,7 @@ const App = () => {
             <Route path="/help" element={<ProtectedRoute><HelpRequests /></ProtectedRoute>} />
             <Route path="/admin/posts" element={<ProtectedRoute><AdminPostsPage /></ProtectedRoute>} />
             <Route path="/admin/post/:id" element={<ProtectedRoute><AdminPostDetailsPage /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/provider/bookings" element={<ProtectedRoute><ProviderBookingsPage /></ProtectedRoute>} />
             <Route path="/provider/booking/:id" element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} />
@@ -91,7 +94,7 @@ const App = () => {
 // Helper to keep layout for NotFound if authenticated
 const ProtectedWrapper = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  // if (!isAuthenticated) return <Navigate to="/welcome" replace />;
+  if (!isAuthenticated) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
 }
 
