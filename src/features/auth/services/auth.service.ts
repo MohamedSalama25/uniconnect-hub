@@ -37,10 +37,10 @@ export const authService = {
         return response.data;
     },
 
-    login: async (credentials: { emailORUsername: string; password: string }): Promise<RegisterResponse & { token: string; roles: string[] }> => {
+    login: async (credentials: { emailORUsername: string; password: string }): Promise<any> => {
         const url = API_CONFIG.ENDPOINTS.ACCOUNTS.LOGIN;
         const response = await clientAxios.post(url, credentials);
-        return response.data;
+        return response.data; // The server returns { success, message, data: { ... } }
     },
 
     logout: async (token: string): Promise<void> => {

@@ -42,30 +42,36 @@ export const LoginForm = () => {
     async function onSubmit(values: LoginFormValues) {
         setIsLoading(true);
         try {
-            const data = await authService.login({
+            const result = await authService.login({
                 emailORUsername: values.emailORUsername,
                 password: values.password
             });
 
-            // Store initial login data (including token)
-            login({
-                email: data.email,
-                displayName: data.displayName,
-                token: data.token,
-                roles: data.roles
-            });
+            if (result.success && result.data) {
+                const userData = result.data;
+                
+                // Store initial login data (including token)
+                login({
+                    email: userData.email,
+                    displayName: userData.displayName,
+                    token: userData.accessToken,
+                    roles: userData.roles
+                });
 
-            // Fetch full profile immediately
-            try {
-                const fullProfile = await authService.getCurrentUser(data.token);
-                useAuthStore.getState().setUserDetails(fullProfile);
-            } catch (profileError) {
-                console.error("Failed to fetch full profile:", profileError);
-                // We still proceed since the login itself was successful
+                // Fetch full profile immediately
+                try {
+                    const fullProfile = await authService.getCurrentUser(userData.accessToken);
+                    useAuthStore.getState().setUserDetails(fullProfile);
+                } catch (profileError) {
+                    console.error("Failed to fetch full profile:", profileError);
+                    // We still proceed since the login itself was successful
+                }
+
+                toast.success("تم تسجيل الدخول بنجاح");
+                navigate("/");
+            } else {
+                throw new Error(result.message || "فشل تسجيل الدخول");
             }
-
-            toast.success("تم تسجيل الدخول بنجاح");
-            navigate("/");
         } catch (error: any) {
             toast.error(error.message || "فشل تسجيل الدخول، يرجى التأكد من البيانات");
         } finally {
