@@ -1,73 +1,125 @@
-# Welcome to your Lovable project
+# 🎓 UniConnect Hub | منصة تواصل الطلاب الجامعية
 
-## Project info
+<p align="center">
+  <img src="public/favicon.svg" width="100" alt="UniConnect Hub Logo" />
+</p>
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**UniConnect Hub** هي منصة متكاملة وشاملة مصممة خصيصاً لتلبية احتياجات الطلاب الجامعيين، حيث توفر بيئة سهلة، آمنة ومبتكرة للبحث عن السكن، الخدمات، والتواصل الفعال بين أفراد المجتمع الجامعي.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ المميزات الرئيسية (Key Features)
 
-**Use Lovable**
+### 🏠 نظام إدارة السكن (Accommodation)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- البحث عن عقارات سكنية مخصصة للطلاب مع فلاتر متقدمة.
+- عرض تفاصيل السكن، المرافق، والموقع الجغرافي.
+- إمكانية التواصل المباشر مع صاحب السكن.
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🛠️ الخدمات الطلابية (Student Services)
 
-**Use your preferred IDE**
+- سوق متكامل للخدمات (دروس، أدوات، استشارات).
+- تصنيف الخدمات وتنظيمها لتسهيل الوصول إليها.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 💬 نظام الدردشة (Real-time Chat)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- تواصل فوري بين الطلاب ومزودي الخدمات.
+- إشعارات فورية وتجربة مستخدم سلسة.
 
-Follow these steps:
+### 📍 الخرائط التفاعلية (Interactive Maps)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- دمج خرائط **Leaflet** لتحديد مواقع السكن والخدمات بدقة.
+- ميزة "الحصول على الاتجاهات" عبر خرائط جوجل.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 📊 لوحة تحكم الإدارة (Admin Dashboard)
 
-# Step 3: Install the necessary dependencies.
-npm i
+- إدارة كاملة للمستخدمين والأدوار (Roles).
+- مراقبة وتدقيق المنشورات (قبول/رفض/مراجعة).
+- إحصائيات متقدمة ورسوم بيانية باستخدام **Recharts**.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### 🔐 الأمان والتوثيق (Security & Auth)
+
+- تسجيل دخول آمن باستخدام JWT.
+- نظام تحقق عبر البريد الإلكتروني (OTP) لضمان موثوقية الحسابات.
+
+---
+
+## 🛠️ التقنيات المستخدمة (Tech Stack)
+
+| التقنية            | الوصف                                 |
+| :----------------- | :------------------------------------ |
+| **React 18**       | مكتبة الواجهات البرمجية الأساسية      |
+| **TypeScript**     | لضمان جودة الكود وكتابته بشكل صارم    |
+| **Vite**           | أداة بناء وتطوير سريعة جداً           |
+| **Tailwind CSS**   | نظام التنسيق والتصميم العصري          |
+| **Shadcn UI**      | مكونات واجهة مستخدم جاهزة واحترافية   |
+| **TanStack Query** | إدارة جلب وتخزين البيانات (Caching)   |
+| **Zustand**        | إدارة حالة التطبيق (State Management) |
+| **Lucide Icons**   | مجموعة أيقونات متجهة وعصرية           |
+
+---
+
+## 🚀 البدء بالعمل (Getting Started)
+
+### المتطلبات (Prerequisites)
+
+- **Node.js**: إصدار 18 أو أحدث.
+- **npm** أو **yarn** أو **bun**.
+
+### خطوات التثبيت (Installation)
+
+1. **نسخ المشروع:**
+
+   ```bash
+   git clone https://github.com/MohamedSalama25/uniconnect-hub.git
+   ```
+
+2. **الدخول لمجلد المشروع:**
+
+   ```bash
+   cd uniconnect-hub
+   ```
+
+3. **تثبيت الحزم البرمجية:**
+
+   ```bash
+   npm install
+   ```
+
+4. **تشغيل بيئة التطوير:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 📂 هيكل المجلدات (Project Structure)
+
+```text
+src/
+├── components/     # المكونات الذرية والعامة (Buttons, Inputs, Tables)
+├── features/       # منطق العمل مقسم حسب المميزات (Auth, Chat, Admin...)
+├── hooks/          # الخطافات المخصصة للتعامل مع الحالة والـ API
+├── lib/            # إعدادات المكتبات الخارجية (Axios, Utils)
+├── pages/          # تعريف المسارات والصفحات الرئيسية
+├── store/          # مخازن Zustand لإدارة الحالة العالمية
+└── types/          # تعريفات TypeScript للموديلات والبيانات
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🎨 التصميم (Design)
 
-**Use GitHub Codespaces**
+تم تصميم الواجهة لتكون متجاوبة بالكامل (Responsive) مع دعم كامل للوضع الداكن (Dark Mode) والوضع الفاتح (Light Mode)، بالإضافة إلى دعم اللغات التي تكتب من اليمين لليار (RTL) مثل العربية.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🤝 المساهمة (Contributing)
 
-This project is built with:
+نرحب دائماً بمساهماتكم! إذا كانت لديك أي فكرة أو واجهت مشكلة، لا تتردد في فتح **Issue** أو إرسال **Pull Request**.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+<p align="center">
+تم تطوير هذا المشروع لخدمة المجتمع الطلابي.
+</p>
