@@ -3,6 +3,7 @@ export interface UserDto {
     email: string;
     username: string;
     phoneNumber: string;
+    phonenumber?: string; // Resilience for backend casing
     firstName: string;
     lastName: string;
     gender: string;

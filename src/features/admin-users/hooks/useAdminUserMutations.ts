@@ -7,42 +7,42 @@ export const useAdminUserMutations = () => {
     const { toast } = useToast();
 
     const onSuccess = (message: string) => {
-        toast({ title: "Success", description: message });
+        toast({ title: "نجاح", description: message });
         queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     };
 
     const onError = (error: any) => {
         toast({
-            title: "Error",
-            description: error.response?.data?.message || "Action failed",
+            title: "خطأ",
+            description: error.response?.data?.message || "حدث خطأ ما، يرجى المحاولة لاحقاً",
             variant: "destructive",
         });
     };
 
     const acceptUserMutation = useMutation({
         mutationFn: (userId: string) => adminUsersService.acceptUser(userId),
-        onSuccess: () => onSuccess("User accepted successfully"),
-        onError,
+        onSuccess: () => onSuccess("تم قبول المستخدم بنجاح"),
+        onError: () => onError({ response: { data: { message: "فشل في قبول المستخدم" } } }),
     });
 
     const blockUserMutation = useMutation({
         mutationFn: (userId: string) => adminUsersService.blockUser(userId),
-        onSuccess: () => onSuccess("User block status updated"),
-        onError,
+        onSuccess: () => onSuccess("تم تحديث حالة حظر المستخدم"),
+        onError: () => onError({ response: { data: { message: "فشل في تحديث حالة الحظر" } } }),
     });
 
     const assignRoleMutation = useMutation({
-        mutationFn: ({ userId, role }: { userId: string; role: string }) => 
-            adminUsersService.assignRole(userId, role),
-        onSuccess: (_, { role }) => onSuccess(`Role ${role} assigned successfully`),
-        onError,
+        mutationFn: ({ username, role }: { username: string; role: string }) => 
+            adminUsersService.assignRole(username, role),
+        onSuccess: (_, { role }) => onSuccess(`تم تعيين دور ${role} بنجاح`),
+        onError: () => onError({ response: { data: { message: "فشل في تعيين الدور" } } }),
     });
 
     const removeRoleMutation = useMutation({
-        mutationFn: ({ userId, role }: { userId: string; role: string }) => 
-            adminUsersService.removeRole(userId, role),
-        onSuccess: (_, { role }) => onSuccess(`Role ${role} removed successfully`),
-        onError,
+        mutationFn: ({ username, role }: { username: string; role: string }) => 
+            adminUsersService.removeRole(username, role),
+        onSuccess: (_, { role }) => onSuccess(`تم إزالة دور ${role} بنجاح`),
+        onError: () => onError({ response: { data: { message: "فشل في إزالة الدور" } } }),
     });
 
     return {

@@ -35,7 +35,7 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
   const handleLogout = async () => {
     try {
       if (user?.token) {
-        await authService.logout(user?.token)
+        await authService.logout()
       }
     } catch (error) {
       console.error("Logout error:", error)

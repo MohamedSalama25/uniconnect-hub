@@ -21,19 +21,15 @@ export const adminUsersService = {
     return response.data;
   },
 
-  assignRole: async (userId: string, role: string): Promise<UserActionResponse> => {
+  assignRole: async (emailOrUsername: string, role: string): Promise<UserActionResponse> => {
     const url = API_CONFIG.ENDPOINTS.USERS.ASSIGN_ROLE;
-    const response = await clientAxios.put(url, null, {
-        params: { userId, role }
-    });
+    const response = await clientAxios.put(url, { emailOrUsername, role });
     return response.data;
   },
 
-  removeRole: async (userId: string, role: string): Promise<UserActionResponse> => {
+  removeRole: async (emailOrUsername: string, role: string): Promise<UserActionResponse> => {
     const url = API_CONFIG.ENDPOINTS.USERS.REMOVE_ROLE;
-    const response = await clientAxios.put(url, null, {
-        params: { userId, role }
-    });
+    const response = await clientAxios.put(url, { emailOrUsername, role });
     return response.data;
   },
 

@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, UserX, Clock } from "lucide-react";
+import StatsCard from "@/components/globalComponents/StatsCard";
 
 interface AdminUsersStatsProps {
   stats: {
@@ -12,58 +12,40 @@ interface AdminUsersStatsProps {
 }
 
 export function AdminUsersStats({ stats, isLoading }: AdminUsersStatsProps) {
-  const statItems = [
-    {
-      title: "All Users",
-      value: stats.totalUsers,
-      icon: Users,
-      color: "text-blue-500",
-      bgColor: "bg-blue-100 dark:bg-blue-900/20",
-    },
-    {
-      title: "Active Users",
-      value: stats.activeUsers,
-      icon: UserCheck,
-      color: "text-green-500",
-      bgColor: "bg-green-100 dark:bg-green-900/20",
-    },
-    {
-      title: "Pending",
-      value: stats.pendingUsers,
-      icon: Clock,
-      color: "text-orange-500",
-      bgColor: "bg-orange-100 dark:bg-orange-900/20",
-    },
-    {
-      title: "Blocked",
-      value: stats.blockedUsers,
-      icon: UserX,
-      color: "text-red-500",
-      bgColor: "bg-red-100 dark:bg-red-900/20",
-    },
-  ];
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {statItems.map((item, index) => (
-        <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {item.title}
-            </CardTitle>
-            <div className={`p-2 rounded-full ${item.bgColor}`}>
-              <item.icon className={`h-4 w-4 ${item.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-               <div className="h-8 w-24 bg-muted animate-pulse rounded" />
-            ) : (
-              <div className="text-2xl font-bold">{item.value}</div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <StatsCard
+        title="إجمالي المستخدمين"
+        value={stats.totalUsers}
+        icon={Users}
+        description="مستخدم في النظام"
+        variant="blue"
+        isLoading={isLoading}
+      />
+      <StatsCard
+        title="المستخدمين النشطين"
+        value={stats.activeUsers}
+        icon={UserCheck}
+        description="تم قبول طلباتهم"
+        variant="green"
+        isLoading={isLoading}
+      />
+      <StatsCard
+        title="بانتظار الموافقة"
+        value={stats.pendingUsers}
+        icon={Clock}
+        description="طلبات جديدة"
+        variant="amber"
+        isLoading={isLoading}
+      />
+      <StatsCard
+        title="المستخدمين المحظورين"
+        value={stats.blockedUsers}
+        icon={UserX}
+        description="تم تقييد وصولهم"
+        variant="red"
+        isLoading={isLoading}
+      />
     </div>
   );
 }

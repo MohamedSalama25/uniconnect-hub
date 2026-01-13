@@ -266,6 +266,7 @@ const UniTable = <TData extends object>({
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,
+        getRowId: (row: any) => row.id || row.ID || row._id,
     })
 
     useEffect(() => {
@@ -335,7 +336,7 @@ const UniTable = <TData extends object>({
                                     {row.getVisibleCells().map(cell => (
                                         <td
                                             key={cell.id}
-                                            className="px-6 py-5 whitespace-nowrap text-sm text-foreground font-medium text-center"
+                                            className="px-4 md:px-6 py-4 md:py-5 whitespace-nowrap text-sm text-foreground font-medium text-center"
                                         >
                                             {cell.column.id === 'actions' || cell.column.id === 'header-actions' ? (
                                                 flexRender(cell.column.columnDef.cell, cell.getContext())

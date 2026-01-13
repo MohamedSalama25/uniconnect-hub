@@ -43,9 +43,15 @@ export const authService = {
         return response.data; // The server returns { success, message, data: { ... } }
     },
 
-    logout: async (token: string): Promise<void> => {
+    logout: async (): Promise<void> => {
         const url = API_CONFIG.ENDPOINTS.ACCOUNTS.LOGOUT;
         await clientAxios.post(url);
+    },
+
+    refreshToken: async (): Promise<any> => {
+        const url = API_CONFIG.ENDPOINTS.ACCOUNTS.REFRESH_TOKEN;
+        const response = await clientAxios.post(url);
+        return response.data;
     },
 
     getCurrentUser: async (token: string): Promise<any> => {
