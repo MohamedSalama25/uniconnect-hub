@@ -152,7 +152,8 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
             setOtpEmail(values.email);
             setShowOTPDialog(true);
         } catch (error: any) {
-            toast.error(error.message || "فشل إرسال رمز التحقق");
+            const errorMessage = error.response?.data?.message || error.message || "فشل إرسال رمز التحقق";
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -180,7 +181,8 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
             toast.success("تم إنشاء الحساب بنجاح");
             navigate("/login");
         } catch (error: any) {
-            toast.error(error.message || "حدث خطأ أثناء التسجيل");
+            const errorMessage = error.response?.data?.message || error.message || "حدث خطأ أثناء التسجيل";
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }

@@ -49,7 +49,12 @@ clientAxios.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthPath = originalRequest.url?.includes('/api/Accounts/login') || 
+                      originalRequest.url?.includes('/api/Accounts/refreshToken') ||
+                      originalRequest.url?.includes('/api/Accounts/registerAsStudent') ||
+                      originalRequest.url?.includes('/api/Accounts/registerAsService');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthPath) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });

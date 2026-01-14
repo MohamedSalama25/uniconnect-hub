@@ -24,10 +24,11 @@ export const useAdminUserMutations = () => {
         onSuccess: () => onSuccess("تم قبول المستخدم بنجاح"),
         onError: () => onError({ response: { data: { message: "فشل في قبول المستخدم" } } }),
     });
-
+    
     const blockUserMutation = useMutation({
-        mutationFn: (userId: string) => adminUsersService.blockUser(userId),
-        onSuccess: () => onSuccess("تم تحديث حالة حظر المستخدم"),
+        mutationFn: ({ userId, isBlocked }: { userId: string; isBlocked: boolean }) => 
+            adminUsersService.blockUser(userId, isBlocked),
+        onSuccess: (_, { isBlocked }) => onSuccess(isBlocked ? "تم حظر المستخدم بنجاح" : "تم فك الحظر عن المستخدم بنجاح"),
         onError: () => onError({ response: { data: { message: "فشل في تحديث حالة الحظر" } } }),
     });
 

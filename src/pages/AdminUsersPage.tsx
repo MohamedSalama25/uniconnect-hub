@@ -192,7 +192,7 @@ export default function AdminUsersPage() {
                     user.isBlocked 
                         ? `هل أنت متأكد من فك الحظر عن ${user.username}؟`
                         : `هل أنت متأكد من رغبتك في حظر ${user.username}؟ لن يتمكن من الوصول إلى حسابه.`,
-                    () => blockUser(user.id),
+                    () => blockUser({ userId: user.id, isBlocked: !user.isBlocked }),
                     user.isBlocked ? "default" : "destructive"
                 );
             },

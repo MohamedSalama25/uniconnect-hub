@@ -74,7 +74,8 @@ export const OTPVerificationDialog = ({
             onVerified();
             onOpenChange(false);
         } catch (error: any) {
-            toast.error(error.message || "رمز التحقق غير صحيح");
+            const errorMessage = error.response?.data?.message || error.message || "رمز التحقق غير صحيح";
+            toast.error(errorMessage);
         } finally {
             setIsVerifying(false);
         }
@@ -88,7 +89,8 @@ export const OTPVerificationDialog = ({
             setTimeLeft(600); // Reset timer
             setOtp("");
         } catch (error: any) {
-            toast.error(error.message || "فشل إرسال رمز التحقق");
+            const errorMessage = error.response?.data?.message || error.message || "فشل إرسال رمز التحقق";
+            toast.error(errorMessage);
         } finally {
             setIsResending(false);
         }

@@ -39,9 +39,11 @@ export const adminUsersService = {
     return response.data;
   },
 
-  blockUser: async (userId: string): Promise<UserActionResponse> => {
+  blockUser: async (userId: string, isBlocked: boolean): Promise<UserActionResponse> => {
     const url = API_CONFIG.ENDPOINTS.USERS.BLOCK(userId);
-    const response = await clientAxios.put(url);
+    const response = await clientAxios.put(url, null, {
+      params: { isBlocked }
+    });
     return response.data;
   }
 };

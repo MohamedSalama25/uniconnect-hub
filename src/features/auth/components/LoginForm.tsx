@@ -73,7 +73,8 @@ export const LoginForm = () => {
                 throw new Error(result.message || "فشل تسجيل الدخول");
             }
         } catch (error: any) {
-            toast.error(error.message || "فشل تسجيل الدخول، يرجى التأكد من البيانات");
+            const errorMessage = error.response?.data?.message || error.message || "فشل تسجيل الدخول، يرجى التأكد من البيانات";
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
