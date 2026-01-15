@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       "/api": {
-        target: "https://ck76sc9k-7012.uks1.devtunnels.ms",
+        target: localStorage.getItem("baseUrl") || "https://ck76sc9k-7012.uks1.devtunnels.ms",
         changeOrigin: true,
         secure: false,
       },
