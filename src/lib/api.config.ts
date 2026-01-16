@@ -24,5 +24,12 @@ export const API_CONFIG = {
             ACCEPT: (userId: string) => `/api/Users/${userId}/accept`,
             BLOCK: (userId: string) => `/api/Users/${userId}/block`,
         },
+        CHAT: {
+             CONVERSATIONS: "/api/Chat/conversations",
+             MESSAGES: (conversationId: number) => `/api/Chat/messages/${conversationId}`,
+             MARK_READ: (conversationId: number) => `/api/Chat/markAsRead/${conversationId}`,
+             ONLINE: (userId: string) => `/api/Chat/online/${userId}`, // NoteBased on screenshot, seems to be a GET status check
+        }
     },
+    SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route
 };
