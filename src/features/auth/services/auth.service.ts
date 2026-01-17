@@ -111,7 +111,7 @@ export const authService = {
     sendOTP: async (email: string): Promise<any> => {
         const url = API_CONFIG.ENDPOINTS.ACCOUNTS.SEND_OTP;
         const response = await clientAxios.post(url, null, {
-            params: { email }
+            params: { email, operation: "register" }
         });
         return response.data;
     },

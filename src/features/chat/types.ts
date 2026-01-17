@@ -3,16 +3,18 @@ export interface ChatUser {
   firstName: string;
   lastName: string;
   email: string;
-  avatar?: string; // Optional if not provided by backend yet
+  avatar?: string;
+  isOnline?: boolean;
 }
 
 export interface Conversation {
   conversationId: number;
   otherUserId: string;
-  otherUserName?: string; // Added for UI convenience, might need to fetch user details
+  otherUserName?: string;
   lastMessage: string;
   lastMessageTime: string;
   unreadCount?: number;
+  isOnline?: boolean; // Added for UI
 }
 
 export interface ChatMessage {

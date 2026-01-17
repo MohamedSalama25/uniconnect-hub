@@ -21,7 +21,18 @@ export function useChat() {
           chatApi.getUsers()
         ]);
         
-        if (convRes.success) setConversations(convRes.data);
+        if (convRes.success) {
+            // Fetch online status for each conversation's user
+            const conversationsWithStatus = await Promise.all(convRes.data.map(async (c) => {
+                try {
+                    const statusRes = await chatApi.checkOnlineStatus(c.otherUserId);
+                    return { ...c, isOnline: statusRes.success ? statusRes.data : false };
+                } catch {
+                    return { ...c, isOnline: false };
+                }
+            }));
+            setConversations(conversationsWithStatus);
+        }
         if (usersRes.success) setUsers(usersRes.data);
 
         // Try to decode token to get current user ID (simple approach) or fetch profile
@@ -99,8 +110,9 @@ export function useChat() {
     try {
       const res = await chatApi.getMessages(conversation.conversationId);
       if (res.success || Array.isArray(res.data)) {
-         // API might return array directly or inside data
-         setMessages(Array.isArray(res.data) ? res.data : []); 
+         const msgs = Array.isArray(res.data) ? res.data : (res.data as any)?.data || [];
+         // Reverse to show oldest first if the API returns newest first (which it seems to based on IDs)
+         setMessages([...msgs].reverse()); 
       }
       chatApi.markAsRead(conversation.conversationId);
     } catch (e) {

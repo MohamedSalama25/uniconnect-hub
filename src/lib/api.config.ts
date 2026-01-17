@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-    BASE_URL: "", // Empty string means it will use the same origin (Vite proxy)
+    BASE_URL: localStorage.getItem("baseUrl") ||import.meta.env.VITE_API_BASE_URL ||  "", 
     ENDPOINTS: {
         ACCOUNTS: {
             LOGIN: "/api/Accounts/login",

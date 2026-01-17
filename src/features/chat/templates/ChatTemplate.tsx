@@ -8,6 +8,7 @@ import { ChatSidebar, SidebarConversation } from '../components/ChatSidebar';
 import { ChatMessageList } from '../components/ChatMessageList';
 import { ChatInput } from '../components/ChatInput';
 import { useChat } from '../hooks/useChat';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
@@ -26,24 +27,12 @@ export const ChatTemplate = () => {
     const [isNewChatOpen, setIsNewChatOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Temporary: Get current user ID from local storage (token) or context
-    const getCurrentUserId = () => {
-        // This is a hacky way. Better to use AuthContext.
-        // Assuming token has some claim or we store user info.
-        // For now, let's rely on 'me' being NOT the other user in a conversation?
-        // No, we need explicit ID for ChatBubble alignment.
-        // I'll try to get it from localStorage if authService stored it, or decode token.
-        // For this iteration, I'll return a placeholder and hope auth service set specific ID.
-        // Actually, let's assume the user is "me" if the senderId is NOT the otherUserId of the active conversation.
-        // But in group chat or my own messages?
-        // Let's use a dummy ID and logic in ChatBubble might be flawed if we don't have real ID.
-        // Wait, I can decode the token here if I had jwt-decode.
-        // Or I can use the 'users' list to find myself? No.
-        // Let's assume the Auth Service puts user id in localStorage 'userId'?
-        return localStorage.getItem('userId') || ''; 
-    };
+    const { fullProfile, user } = useAuthStore();
     
-    const currentUserId = getCurrentUserId();
+    // Get ID from fullProfile or fallback to localStorage if set there
+    // The user's senderId in JSON is a UUID.
+    const currentUserId = fullProfile?.id || localStorage.getItem('userId') || localStorage.getItem('id') || ''; 
+
 
     const sidebarConversations: SidebarConversation[] = useMemo(() => {
         return conversations.map(c => {
@@ -55,7 +44,8 @@ export const ChatTemplate = () => {
                 lastMessage: c.lastMessage,
                 time: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '',
                 unread: c.unreadCount || 0,
-                otherUserId: c.otherUserId
+                otherUserId: c.otherUserId,
+                isOnline: c.isOnline
             };
         });
     }, [conversations, users]);
@@ -117,8 +107,13 @@ export const ChatTemplate = () => {
                                         <div>
                                             <h3 className="font-semibold">{activeSidebarConv?.name || '...'}</h3>
                                             <p className="text-xs text-muted-foreground">
-                                                {/* Online status could be checked here */}
-                                                متصل
+                                                {/* Online status */}
+                                                {activeSidebarConv?.isOnline ? (
+                                                    <span className="text-green-600 flex items-center gap-1">
+                                                        <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+                                                        متصل الآن
+                                                    </span>
+                                                ) : "غير متصل"}
                                             </p>
                                         </div>
                                     </div>
@@ -136,7 +131,11 @@ export const ChatTemplate = () => {
                                     </div>
                                 </div>
 
-                                <ChatMessageList messages={messages} currentUserId={currentUserId} />
+                                <ChatMessageList 
+                                    messages={messages} 
+                                    currentUserId={currentUserId} 
+                                    otherUserId={activeConversation.otherUserId}
+                                />
                                 <ChatInput onSend={sendMessage} />
                             </>
                         ) : (

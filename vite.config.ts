@@ -10,13 +10,6 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "::",
       port: 8080,
-      proxy: {
-        "/api": {
-          target: env.VITE_API_BASE_URL || "https://93zhq3fk-7012.uks1.devtunnels.ms",
-          changeOrigin: true,
-          secure: false,
-        },
-      },
     },
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
     resolve: {
