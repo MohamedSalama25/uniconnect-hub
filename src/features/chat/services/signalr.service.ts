@@ -9,7 +9,7 @@ class SignalRService {
   
 
   constructor() {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const baseUrl = localStorage.getItem("baseUrl") ||import.meta.env.VITE_API_BASE_URL;
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${baseUrl}/chatHub`, {
         accessTokenFactory: () => accessTokenFactory || ""
