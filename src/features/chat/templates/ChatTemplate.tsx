@@ -12,6 +12,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
+import { Spinner } from '@/components/ui/spinner';
+
 export const ChatTemplate = () => {
     const { 
         conversations, 
@@ -20,7 +22,8 @@ export const ChatTemplate = () => {
         messages, 
         sendMessage,
         users,
-        startChatWithUser
+        startChatWithUser,
+        isLoading
     } = useChat();
 
     const [showConversations, setShowConversations] = useState(true);
@@ -36,11 +39,10 @@ export const ChatTemplate = () => {
 
     const sidebarConversations: SidebarConversation[] = useMemo(() => {
         return conversations.map(c => {
-            const user = users.find(u => u.id === c.otherUserId);
             return {
                 id: c.conversationId,
-                name: user ? `${user.firstName} ${user.lastName}` : (c.otherUserName || 'Unknown User'),
-                avatar: user?.avatar,
+                name: c.otherUserName || 'Unknown User',
+                avatar: c.otherUserImageUrl,
                 lastMessage: c.lastMessage,
                 time: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '',
                 unread: c.unreadCount || 0,
@@ -48,7 +50,7 @@ export const ChatTemplate = () => {
                 isOnline: c.isOnline
             };
         });
-    }, [conversations, users]);
+    }, [conversations]);
 
     const activeSidebarConv = sidebarConversations.find(c => c.id === activeConversation?.conversationId);
 
@@ -80,6 +82,7 @@ export const ChatTemplate = () => {
                         }}
                         showConversations={showConversations}
                         onNewChat={() => setIsNewChatOpen(true)}
+                        isLoading={isLoading}
                     />
 
                     {/* Chat Area */}
@@ -96,7 +99,10 @@ export const ChatTemplate = () => {
                                             variant="ghost"
                                             size="icon"
                                             className="md:hidden"
-                                            onClick={() => setShowConversations(true)}
+                                            onClick={() => {
+                                                setShowConversations(true);
+                                                selectConversation(null);
+                                            }}
                                         >
                                             <ArrowRight className="w-5 h-5" />
                                         </Button>
@@ -119,23 +125,29 @@ export const ChatTemplate = () => {
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <Button variant="ghost" size="icon" className="rounded-xl">
+                                        {/* <Button variant="ghost" size="icon" className="rounded-xl">
                                             <Phone className="w-5 h-5" />
                                         </Button>
                                         <Button variant="ghost" size="icon" className="rounded-xl">
                                             <Video className="w-5 h-5" />
-                                        </Button>
+                                        </Button> */}
                                         <Button variant="ghost" size="icon" className="rounded-xl">
                                             <MoreVertical className="w-5 h-5" />
                                         </Button>
                                     </div>
                                 </div>
 
-                                <ChatMessageList 
-                                    messages={messages} 
-                                    currentUserId={currentUserId} 
-                                    otherUserId={activeConversation.otherUserId}
-                                />
+                                {isLoading ? (
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <Spinner size={40} />
+                                    </div>
+                                ) : (
+                                    <ChatMessageList 
+                                        messages={messages} 
+                                        currentUserId={currentUserId} 
+                                        otherUserId={activeConversation.otherUserId}
+                                    />
+                                )}
                                 <ChatInput onSend={sendMessage} />
                             </>
                         ) : (

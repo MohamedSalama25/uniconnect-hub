@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Star, Calendar, MessageCircle, Shield, Building2, Utensils } from "lucide-react";
 import { getUserPosts, Student } from "@/data/mockData";
 import { useState, useEffect } from "react";
+import { formatImageUrl } from "@/lib/utils";
 
 interface UserProfileModalProps {
     isOpen: boolean;
@@ -90,7 +91,7 @@ export function UserProfileModal({ isOpen, onClose, userName, userAvatar, userId
                                             <div className="flex gap-4 p-3">
                                                 <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0">
                                                     <img
-                                                        src={post.image || post.images?.[0] || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"}
+                                                        src={formatImageUrl(post.image || post.images?.[0]) || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"}
                                                         alt={post.title || post.name}
                                                         className="w-full h-full object-cover"
                                                     />

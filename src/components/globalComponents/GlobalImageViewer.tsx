@@ -2,6 +2,7 @@ import { useImageViewerStore } from "@/store/useImageViewerStore";
 import { X, ZoomIn, ZoomOut, Download, RotateCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { formatImageUrl } from "@/lib/utils";
 
 export const GlobalImageViewer = () => {
     const { isOpen, imageUrl, close } = useImageViewerStore();
@@ -74,7 +75,7 @@ export const GlobalImageViewer = () => {
                 onClick={(e) => e.target === e.currentTarget && close()}
             >
                 <img
-                    src={imageUrl}
+                    src={formatImageUrl(imageUrl)}
                     alt="View"
                     className="max-w-full max-h-full object-contain transition-transform duration-200 shadow-2xl"
                     style={{

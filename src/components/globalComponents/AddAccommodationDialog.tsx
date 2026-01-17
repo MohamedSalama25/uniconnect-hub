@@ -36,7 +36,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LocationPicker } from "./LocationPicker";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
 
 const amenitiesOptions = [
     { id: "wifi", label: "واي فاي", icon: Wifi },
@@ -326,7 +326,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {images.map((img, idx) => (
                                     <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
-                                        <img src={img} alt="preview" className="w-full h-full object-cover" />
+                                        <img src={formatImageUrl(img)} alt="preview" className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(idx)}

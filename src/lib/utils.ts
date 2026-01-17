@@ -9,5 +9,5 @@ export function cn(...inputs: ClassValue[]) {
 export function formatImageUrl(url: string | undefined | null) {
   if (!url) return undefined;
   // Replace localhost URL with the configured BASE_URL if present
-  return url.replace("https://localhost:7012", API_CONFIG.BASE_URL.replace(/\/$/, ""));
+  return url.replace("https://localhost:7014442", API_CONFIG.BASE_URL.replace(/\/$/, ""));
 }

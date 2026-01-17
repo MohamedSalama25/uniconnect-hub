@@ -32,6 +32,7 @@ import {
 import { toast } from "sonner";
 import { Plus, Upload, X, Loader2, MapPin, Phone, Clock, Briefcase } from "lucide-react";
 import { LocationPicker } from "@/components/globalComponents/LocationPicker";
+import { cn, formatImageUrl } from "@/lib/utils";
 
 const formSchema = z.object({
     name: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
@@ -252,7 +253,7 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {images.map((img, idx) => (
                                     <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
-                                        <img src={img} alt="preview" className="w-full h-full object-cover" />
+                                        <img src={formatImageUrl(img)} alt="preview" className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(idx)}

@@ -55,30 +55,56 @@ export function useChat() {
   // Handle SignalR events
   useEffect(() => {
     signalRService.onMessageReceived((message) => {
-      // If message belongs to active conversation, add it
-      if (activeConversation && 
+      const isForActive = activeConversation && 
           (message.conversationId === activeConversation.conversationId || 
-           message.senderId === activeConversation.otherUserId)) {
+           message.senderId === activeConversation.otherUserId);
+
+      // If message belongs to active conversation, add it
+      if (isForActive) {
         setMessages(prev => [...prev, message]);
-        // Mark as read if window is focused (simplified)
+        // Mark as read immediately if it's the active conversation
         if(message.conversationId) chatApi.markAsRead(message.conversationId);
       }
 
-      // Update conversations list (move to top, update last message)
+      // Update conversations list (move to top, update last message, update unread count)
       setConversations(prev => {
         const existingIndex = prev.findIndex(c => c.otherUserId === message.senderId);
+        
         if (existingIndex > -1) {
-          const updated = { ...prev[existingIndex], lastMessage: message.content, lastMessageTime: new Date().toISOString() };
+          const conversation = prev[existingIndex];
+          const updated = { 
+            ...conversation, 
+            lastMessage: message.content, 
+            lastMessageTime: new Date().toISOString(),
+            // Only increment unread if NOT the active conversation
+            unreadCount: isForActive ? 0 : (conversation.unreadCount || 0) + 1
+          };
           const newBranch = [...prev];
           newBranch.splice(existingIndex, 1);
           return [updated, ...newBranch];
         } else {
-            // New conversation started by someone else? We might need to reload conversations or manually create entry
-            // For now, let's reload to be safe and get correct ID
-            chatApi.getConversations().then(res => {
-                if(res.success) setConversations(res.data);
-            });
-            return prev;
+            // New conversation started by someone else
+            // Look for user in our users list to build the conversation object locally
+            const user = users.find(u => u.id === message.senderId);
+            if (user) {
+              const newConv: Conversation = {
+                conversationId: message.conversationId,
+                otherUserId: message.senderId,
+                otherUserName: `${user.firstName} ${user.lastName}`,
+                otherUserImageUrl: user.avatar, // Use avatar from user list for new chats
+                lastMessage: message.content,
+                lastMessageTime: new Date().toISOString(),
+                unreadCount: isForActive ? 0 : 1,
+                isOnline: user.isOnline
+              };
+              return [newConv, ...prev];
+            } else {
+                // If user not in list (rare but possible), then fetch
+                chatApi.getConversations().then(res => {
+                    if(res.success) setConversations(res.data);
+                });
+                return prev;
+            }
         }
       });
     });
@@ -102,10 +128,25 @@ export function useChat() {
             return prev;
         });
     });
-  }, [activeConversation]);
+    return () => {
+      signalRService.offMessageReceived();
+      signalRService.offMessageSent();
+    };
+  }, [activeConversation, users]); // Added users dependency to find info for new conversations
 
-  const selectConversation = useCallback(async (conversation: Conversation) => {
+  const selectConversation = useCallback(async (conversation: Conversation | null) => {
     setActiveConversation(conversation);
+    
+    if (!conversation) {
+        setMessages([]);
+        return;
+    }
+
+    // Clear unread count locally immediately for better UX
+    setConversations(prev => prev.map(c => 
+      c.conversationId === conversation.conversationId ? { ...c, unreadCount: 0 } : c
+    ));
+
     setIsLoading(true);
     try {
       const res = await chatApi.getMessages(conversation.conversationId);
@@ -149,6 +190,7 @@ export function useChat() {
                   conversationId: 0, // 0 indicates new/temporary
                   otherUserId: userId,
                   otherUserName: `${user.firstName} ${user.lastName}`, 
+                  otherUserImageUrl: user.avatar,
                   lastMessage: "",
                   lastMessageTime: new Date().toISOString()
               };

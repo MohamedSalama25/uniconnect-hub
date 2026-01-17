@@ -14,6 +14,7 @@ import { useAdminUsers } from "@/features/admin-users/hooks/useAdminUsers";
 import { useAdminUserMutations } from "@/features/admin-users/hooks/useAdminUserMutations";
 import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
 import { AdminUserDetailModal } from "@/features/admin-users/components/AdminUserDetailModal";
+import { CustomLoader } from "@/components/ui/loader";
 
 export default function AdminUsersPage() {
     const { toast } = useToast();
@@ -246,7 +247,8 @@ export default function AdminUsersPage() {
 
     return (
         <DashboardLayout>
-            <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-muted/30 min-h-screen" dir="rtl">
+            <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-muted/30 " dir="rtl">
+                {isLoading && <CustomLoader />}
                 <div className="flex flex-col gap-2">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight">إدارة المستخدمين</h1>
                     <p className="text-muted-foreground text-sm md:text-base">

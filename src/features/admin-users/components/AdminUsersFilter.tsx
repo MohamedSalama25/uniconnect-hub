@@ -27,7 +27,7 @@ export function AdminUsersFilter({
   return (
     <div className="flex flex-col gap-4 py-4" dir="rtl">
       <div className="flex flex-col md:flex-row gap-3">
-        <div className="relative flex-1">
+        <div className="relative flex-1 max-w-[300px]">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="البحث بالاسم أو البريد الإلكتروني..."
@@ -42,10 +42,10 @@ export function AdminUsersFilter({
             value={filters.role}
             onValueChange={(value) => onFilterChange("role", value)}
           >
-            <SelectTrigger className="w-full md:w-[140px] h-11">
+            <SelectTrigger dir="rtl" className="w-full md:w-[140px] h-11">
               <SelectValue placeholder="كل الأدوار" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent dir="rtl">
               <SelectItem value="all">كل الأدوار</SelectItem>
               <SelectItem value="Admin">مشرف</SelectItem>
               <SelectItem value="Student">طالب</SelectItem>
@@ -57,10 +57,10 @@ export function AdminUsersFilter({
             value={filters.status}
             onValueChange={(value) => onFilterChange("status", value)}
           >
-            <SelectTrigger className="w-full md:w-[140px] h-11">
+            <SelectTrigger dir="rtl" className="w-full md:w-[140px] h-11">
               <SelectValue placeholder="الحالة" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent dir="rtl">
               <SelectItem value="all">كل الحالات</SelectItem>
               <SelectItem value="active">نشط</SelectItem>
               <SelectItem value="pending">معلق</SelectItem>

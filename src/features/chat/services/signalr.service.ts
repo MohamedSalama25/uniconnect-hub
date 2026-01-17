@@ -76,8 +76,16 @@ class SignalRService {
     this.messageReceivedCallback = callback;
   }
 
+  offMessageReceived() {
+    this.messageReceivedCallback = undefined;
+  }
+
   onMessageSent(callback: MessageCallback) {
     this.messageSentCallback = callback;
+  }
+
+  offMessageSent() {
+    this.messageSentCallback = undefined;
   }
 }
 

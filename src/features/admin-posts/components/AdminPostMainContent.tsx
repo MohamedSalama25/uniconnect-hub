@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, AlertCircle } from "lucide-react";
+import { cn, formatImageUrl } from "@/lib/utils";
 import {
     Carousel,
     CarouselContent,
@@ -28,7 +29,7 @@ const AdminPostMainContent: React.FC<AdminPostMainContentProps> = ({ post }) => 
                                     <CarouselItem key={index}>
                                         <div className="aspect-video w-full overflow-hidden">
                                             <img
-                                                src={image}
+                                                src={formatImageUrl(image)}
                                                 alt={`${post.title} - ${index + 1}`}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             />

@@ -43,7 +43,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

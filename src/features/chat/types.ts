@@ -11,10 +11,11 @@ export interface Conversation {
   conversationId: number;
   otherUserId: string;
   otherUserName?: string;
+  otherUserImageUrl?: string; // New field from API
   lastMessage: string;
   lastMessageTime: string;
   unreadCount?: number;
-  isOnline?: boolean; // Added for UI
+  isOnline?: boolean;
 }
 
 export interface ChatMessage {

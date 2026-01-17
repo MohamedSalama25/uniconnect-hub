@@ -148,16 +148,16 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="gap-2" onClick={() => navigate('/profile')}>
+              <DropdownMenuContent  className="w-40">
+                <DropdownMenuItem dir="rtl" className="gap-2 " onClick={() => navigate('/profile')}>
                   <UserIcon className="w-4 h-4" />
                   <span>الملف الشخصي</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2" onClick={() => navigate('/profile', { state: { tab: 'settings' } })}>
+                <DropdownMenuItem dir="rtl" className="gap-2" onClick={() => navigate('/profile', { state: { tab: 'settings' } })}>
                   <Settings className="w-4 h-4" />
                   <span>الإعدادات</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive gap-2">
+                <DropdownMenuItem dir="rtl" onClick={handleLogout} className="text-destructive gap-2">
                   <LogOut className="w-4 h-4" />
                   <span>تسجيل الخروج</span>
                 </DropdownMenuItem>

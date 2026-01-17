@@ -32,7 +32,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         collapsed ? 'md:mr-20' : 'md:mr-64'
       )}>
         <TopNavbar onMenuClick={() => setMobileMenuOpen(true)} />
-        <main className="p-4 md:p-6 lg:p-8">
+        <main className="p-4 md:p-6 lg:p-8 relative">
           {children}
         </main>
       </div>
