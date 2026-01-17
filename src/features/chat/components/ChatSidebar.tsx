@@ -1,14 +1,26 @@
-import { Search } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { chatConversations } from '@/data/mockData';
+
+export interface SidebarConversation {
+    id: number;
+    name: string;
+    avatar?: string;
+    lastMessage: string;
+    time: string;
+    unread: number;
+    otherUserId: string; // Keep this for reference
+}
 
 interface ChatSidebarProps {
-    conversations: typeof chatConversations;
-    selectedId: string;
-    onSelect: (conversation: typeof chatConversations[0]) => void;
+    conversations: SidebarConversation[];
+    selectedId: number;
+    onSelect: (conversation: SidebarConversation) => void;
+    onNewChat?: () => void;
     showConversations: boolean;
 }
 
@@ -16,33 +28,56 @@ export const ChatSidebar = ({
     conversations,
     selectedId,
     onSelect,
+    onNewChat,
     showConversations,
 }: ChatSidebarProps) => {
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filteredConversations = conversations.filter(c => 
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        c.lastMessage?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className={cn(
             'w-full md:w-80 border-l border-border flex flex-col',
             !showConversations && 'hidden md:flex'
         )}>
-            {/* Search */}
-            <div className="p-4 border-b border-border">
+            {/* Header / Search */}
+            <div className="p-4 border-b border-border space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                    <h2 className="font-semibold text-lg">المحادثات</h2>
+                    {onNewChat && (
+                        <Button variant="ghost" size="icon" onClick={onNewChat} title="محادثة جديدة">
+                            <Plus className="w-5 h-5" />
+                        </Button>
+                    )}
+                </div>
                 <div className="relative">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                         type="search"
                         placeholder="ابحث في المحادثات..."
                         className="pr-10"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
 
             {/* Conversations */}
             <div className="flex-1 overflow-y-auto">
-                {conversations.map((conversation) => (
+                {filteredConversations.length === 0 && (
+                    <div className="p-4 text-center text-muted-foreground text-sm">
+                        {searchTerm ? "لا توجد نتائج" : "لا توجد محادثات"}
+                    </div>
+                )}
+                {filteredConversations.map((conversation) => (
                     <button
                         key={conversation.id}
                         onClick={() => onSelect(conversation)}
                         className={cn(
-                            'w-full flex items-center gap-3 p-4 hover:bg-secondary/50 transition-colors',
+                            'w-full flex items-center gap-3 p-4 hover:bg-secondary/50 transition-colors text-right',
                             selectedId === conversation.id && 'bg-secondary'
                         )}
                     >
@@ -57,13 +92,13 @@ export const ChatSidebar = ({
                                 </Badge>
                             )}
                         </div>
-                        <div className="flex-1 text-right">
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs text-muted-foreground">{conversation.time}</span>
-                                <span className="font-medium">{conversation.name}</span>
+                        <div className="flex-1 overflow-hidden">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="font-medium truncate">{conversation.name}</span>
+                                <span className="text-xs text-muted-foreground shrink-0">{conversation.time}</span>
                             </div>
-                            <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                                {conversation.lastMessage}
+                            <p className="text-sm text-muted-foreground line-clamp-1 truncate">
+                                {conversation.lastMessage || "..."}
                             </p>
                         </div>
                     </button>
@@ -72,3 +107,4 @@ export const ChatSidebar = ({
         </div>
     );
 };
+

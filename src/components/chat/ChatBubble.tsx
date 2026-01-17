@@ -1,12 +1,13 @@
 import { cn } from '@/lib/utils';
-import type { ChatMessage } from '@/data/mockData';
+import { ChatMessage } from '@/features/chat/types';
 
 interface ChatBubbleProps {
   message: ChatMessage;
+  currentUserId: string;
 }
 
-export function ChatBubble({ message }: ChatBubbleProps) {
-  const isMe = message.sender === 'me';
+export function ChatBubble({ message, currentUserId }: ChatBubbleProps) {
+  const isMe = message.senderId === currentUserId;
 
   return (
     <div className={cn(
@@ -24,9 +25,10 @@ export function ChatBubble({ message }: ChatBubbleProps) {
           'text-xs mt-1',
           isMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
         )}>
-          {message.time}
+          {new Date(message.sentAt || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
     </div>
   );
 }
+
