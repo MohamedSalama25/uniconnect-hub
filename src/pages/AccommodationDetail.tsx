@@ -4,19 +4,19 @@ import { useQuery } from "@tanstack/react-query";
 import { houseService } from "@/features/accommodation-list/services/house.service";
 import { House } from "@/features/accommodation-list/types/house.types";
 import { Accommodation } from "@/data/mockData";
-import { Loader } from "lucide-react";
-import { CustomLoader } from "@/components/ui/loader";
+import { useMemo } from "react";
 
 const AccommodationDetail = () => {
     const { id } = useParams();
+    const houseId = Number(id);
 
     const { data: house, isLoading } = useQuery({
         queryKey: ['public-house', id],
-        queryFn: () => houseService.getPublicHouseById(Number(id)),
-        enabled: !!id
+        queryFn: () => houseService.getPublicHouseById(houseId),
+        enabled: !!id && !isNaN(houseId)
     });
 
-    const mapHouseToAccommodation = (house: House | undefined): Accommodation | undefined => {
+    const accommodation = useMemo((): Accommodation | undefined => {
         if (!house) return undefined;
         return {
             id: house.id.toString(),
@@ -41,9 +41,9 @@ const AccommodationDetail = () => {
             lat: house.latitude,
             lng: house.longitude,
         };
-    };
+    }, [house]);
 
-    return <AccommodationDetailTemplate isLoading={isLoading} accommodation={mapHouseToAccommodation(house)} />;
+    return <AccommodationDetailTemplate isLoading={isLoading} accommodation={accommodation} />;
 };
 
 export default AccommodationDetail;

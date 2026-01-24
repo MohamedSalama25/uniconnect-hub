@@ -35,7 +35,7 @@ export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLo
         if (accommodation) {
             setIsFavorite(accommodation.isFavorite || false);
         }
-    }, [accommodation]);
+    }, [accommodation?.id, accommodation?.isFavorite]);
 
     const handleToggleFavorite = async () => {
         if (!accommodation) return;
