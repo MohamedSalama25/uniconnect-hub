@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-    BASE_URL: localStorage.getItem("baseUrl") ||import.meta.env.VITE_API_BASE_URL ||  "", 
+    BASE_URL: localStorage.getItem("baseUrl") || import.meta.env.VITE_API_BASE_URL || "",
     ENDPOINTS: {
         ACCOUNTS: {
             LOGIN: "/api/Accounts/login",
@@ -25,10 +25,10 @@ export const API_CONFIG = {
             BLOCK: (userId: string) => `/api/Users/${userId}/block`,
         },
         CHAT: {
-             CONVERSATIONS: "/api/Chat/conversations",
-             MESSAGES: (conversationId: number) => `/api/Chat/messages/${conversationId}`,
-             MARK_READ: (conversationId: number) => `/api/Chat/markAsRead/${conversationId}`,
-             ONLINE: (userId: string) => `/api/Chat/online/${userId}`, // NoteBased on screenshot, seems to be a GET status check
+            CONVERSATIONS: "/api/Chat/conversations",
+            MESSAGES: (conversationId: number) => `/api/Chat/messages/${conversationId}`,
+            MARK_READ: (conversationId: number) => `/api/Chat/markAsRead/${conversationId}`,
+            ONLINE: (userId: string) => `/api/Chat/online/${userId}`, // NoteBased on screenshot, seems to be a GET status check
         },
         HOUSE: {
             GET_ALL: "/api/House/Houses",
@@ -37,6 +37,8 @@ export const API_CONFIG = {
             DASHBOARD_HOUSE_BY_ID: (id: number) => `/api/House/dashboard/${id}`,
             ACCEPT: (id: number) => `/api/House/${id}/accept`,
             TOGGLE_FAVORITE: (id: number) => `/api/House/favorite/${id}`,
+            DELETE: (id: number) => `/api/House/${id}`,
+            UPDATE: (id: number) => `/api/House/${id}`,
         }
     },
     SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route

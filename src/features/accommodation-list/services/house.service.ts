@@ -17,7 +17,7 @@ const mapHouseImages = (house: House): House => ({
 export const houseService = {
   createHouse: async (data: CreateHouseRequest): Promise<CreateHouseResponse> => {
     const formData = new FormData();
-    
+
     // Append simple fields
     formData.append('Name', data.Name);
     formData.append('Address', data.Address);
@@ -28,6 +28,9 @@ export const houseService = {
     formData.append('TypeId', data.TypeId.toString());
     formData.append('IsAvailable', data.IsAvailable.toString());
     formData.append('AvailableFrom', data.AvailableFrom);
+
+    if (data.Latitude !== undefined) formData.append('Latitude', data.Latitude.toString());
+    if (data.Longitude !== undefined) formData.append('Longitude', data.Longitude.toString());
 
     // Append facilities (array)
     if (data.Facilities && data.Facilities.length > 0) {
@@ -52,7 +55,7 @@ export const houseService = {
     const response = await clientAxios.get<import('../types/house.types').PaginatedHouses>(API_CONFIG.ENDPOINTS.HOUSE.GET_ALL, {
       params
     });
-    
+
     return {
       ...response.data,
       data: response.data.data.map(mapHouseImages)
@@ -69,7 +72,7 @@ export const houseService = {
     const response = await clientAxios.get<import('../types/house.types').PaginatedHouses>(API_CONFIG.ENDPOINTS.HOUSE.DASHBOARD_HOUSES, {
       params
     });
-    
+
     return {
       ...response.data,
       data: response.data.data.map(mapHouseImages)
@@ -92,4 +95,40 @@ export const houseService = {
     const response = await clientAxios.post(API_CONFIG.ENDPOINTS.HOUSE.TOGGLE_FAVORITE(id));
     return response.data;
   },
+
+  deleteHouse: async (id: number): Promise<void> => {
+    await clientAxios.delete(API_CONFIG.ENDPOINTS.HOUSE.DELETE(id));
+  },
+
+  updateHouse: async (id: number, data: CreateHouseRequest): Promise<House> => {
+    const formData = new FormData();
+    formData.append('Name', data.Name);
+    formData.append('Address', data.Address);
+    formData.append('Description', data.Description);
+    formData.append('Price', data.Price.toString());
+    formData.append('NumberOfRooms', data.NumberOfRooms.toString());
+    formData.append('NumberOfBathrooms', data.NumberOfBathrooms.toString());
+    formData.append('TypeId', data.TypeId.toString());
+    formData.append('IsAvailable', data.IsAvailable.toString());
+    formData.append('AvailableFrom', data.AvailableFrom);
+
+    if (data.Latitude !== undefined) formData.append('Latitude', data.Latitude.toString());
+    if (data.Longitude !== undefined) formData.append('Longitude', data.Longitude.toString());
+
+    if (data.Facilities && data.Facilities.length > 0) {
+      data.Facilities.forEach((facility) => {
+        formData.append('Facilities', facility);
+      });
+    }
+    console.log(data.Images);
+    if (data.Images && data.Images.length > 0) {
+      data.Images.forEach((image) => {
+        // Each item can be a File (new) or a string (existing URL)
+        formData.append('Images', image);
+      });
+    }
+
+    const response = await clientAxios.put<House>(API_CONFIG.ENDPOINTS.HOUSE.UPDATE(id), formData);
+    return mapHouseImages(response.data);
+  }
 };

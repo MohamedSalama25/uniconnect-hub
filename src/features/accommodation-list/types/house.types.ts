@@ -19,6 +19,8 @@ export interface House {
   address: string;
   description: string;
   price: number;
+  latitude: number;
+  longitude: number;
   numberOfRooms: number;
   numberOfBathrooms: number;
   typeId: number;
@@ -53,7 +55,9 @@ export interface CreateHouseRequest {
   IsAvailable: boolean;
   AvailableFrom: string;
   Facilities: string[];
-  Images: File[];
+  Images: (File | string)[]; // Consolidated: can be new Files or existing URLs
+  Latitude?: number;
+  Longitude?: number;
 }
 
 export type CreateHouseResponse = House & {

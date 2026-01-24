@@ -2,6 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { toast } from "sonner";
 import { Loader2, Home, Bed, Bath, DollarSign, Calendar, XCircle, CheckCircle, Clock } from "lucide-react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Feature Imports
 import AdminPostDetailsHeader from "@/features/admin-posts/components/AdminPostDetailsHeader";
@@ -12,21 +14,65 @@ import { useHouseDetail } from "@/features/admin-posts/hooks/useHouseDetail";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
+import { useAuthStore } from "@/store/useAuthStore";
+import { houseService } from "@/features/accommodation-list/services/house.service";
+import { AddAccommodationDialog } from "@/components/globalComponents/AddAccommodationDialog";
+import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
 
 const AdminPostDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user, fullProfile } = useAuthStore();
+    const currentUserId = fullProfile?.id || (user as any)?.id; // Adjust based on your auth store structure
 
     const { data: house, isLoading, error } = useHouseDetail(id);
 
-    const handleApprove = () => {
-        toast.success("تم قبول المنشور بنجاح");
-        navigate("/admin/posts");
+    // Dialog States
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    // Invalidate queries after edit to refresh data
+    const queryClient = useQueryClient();
+
+    const handleApprove = async () => {
+        if (!house) return;
+        try {
+            await houseService.acceptHouse(house.id, true);
+            toast.success("تم قبول المنشور بنجاح");
+            navigate("/admin/posts");
+        } catch (err) {
+            toast.error("فشل في قبول المنشور");
+        }
     };
 
-    const handleReject = () => {
-        toast.error("تم رفض المنشور");
-        navigate("/admin/posts");
+    const handleReject = async () => {
+        if (!house) return;
+        try {
+            await houseService.acceptHouse(house.id, false);
+            toast.error("تم رفض المنشور");
+            navigate("/admin/posts");
+        } catch (err) {
+            toast.error("فشل في رفض المنشور");
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!house) return;
+        try {
+            await houseService.deleteHouse(house.id);
+            toast.success("تم حذف المنشور بنجاح");
+            setIsDeleteDialogOpen(false);
+            navigate("/admin/posts");
+        } catch (err) {
+            toast.error("فشل في حذف المنشور");
+        }
+    };
+
+    const handleAddDialogClose = (open: boolean) => {
+        setIsAddDialogOpen(open);
+        if (!open) {
+            queryClient.invalidateQueries({ queryKey: ['house-detail', id] });
+        }
     };
 
     if (isLoading) {
@@ -77,6 +123,9 @@ const AdminPostDetailsPage = () => {
         images: house.imageUrls
     };
 
+    const isOwner = String(house.createdUser?.id) === String(currentUserId);
+    const isAdmin = user?.roles?.includes("Admin");
+
     return (
         <DashboardLayout>
             <div className="p-4 md:p-8 space-y-8 bg-muted/30 min-h-screen" dir="rtl">
@@ -85,6 +134,10 @@ const AdminPostDetailsPage = () => {
                     onApprove={handleApprove}
                     onReject={handleReject}
                     isAccepted={house.isAccepted}
+                    isOwner={isOwner}
+                    isAdmin={isAdmin}
+                    onEdit={() => setIsAddDialogOpen(true)}
+                    onDelete={() => setIsDeleteDialogOpen(true)}
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -102,11 +155,35 @@ const AdminPostDetailsPage = () => {
                         <AdminPostLocation
                             title={house.name}
                             address={house.address}
+                            lat={house.latitude}
+                            lng={house.longitude}
                         />
                     </div>
 
                     <AdminPostAuthorSidebar post={mappedPost as any} user={house.createdUser} />
                 </div>
+
+                {/* Edit Dialog */}
+                {house && (
+                    <AddAccommodationDialog
+                        open={isAddDialogOpen}
+                        onOpenChange={handleAddDialogClose}
+                        initialData={house}
+                        trigger={<span className="hidden" />}
+                    />
+                )}
+
+                {/* Delete Confirmation */}
+                <ConfirmDialog
+                    isOpen={isDeleteDialogOpen}
+                    onClose={() => setIsDeleteDialogOpen(false)}
+                    onConfirm={handleDelete}
+                    title="حذف المنشور"
+                    description="هل أنت متأكد من أنك تريد حذف هذا السكن؟ لا يمكن التراجع عن هذا الإجراء."
+                    variant="destructive"
+                    confirmText="نعم، حذف"
+                    cancelText="إلغاء"
+                />
             </div>
         </DashboardLayout>
     );

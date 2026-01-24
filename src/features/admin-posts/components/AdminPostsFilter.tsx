@@ -15,9 +15,8 @@ interface AdminPostsFilterProps {
 
 const categories = [
     { id: "housing", label: "سكن", icon: Home },
-    { id: "complaints", label: "شكاوى", icon: AlertCircle },
-    { id: "transport", label: "مواصلات", icon: Car },
-    { id: "tools", label: "أدوات", icon: BookOpen },
+    { id: "complaints", label: "طلبات المساعدة", icon: AlertCircle },
+    { id: "transport", label: "خدمات", icon: Car },
 ];
 
 const AdminPostsFilter: React.FC<AdminPostsFilterProps> = ({

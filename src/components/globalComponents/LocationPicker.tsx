@@ -75,11 +75,12 @@ export function LocationPicker({
 
     const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
+    // Sync with defaultLocation when it changes (for async data loading)
     useEffect(() => {
-        if (position) {
-            onLocationSelect(position);
+        if (defaultLocation) {
+            setPosition(defaultLocation);
         }
-    }, [position, onLocationSelect]);
+    }, [defaultLocation?.lat, defaultLocation?.lng]);
 
     const handleGetCurrentLocation = () => {
         if (!navigator.geolocation) {
@@ -97,6 +98,15 @@ export function LocationPicker({
 
                 const newLocation = { lat: latitude, lng: longitude };
                 setPosition(newLocation);
+                onLocationSelect(newLocation); // Call parent callback directly
+
+                // Update session storage
+                sessionStorage.setItem("location", JSON.stringify({
+                    ...newLocation,
+                    timestamp: new Date().getTime()
+                }));
+
+                setIsLoadingLocation(false);
 
                 // Update session storage
                 sessionStorage.setItem("location", JSON.stringify({
@@ -173,7 +183,10 @@ export function LocationPicker({
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
-                    <MapEvents onSelect={setPosition} />
+                    <MapEvents onSelect={(latlng) => {
+                        setPosition(latlng);
+                        onLocationSelect(latlng);
+                    }} />
 
                     {position && <Marker position={position} />}
                     {position && <FlyToLocation location={position} />}

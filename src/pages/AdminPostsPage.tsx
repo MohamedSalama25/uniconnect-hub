@@ -9,10 +9,14 @@ import {
     XCircle,
     Loader2,
     Loader,
+    Plus,
+    Edit,
+    Trash2,
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { Button } from "@/components/ui/button"; // Added Button
 import { formatDate } from "@/lib/utils";
 
 // Feature Imports
@@ -22,9 +26,14 @@ import AdminPostsFilter, { PostCategory } from "@/features/admin-posts/component
 import { useAdminHouses } from "@/features/admin-posts/hooks/useAdminHouses";
 import { House } from "@/features/accommodation-list/types/house.types";
 import { houseService } from "@/features/accommodation-list/services/house.service";
+import { useAuthStore } from "@/store/useAuthStore";
+import { AddAccommodationDialog } from "@/components/globalComponents/AddAccommodationDialog";
+import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
 
 const AdminPostsPage = () => {
     const navigate = useNavigate();
+    const { user, fullProfile } = useAuthStore();
+    const currentUserId = fullProfile?.id || (user as any)?.id; // Adjust based on your auth store structure
 
     // State management for filters and pagination
     const [selectedCategory, setSelectedCategory] = useState<PostCategory>("housing");
@@ -33,6 +42,12 @@ const AdminPostsPage = () => {
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [processingId, setProcessingId] = useState<number | null>(null);
+
+    // Dialog States
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [editingHouse, setEditingHouse] = useState<House | undefined>(undefined);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [houseToDelete, setHouseToDelete] = useState<number | null>(null);
 
     // Fetching data only for housing for now (can be expanded easily)
     const { data: housesData, isLoading: housesLoading, refetch } = useAdminHouses({
@@ -51,6 +66,40 @@ const AdminPostsPage = () => {
             toast.error("فشل في تحديث حالة المنشور");
         } finally {
             setProcessingId(null);
+        }
+    };
+
+    const confirmDelete = (id: number) => {
+        setHouseToDelete(id);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!houseToDelete) return;
+        setProcessingId(houseToDelete);
+        try {
+            await houseService.deleteHouse(houseToDelete);
+            toast.success("تم حذف المنشور بنجاح");
+            setIsDeleteDialogOpen(false);
+            setHouseToDelete(null);
+            refetch();
+        } catch (error: any) {
+            toast.error("فشل في حذف المنشور");
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    const handleEdit = (house: House) => {
+        setEditingHouse(house);
+        setIsAddDialogOpen(true);
+    };
+
+    const handleAddDialogClose = (open: boolean) => {
+        setIsAddDialogOpen(open);
+        if (!open) {
+            setEditingHouse(undefined);
+            refetch(); // Refetch to show new/updated data
         }
     };
 
@@ -99,20 +148,37 @@ const AdminPostsPage = () => {
     ];
 
     const actions: Action<any>[] = [
+        // Admin Actions
         {
             label: "وافق",
             onClick: (row) => handleAcceptReject(row.id, true),
-            show: (row) => !row.isAccepted,
+            show: (row) => !row.isAccepted && (user?.roles?.includes("Admin") || false),
             disabled: (row) => processingId === row.id,
             classname: "text-green-600 hover:text-green-700"
         },
         {
             label: "رفض",
             onClick: (row) => handleAcceptReject(row.id, false),
-            show: (row) => !row.isAccepted,
+            show: (row) => !row.isAccepted && (user?.roles?.includes("Admin") || false),
             disabled: (row) => processingId === row.id,
             classname: "text-red-600 hover:text-red-700"
         },
+        // Owner Actions
+        {
+            label: "تعديل",
+            onClick: (row) => handleEdit(row),
+            show: (row) => String(row.createdUser?.id) === String(currentUserId),
+            classname: "text-blue-600 hover:text-blue-700 font-bold",
+            icon: Edit
+        },
+        {
+            label: "حذف",
+            onClick: (row) => confirmDelete(row.id),
+            show: (row) => String(row.createdUser?.id) === String(currentUserId),
+            classname: "text-red-600 hover:text-red-700 font-bold",
+            icon: Trash2
+        },
+        // View Details (Common)
         {
             label: "عرض",
             onClick: (row) => navigate(`/admin/post/${row.id}`),
@@ -128,7 +194,23 @@ const AdminPostsPage = () => {
     return (
         <DashboardLayout>
             <div className="p-8 space-y-8 bg-muted/30 min-h-screen" dir="rtl">
-                <AdminPostsHeader />
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <AdminPostsHeader />
+                    {selectedCategory === "housing" && (
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={() => {
+                                    setEditingHouse(undefined);
+                                    setIsAddDialogOpen(true);
+                                }}
+                                className="gap-2 rounded-full px-6 shadow-lg shadow-primary/20 font-bold h-12"
+                            >
+                                <Plus className="w-5 h-5" />
+                                <span>إضافة سكن</span>
+                            </Button>
+                        </div>
+                    )}
+                </div>
 
                 <AdminStatsCards stats={stats} />
 
@@ -160,12 +242,29 @@ const AdminPostsPage = () => {
                             onPageChange={setPageIndex}
                             tableName={
                                 selectedCategory === "housing" ? "سكن" :
-                                    selectedCategory === "complaints" ? "شكاوى" :
-                                        selectedCategory === "transport" ? "مواصلات" : "أدوات"
+                                    selectedCategory === "complaints" ? "طلبات المساعدة" :
+                                        selectedCategory === "transport" ? "خدمات" : ""
                             }
                         />
                     )}
                 </div>
+
+                <AddAccommodationDialog
+                    open={isAddDialogOpen}
+                    onOpenChange={handleAddDialogClose}
+                    initialData={editingHouse}
+                />
+
+                <ConfirmDialog
+                    isOpen={isDeleteDialogOpen}
+                    onClose={() => setIsDeleteDialogOpen(false)}
+                    onConfirm={handleDelete}
+                    title="حذف المنشور"
+                    description="هل أنت متأكد من أنك تريد حذف هذا السكن؟ لا يمكن التراجع عن هذا الإجراء."
+                    variant="destructive"
+                    confirmText="نعم، حذف"
+                    cancelText="إلغاء"
+                />
             </div>
         </DashboardLayout>
     );

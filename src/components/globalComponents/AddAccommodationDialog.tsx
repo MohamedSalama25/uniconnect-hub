@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Upload, X, Loader2, Home, MapPin, Bath, BedDouble, Wifi, Wind, Waves, Coffee, ShieldCheck, GraduationCap } from "lucide-react";
+import { Plus, Upload, X, Loader2, Home, MapPin, Bath, BedDouble, Wifi, Wind, Waves, Coffee, ShieldCheck, GraduationCap, Edit, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -36,6 +36,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { LocationPicker } from "./LocationPicker";
 import { cn, formatImageUrl } from "@/lib/utils";
 import { useCreateHouse } from "@/features/accommodation-list/hooks/useCreateHouse";
+import { useUpdateHouse } from "@/features/accommodation-list/hooks/useUpdateHouse";
+import { House } from "@/features/accommodation-list/types/house.types";
+import { useHouseDetail } from "@/features/admin-posts/hooks/useHouseDetail";
 
 const amenitiesOptions = [
     { id: "wifi", label: "واي فاي", icon: Wifi },
@@ -66,17 +69,30 @@ interface AddAccommodationDialogProps {
     triggerClassName?: string;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
+    initialData?: House; // For Edit Mode
 }
 
-export function AddAccommodationDialog({ trigger, triggerClassName, open: controlledOpen, onOpenChange: setControlledOpen }: AddAccommodationDialogProps) {
+export function AddAccommodationDialog({
+    trigger,
+    triggerClassName,
+    open: controlledOpen,
+    onOpenChange: setControlledOpen,
+    initialData
+}: AddAccommodationDialogProps) {
     const [internalOpen, setInternalOpen] = useState(false);
     const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
-    const setOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
+    const setOpen = controlledOpen !== undefined ? setControlledOpen : setInternalOpen;
 
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    
+    const [existingImages, setExistingImages] = useState<string[]>([]); // URLs of existing images for edit
     const createHouseMutation = useCreateHouse();
+    const updateHouseMutation = useUpdateHouse();
+    const isEditMode = !!initialData;
+
+    // Fetch full detail if editing, to ensure we have all data (images, etc) that might be missing in list view
+    const { data: fetchedHouse } = useHouseDetail(initialData?.id?.toString());
+    const activeData = fetchedHouse || initialData;
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -86,14 +102,52 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
             price: "",
             rooms: "",
             bathrooms: "",
-            typeId: "1", // Default TypeId
+            typeId: "1",
             address: "",
             amenities: [],
         },
     });
 
+    // Populate form if activeData changes (Edit Mode)
+    useEffect(() => {
+        if (activeData && open && isEditMode) {
+            form.reset({
+                name: activeData.name,
+                description: activeData.description,
+                price: activeData.price.toString(),
+                rooms: activeData.numberOfRooms.toString(),
+                bathrooms: activeData.numberOfBathrooms.toString(),
+                typeId: activeData.typeId.toString(),
+                address: activeData.address,
+                amenities: activeData.facilityNames || [],
+                location: {
+                    lat: activeData.latitude || 0,
+                    lng: activeData.longitude || 0
+                },
+            });
+            setExistingImages(activeData.imageUrls || []);
+            setImages([]);
+            setImagePreviews([]);
+        } else if (!isEditMode && open) {
+            form.reset({
+                name: "",
+                description: "",
+                price: "",
+                rooms: "",
+                bathrooms: "",
+                typeId: "1",
+                address: "",
+                amenities: [],
+            });
+            setExistingImages([]);
+            setImages([]);
+            setImagePreviews([]);
+        }
+    }, [activeData, open, form, isEditMode]);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        if (images.length === 0) {
+        // Validation: Must have at least one image (new or existing)
+        if (images.length === 0 && existingImages.length === 0) {
             toast.error("يرجى إضافة صورة واحدة على الأقل");
             return;
         }
@@ -109,20 +163,30 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
             IsAvailable: true,
             AvailableFrom: new Date().toISOString(),
             Facilities: values.amenities,
-            Images: images,
+            Images: [...existingImages, ...images], // Combined: existing URLs first, then new Files
+            Latitude: values.location?.lat || 0,
+            Longitude: values.location?.lng || 0,
         };
 
-        createHouseMutation.mutate(requestData, {
-            onSuccess: (response) => {
-                const isError = response.statusCode && response.statusCode >= 400;
-                if (!isError) {
+        if (isEditMode && initialData) {
+            updateHouseMutation.mutate({ id: initialData.id, data: requestData }, {
+                onSuccess: () => {
                     setOpen(false);
-                    form.reset();
-                    setImages([]);
-                    setImagePreviews([]);
                 }
-            }
-        });
+            });
+        } else {
+            createHouseMutation.mutate(requestData, {
+                onSuccess: (response) => {
+                    const isError = response.statusCode && response.statusCode >= 400;
+                    if (!isError) {
+                        setOpen(false);
+                        form.reset();
+                        setImages([]);
+                        setImagePreviews([]);
+                    }
+                }
+            });
+        }
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +194,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
         if (files) {
             const newFiles = Array.from(files);
             setImages([...images, ...newFiles]);
-            
+
             const newPreviews = newFiles.map(file => URL.createObjectURL(file));
             setImagePreviews([...imagePreviews, ...newPreviews]);
         }
@@ -140,6 +204,17 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
         setImages(images.filter((_, i) => i !== index));
         setImagePreviews(imagePreviews.filter((_, i) => i !== index));
     };
+
+    const removeExistingImage = (index: number) => {
+        setExistingImages(existingImages.filter((_, i) => i !== index));
+    };
+
+    // Note: We cannot "remove" existing images easily with current API unless there's a specific endpoint or logic for it.
+    // For now, we will just display them. If user wants to replace, they might need to delete post and create new one or we assume backend handles "Images" as "Add Images" and doesn't delete old ones unless specified.
+    // However, usually "Update" might replace all or be partial. Assuming backend just adds new images or replaces. 
+    // Given the task, we'll keep it simple: We just show existing. Removing existing is complex without backend support.
+
+    const isLoading = createHouseMutation.isPending || updateHouseMutation.isPending;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -153,9 +228,11 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
             </DialogTrigger>
             <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold">إضافة سكن جديد</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold">
+                        {isEditMode ? "تعديل بيانات السكن" : "إضافة سكن جديد"}
+                    </DialogTitle>
                     <DialogDescription>
-                        أدخل تفاصيل السكن المتاح لضمان الحصول على أفضل المستأجرين.
+                        {isEditMode ? "قم بتحديث تفاصيل السكن." : "أدخل تفاصيل السكن المتاح لضمان الحصول على أفضل المستأجرين."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -182,7 +259,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>نوع السكن <span className="text-red-500">*</span></FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger className="h-12 text-base">
                                                     <SelectValue placeholder="اختر نوع السكن" />
@@ -298,7 +375,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                             </div>
                         </div>
 
-                        {/* Location Picker (Visual Only for now) */}
+                        {/* Location Picker (Visual Only) */}
                         <FormField
                             control={form.control}
                             name="location"
@@ -337,23 +414,43 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
 
                         {/* Images */}
                         <div>
-                            <FormLabel className="block mb-3">صور السكن (اختر صور متعددة) <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel className="block mb-3 text-lg font-bold">صور السكن <span className="text-red-500">*</span></FormLabel>
+
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {/* Existing Images */}
+                                {isEditMode && existingImages.map((img, idx) => (
+                                    <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
+                                        <img src={formatImageUrl(img)} alt="existing" className="w-full h-full object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeExistingImage(idx)}
+                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/40 py-1 text-[10px] text-white text-center">صورة حالية</div>
+                                    </div>
+                                ))}
+
+                                {/* New Image Previews */}
                                 {imagePreviews.map((img, idx) => (
-                                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
-                                        <img src={formatImageUrl(img)} alt="preview" className="w-full h-full object-cover" />
+                                    <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
+                                        <img src={img} alt="preview" className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(idx)}
-                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
                                         >
-                                            <X className="w-3 h-3" />
+                                            <X className="w-4 h-4" />
                                         </button>
+                                        <div className="absolute bottom-0 left-0 right-0 bg-primary/60 py-1 text-[10px] text-white text-center">صورة جديدة</div>
                                     </div>
                                 ))}
+
+                                {/* Upload Button */}
                                 <label className="flex flex-col items-center justify-center aspect-square rounded-xl border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
                                     <Upload className="w-6 h-6 text-muted-foreground mb-2" />
-                                    <span className="text-xs text-muted-foreground">رفع صور</span>
+                                    <span className="text-xs text-muted-foreground font-medium">رفع صور إضافية</span>
                                     <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
                                 </label>
                             </div>
@@ -380,16 +477,16 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                             <Button type="button" variant="outline" onClick={() => setOpen(false)} className="h-12 px-6">
                                 إلغاء
                             </Button>
-                            <Button type="submit" className="h-12 px-8 font-bold gap-2" disabled={createHouseMutation.isPending}>
-                                {createHouseMutation.isPending ? (
+                            <Button type="submit" className="h-12 px-8 font-bold gap-2" disabled={isLoading}>
+                                {isLoading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        جاري الإضافة...
+                                        {isEditMode ? "جاري التحديث..." : "جاري الإضافة..."}
                                     </>
                                 ) : (
                                     <>
-                                        <Plus className="w-5 h-5" />
-                                        إضافة السكن
+                                        {isEditMode ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                                        {isEditMode ? "حفظ التعديلات" : "إضافة السكن"}
                                     </>
                                 )}
                             </Button>

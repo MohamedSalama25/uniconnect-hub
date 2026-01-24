@@ -8,8 +8,17 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatImageUrl(url: string | undefined | null) {
   if (!url) return undefined;
-  // Replace localhost URL with the configured BASE_URL if present
-  return url.replace("https://localhost:7012", API_CONFIG.BASE_URL.replace(/\/$/, ""));
+
+  // Clean base URL (remove trailing slash)
+  const baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, "");
+
+  // If it's a relative path (starts with /), prepend base URL
+  if (url.startsWith("/")) {
+    return `${baseUrl}${url}`;
+  }
+
+  // Replace localhost URL if present
+  return url.replace("https://localhost:7012", baseUrl);
 }
 
 export function formatDate(date: string | Date | undefined | null) {

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, XCircle, Edit, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface AdminPostDetailsHeaderProps {
@@ -7,6 +7,10 @@ interface AdminPostDetailsHeaderProps {
     onApprove: () => void;
     onReject: () => void;
     isAccepted?: boolean;
+    isOwner?: boolean;
+    onEdit?: () => void;
+    onDelete?: () => void;
+    isAdmin?: boolean;
 }
 
 const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
@@ -14,6 +18,10 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
     onApprove,
     onReject,
     isAccepted,
+    isOwner,
+    onEdit,
+    onDelete,
+    isAdmin
 }) => {
     return (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -28,11 +36,30 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
                 </Button>
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight">تفاصيل المنشور</h1>
-                    <p className="text-muted-foreground mt-1">مراجعة بيانات المنشور وصاحبه قبل القبول</p>
+                    <p className="text-muted-foreground mt-1">مراجعة بيانات المنشور وصاحبه</p>
                 </div>
             </div>
-            <div className="flex gap-3 w-full md:w-auto">
-                {!isAccepted && (
+            <div className="flex gap-3 w-full md:w-auto flex-wrap">
+                {isOwner && (
+                    <>
+                        <Button
+                            variant="destructive"
+                            className="flex-1 md:flex-none rounded-xl gap-2 font-bold px-6"
+                            onClick={onDelete}
+                        >
+                            <Trash2 className="w-4 h-4" /> حذف
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="flex-1 md:flex-none rounded-xl gap-2 font-bold px-6 border-blue-200 text-blue-700 hover:bg-blue-50"
+                            onClick={onEdit}
+                        >
+                            <Edit className="w-4 h-4" /> تعديل
+                        </Button>
+                    </>
+                )}
+
+                {!isAccepted && isAdmin && (
                     <>
                         <Button
                             variant="destructive"

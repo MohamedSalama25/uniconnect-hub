@@ -35,13 +35,12 @@ export function LocationViewer({ lat, lng, title, className }: LocationViewerPro
                     الموقع على الخريطة
                 </h3>
                 <Button
-                    variant="outline"
                     size="sm"
                     onClick={openGoogleMaps}
-                    className="gap-2 text-xs font-bold hover:bg-blue-50 text-blue-600 border-blue-200"
+                    className="gap-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 rounded-full px-4 transition-all hover:scale-105 active:scale-95"
                 >
                     <ExternalLink className="w-3 h-3" />
-                    الحصول على الاتجاهات
+                    احصل على الاتجاهات
                 </Button>
             </div>
 

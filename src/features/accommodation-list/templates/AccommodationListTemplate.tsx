@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Search, SlidersHorizontal, Plus, Loader2 } from 'lucide-react';
+import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AccommodationFilters } from '../components/AccommodationFilters';
 import { AccommodationList } from '../components/AccommodationList';
-import { AddAccommodationDialog } from '@/components/globalComponents/AddAccommodationDialog';
 import { houseService } from '../services/house.service';
 import { useQuery } from '@tanstack/react-query';
 import { House } from '../types/house.types';
@@ -31,7 +30,7 @@ export const AccommodationListTemplate = () => {
         image: house.imageUrls?.[0] || "",
         images: house.imageUrls || [],
         price: house.price,
-        distance: 0, 
+        distance: 0,
         type: house.typeName?.toLowerCase().includes('shared') ? 'shared' : 'private',
         rating: house.averageRating,
         location: house.address,
@@ -69,14 +68,6 @@ export const AccommodationListTemplate = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <AddAccommodationDialog
-                            trigger={
-                                <Button className="gap-2 rounded-full px-6 shadow-lg shadow-primary/20">
-                                    <Plus className="w-4 h-4" />
-                                    <span>إضافة سكن</span>
-                                </Button>
-                            }
-                        />
                         <div className="relative flex-1 md:w-80">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
