@@ -102,6 +102,14 @@ export const authService = {
         return response.data;
     },
 
+    forgetPassword: async (email: string): Promise<any> => {
+        const url = API_CONFIG.ENDPOINTS.ACCOUNTS.FORGET_PASSWORD;
+        const response = await clientAxios.post(url, null, {
+            params: { email }
+        });
+        return response.data;
+    },
+
     changePassword: async (token: string, data: { currentPassword: string; newPassword: string }): Promise<any> => {
         const url = API_CONFIG.ENDPOINTS.ACCOUNTS.CHANGE_PASSWORD;
         const response = await clientAxios.post(url, data);

@@ -109,6 +109,14 @@ export const LoginForm = () => {
                         </FormItem>
                     )}
                 />
+                <div className="flex justify-end">
+                    <Link
+                        to="/forget-password"
+                        className="text-sm text-primary font-medium hover:underline"
+                    >
+                        نسيت كلمة المرور؟
+                    </Link>
+                </div>
                 <Button
                     type="submit"
                     className="w-full py-6 text-lg rounded-xl mt-4"

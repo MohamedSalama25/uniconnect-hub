@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { houseService } from "@/features/accommodation-list/services/house.service";
+import { Loader2 } from "lucide-react";
 import type { Accommodation } from "@/data/mockData";
 import { AccommodationImageSlider } from "../components/AccommodationImageSlider";
 import { AccommodationPropertyInfo } from "../components/AccommodationPropertyInfo";
@@ -17,7 +19,29 @@ interface AccommodationDetailTemplateProps {
 
 export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDetailTemplateProps) => {
     const navigate = useNavigate();
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(accommodation?.isFavorite || false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (accommodation) {
+            setIsFavorite(accommodation.isFavorite || false);
+        }
+    }, [accommodation]);
+
+    const handleToggleFavorite = async () => {
+        if (!accommodation) return;
+        
+        setIsLoading(true);
+        try {
+            await houseService.toggleFavorite(Number(accommodation.id));
+            setIsFavorite(!isFavorite);
+            toast.success(!isFavorite ? "تمت الإضافة إلى المفضلة" : "تمت الإزالة من المفضلة");
+        } catch (error) {
+            toast.error("فشل في تحديث المفضلة");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -65,10 +89,15 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
                         <Button
                             variant="outline"
                             size="sm"
+                            disabled={isLoading}
                             className={cn("rounded-full flex items-center gap-1.5 md:gap-2 px-3 md:px-4", isFavorite && "text-destructive border-destructive")}
-                            onClick={() => setIsFavorite(!isFavorite)}
+                            onClick={handleToggleFavorite}
                         >
-                            <Heart className={cn("w-4 h-4", isFavorite && "fill-current")} />
+                            {isLoading ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Heart className={cn("w-4 h-4", isFavorite && "fill-current")} />
+                            )}
                             <span className="hidden xs:inline">{isFavorite ? 'محفوظ' : 'حفظ'}</span>
                         </Button>
                     </div>
@@ -101,6 +130,7 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
                         <AccommodationHostCard
                             hostName={accommodation.hostName}
                             hostAvatar={accommodation.hostAvatar}
+                            createdById={accommodation.createdById}
                         />
                     </div>
                 </div>

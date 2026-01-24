@@ -15,6 +15,8 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ForgetPasswordPage from "./pages/ForgetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AdminPostsPage from "./pages/AdminPostsPage";
 import AdminPostDetailsPage from "./pages/AdminPostDetailsPage";
 import AccommodationDetail from "@/pages/AccommodationDetail";
@@ -64,6 +66,14 @@ const App = () => {
             <Route
               path="/register"
               element={isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />}
+            />
+            <Route
+              path="/forget-password"
+              element={isAuthenticated ? <Navigate to="/" replace /> : <ForgetPasswordPage />}
+            />
+            <Route
+              path="/reset-password"
+              element={isAuthenticated ? <Navigate to="/" replace /> : <ResetPasswordPage />}
             />
 
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />

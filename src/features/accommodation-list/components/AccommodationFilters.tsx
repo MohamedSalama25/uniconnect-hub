@@ -27,8 +27,8 @@ export const AccommodationFilters = ({
                 <Slider
                     value={priceRange}
                     onValueChange={setPriceRange}
-                    max={10000}
-                    step={100}
+                    max={500000}
+                    step={500}
                     className="w-full"
                 />
                 <div className="flex justify-between text-sm text-muted-foreground">

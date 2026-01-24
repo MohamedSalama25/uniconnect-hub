@@ -43,6 +43,7 @@ export interface Action<TData> {
     onClick: (rowData: TData) => void;
     icon?: React.ElementType;
     show?: (rowData: TData) => boolean;
+    disabled?: (rowData: TData) => boolean;
 }
 
 interface UniTableProps<TData> {
@@ -231,6 +232,7 @@ const UniTable = <TData extends object>({
                                                 event.stopPropagation();
                                                 action.onClick(row.original);
                                             }}
+                                            disabled={action.disabled ? action.disabled(row.original) : false}
                                         >
                                             {IconComponent && <IconComponent className={`h-4 w-4 ${actionLabel === 'Delete' || actionLabel === 'Refuse' || actionLabel === 'Reject' || actionLabel === 'رفض' ? 'text-red-500' : 'text-primary'}`} />}
                                             <span className="sr-only">{actionLabel}</span>

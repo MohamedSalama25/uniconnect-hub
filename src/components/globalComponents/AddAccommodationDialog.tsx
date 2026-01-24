@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Upload, X, Loader2, Home, MapPin, Bath, BedDouble, Users, Wifi, Wind, Waves, Coffee, ShieldCheck, GraduationCap } from "lucide-react";
+import { Plus, Upload, X, Loader2, Home, MapPin, Bath, BedDouble, Wifi, Wind, Waves, Coffee, ShieldCheck, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -22,7 +21,6 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-    FormDescription
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LocationPicker } from "./LocationPicker";
 import { cn, formatImageUrl } from "@/lib/utils";
+import { useCreateHouse } from "@/features/accommodation-list/hooks/useCreateHouse";
 
 const amenitiesOptions = [
     { id: "wifi", label: "واي فاي", icon: Wifi },
@@ -48,13 +47,12 @@ const amenitiesOptions = [
 ];
 
 const formSchema = z.object({
-    title: z.string().min(5, { message: "عنوان المنشور يجب أن يكون 5 أحرف على الأقل" }),
+    name: z.string().min(5, { message: "عنوان المنشور يجب أن يكون 5 أحرف على الأقل" }),
     description: z.string().min(20, { message: "الوصف يجب أن يكون 20 حرفاً على الأقل" }),
     price: z.string().min(1, { message: "يرجى تحديد السعر" }),
-    phone: z.string().min(10, { message: "رقم الهاتف غير صحيح" }),
     rooms: z.string().min(1, { message: "يرجى تحديد عدد الغرف" }),
     bathrooms: z.string().min(1, { message: "يرجى تحديد عدد دورات المياه" }),
-    accommodationType: z.enum(["individual", "shared"]),
+    typeId: z.string().min(1, { message: "يرجى اختيار نوع السكن" }),
     address: z.string().min(5, { message: "يرجى إدخال العنوان بالتفصيل" }),
     amenities: z.array(z.string()).default([]),
     location: z.object({
@@ -75,19 +73,20 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
     const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
     const setOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
 
-    const [images, setImages] = useState<string[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [images, setImages] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    
+    const createHouseMutation = useCreateHouse();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: "",
+            name: "",
             description: "",
             price: "",
-            phone: "",
             rooms: "",
             bathrooms: "",
-            accommodationType: "individual",
+            typeId: "1", // Default TypeId
             address: "",
             amenities: [],
         },
@@ -99,31 +98,47 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
             return;
         }
 
-        setIsSubmitting(true);
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const requestData = {
+            Name: values.name,
+            Address: values.address,
+            Description: values.description,
+            Price: parseFloat(values.price),
+            NumberOfRooms: parseInt(values.rooms),
+            NumberOfBathrooms: parseInt(values.bathrooms),
+            TypeId: parseInt(values.typeId),
+            IsAvailable: true,
+            AvailableFrom: new Date().toISOString(),
+            Facilities: values.amenities,
+            Images: images,
+        };
 
-        console.log({ ...values, images });
-        toast.success("تم إضافة السكن بنجاح!", {
-            description: "سيتم مراجعة طلبك من قبل المشرفين قبل النشر."
+        createHouseMutation.mutate(requestData, {
+            onSuccess: (response) => {
+                const isError = response.statusCode && response.statusCode >= 400;
+                if (!isError) {
+                    setOpen(false);
+                    form.reset();
+                    setImages([]);
+                    setImagePreviews([]);
+                }
+            }
         });
-
-        setIsSubmitting(false);
-        setOpen(false);
-        form.reset();
-        setImages([]);
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files) {
-            const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-            setImages([...images, ...newImages]);
+            const newFiles = Array.from(files);
+            setImages([...images, ...newFiles]);
+            
+            const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+            setImagePreviews([...imagePreviews, ...newPreviews]);
         }
     };
 
     const removeImage = (index: number) => {
         setImages(images.filter((_, i) => i !== index));
+        setImagePreviews(imagePreviews.filter((_, i) => i !== index));
     };
 
     return (
@@ -149,7 +164,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField
                                 control={form.control}
-                                name="title"
+                                name="name"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>عنوان الإعلان <span className="text-red-500">*</span></FormLabel>
@@ -163,7 +178,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
 
                             <FormField
                                 control={form.control}
-                                name="accommodationType"
+                                name="typeId"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>نوع السكن <span className="text-red-500">*</span></FormLabel>
@@ -174,8 +189,8 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="individual">غرفة فردية</SelectItem>
-                                                <SelectItem value="shared">سكن مشترك</SelectItem>
+                                                <SelectItem value="1">غرفة فردية</SelectItem>
+                                                <SelectItem value="2">سكن مشترك</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -259,13 +274,13 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                                                 >
                                                     <FormControl>
                                                         <Checkbox
-                                                            checked={field.value?.includes(option.id)}
+                                                            checked={field.value?.includes(option.label)}
                                                             onCheckedChange={(checked) => {
                                                                 return checked
-                                                                    ? field.onChange([...field.value, option.id])
+                                                                    ? field.onChange([...field.value, option.label])
                                                                     : field.onChange(
                                                                         field.value?.filter(
-                                                                            (value) => value !== option.id
+                                                                            (value) => value !== option.label
                                                                         )
                                                                     );
                                                             }}
@@ -283,7 +298,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                             </div>
                         </div>
 
-                        {/* Location Picker */}
+                        {/* Location Picker (Visual Only for now) */}
                         <FormField
                             control={form.control}
                             name="location"
@@ -324,7 +339,7 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                         <div>
                             <FormLabel className="block mb-3">صور السكن (اختر صور متعددة) <span className="text-red-500">*</span></FormLabel>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {images.map((img, idx) => (
+                                {imagePreviews.map((img, idx) => (
                                     <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
                                         <img src={formatImageUrl(img)} alt="preview" className="w-full h-full object-cover" />
                                         <button
@@ -344,8 +359,8 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                             </div>
                         </div>
 
-                        {/* Price & Phone */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-muted/20 p-6 rounded-xl">
+                        {/* Price */}
+                        <div className="grid grid-cols-1 gap-6 bg-muted/20 p-6 rounded-xl">
                             <FormField
                                 control={form.control}
                                 name="price"
@@ -359,27 +374,14 @@ export function AddAccommodationDialog({ trigger, triggerClassName, open: contro
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                control={form.control}
-                                name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>رقم التواصل <span className="text-red-500">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="01xxxxxxxxx" className="h-12 dir-ltr bg-white" style={{ direction: 'ltr', textAlign: 'right' }} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t">
                             <Button type="button" variant="outline" onClick={() => setOpen(false)} className="h-12 px-6">
                                 إلغاء
                             </Button>
-                            <Button type="submit" className="h-12 px-8 font-bold gap-2" disabled={isSubmitting}>
-                                {isSubmitting ? (
+                            <Button type="submit" className="h-12 px-8 font-bold gap-2" disabled={createHouseMutation.isPending}>
+                                {createHouseMutation.isPending ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                         جاري الإضافة...

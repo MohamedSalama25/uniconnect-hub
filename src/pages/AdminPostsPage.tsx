@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import UniTable, { Action } from "@/components/globalComponents/UniTable";
 import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
@@ -7,98 +7,111 @@ import {
     CheckCircle,
     Clock,
     XCircle,
+    Loader2,
+    Loader,
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { formatDate } from "@/lib/utils";
 
 // Feature Imports
-import { Post } from "@/features/admin-posts/types";
 import AdminPostsHeader from "@/features/admin-posts/components/AdminPostsHeader";
 import AdminStatsCards from "@/features/admin-posts/components/AdminStatsCards";
-import AdminPostsFilter from "@/features/admin-posts/components/AdminPostsFilter";
+import AdminPostsFilter, { PostCategory } from "@/features/admin-posts/components/AdminPostsFilter";
+import { useAdminHouses } from "@/features/admin-posts/hooks/useAdminHouses";
+import { House } from "@/features/accommodation-list/types/house.types";
+import { houseService } from "@/features/accommodation-list/services/house.service";
 
 const AdminPostsPage = () => {
     const navigate = useNavigate();
-    const [data, setData] = useState<Post[]>([
-        { id: "1", title: "شقة مفروشة للإيجار - حي النرجس", author: "أحمد محمد", date: "2026-01-08", status: "pending", type: "سكن" },
-        { id: "2", title: "توصيل طالبات من حي الملك فهد", author: "سارة علي", date: "2026-01-07", status: "completed", type: "مواصلات" },
-        { id: "3", title: "مطلوب شريك سكن بجوار الجامعة", author: "خالد سعيد", date: "2026-01-06", status: "rejected", type: "سكن" },
-        { id: "4", title: "بيع كتب هندسة طبية - مستوى 3", author: "نورة حسن", date: "2026-01-05", status: "pending", type: "أدوات دراسية" },
-        { id: "5", title: "نقل عفش وأثاث طالبات", author: "محمد إبراهيم", date: "2026-01-04", status: "completed", type: "مواصلات" },
-    ]);
 
+    // State management for filters and pagination
+    const [selectedCategory, setSelectedCategory] = useState<PostCategory>("housing");
     const [filterStatus, setFilterStatus] = useState<string>("all");
     const [searchTerm, setSearchTerm] = useState("");
+    const [pageIndex, setPageIndex] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [processingId, setProcessingId] = useState<number | null>(null);
 
-    const filteredData = data.filter(item => {
-        const matchesStatus = filterStatus === "all" || item.status === filterStatus;
-        const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.author.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesStatus && matchesSearch;
+    // Fetching data only for housing for now (can be expanded easily)
+    const { data: housesData, isLoading: housesLoading, refetch } = useAdminHouses({
+        Search: searchTerm || undefined,
+        pageIndex: pageIndex,
+        pageSize: pageSize,
     });
 
-    const stats = {
-        total: data.length,
-        pending: data.filter(i => i.status === "pending").length,
-        completed: data.filter(i => i.status === "completed").length,
-        rejected: data.filter(i => i.status === "rejected").length,
+    const handleAcceptReject = async (id: number, isAccepted: boolean) => {
+        setProcessingId(id);
+        try {
+            await houseService.acceptHouse(id, isAccepted);
+            toast.success(isAccepted ? "تم قبول المنشور بنجاح" : "تم رفض المنشور");
+            refetch();
+        } catch (error: any) {
+            toast.error("فشل في تحديث حالة المنشور");
+        } finally {
+            setProcessingId(null);
+        }
     };
 
-    const columns: ColumnDef<Post>[] = [
+    // Stats calculation (Mocking for now while waiting for real stats API)
+    const stats = {
+        total: housesData?.count || 0,
+        pending: 0, // Should come from API
+        completed: 0,
+        rejected: 0,
+    };
+
+    const housingColumns: ColumnDef<House>[] = [
         {
-            accessorKey: "title",
+            accessorKey: "name",
             header: "عنوان المنشور",
-            cell: ({ row }) => <span className="font-bold text-primary">{row.original.title}</span>
+            cell: ({ row }) => <span className="font-bold text-primary">{row.original.name}</span>
         },
         {
-            accessorKey: "author",
+            accessorKey: "createdUser",
             header: "صاحب المنشور",
             cell: ({ row }) => (
-                <UserProfileTrigger name={row.original.author} className="w-fit">
-                    <span className="font-medium hover:text-primary transition-colors cursor-pointer border-b border-dashed border-muted-foreground/50 hover:border-primary">
-                        {row.original.author}
-                    </span>
-                </UserProfileTrigger>
+                <span className="font-medium hover:text-primary transition-colors cursor-pointer border-b text-center border-dashed border-muted-foreground/50 hover:border-primary">
+                    {row.original.createdUser?.username || "غير معروف"}
+                </span>
             )
         },
         {
-            accessorKey: "type",
+            accessorKey: "typeName",
             header: "القسم",
-            cell: ({ row }) => <Badge variant="secondary" className="px-3 py-1">{row.original.type}</Badge>
+            cell: ({ row }) => <Badge variant="secondary" className="px-3 py-1">{row.original.typeName || "سكن"}</Badge>
         },
         {
-            accessorKey: "date",
+            accessorKey: "createdAt",
             header: "تاريخ النشر",
+            cell: ({ row }) => <span>{formatDate(row.original.createdAt)}</span>
         },
         {
-            accessorKey: "status",
+            accessorKey: "isAccepted",
             header: "الحالة",
             cell: ({ row }) => {
-                const s = row.original.status;
-                if (s === "pending") return <Badge className="bg-amber-500 hover:bg-amber-600 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
-                if (s === "completed") return <Badge className="bg-green-500 hover:bg-green-600 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
-                return <Badge className="bg-red-500 hover:bg-red-600 border-none gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
+                const isAccepted = row.original.isAccepted;
+                if (!isAccepted) return <Badge className="bg-amber-500 hover:bg-amber-600 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
+                return <Badge className="bg-green-500 hover:bg-green-600 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
             }
         }
     ];
 
-    const actions: Action<Post>[] = [
+    const actions: Action<any>[] = [
         {
             label: "وافق",
-            onClick: (row) => {
-                setData(prev => prev.map(p => p.id === row.id ? { ...p, status: "completed" } : p));
-                toast.success("تم قبول المنشور بنجاح");
-            },
-            show: (row) => row.status === "pending"
+            onClick: (row) => handleAcceptReject(row.id, true),
+            show: (row) => !row.isAccepted,
+            disabled: (row) => processingId === row.id,
+            classname: "text-green-600 hover:text-green-700"
         },
         {
             label: "رفض",
-            onClick: (row) => {
-                setData(prev => prev.map(p => p.id === row.id ? { ...p, status: "rejected" } : p));
-                toast.error("تم رفض المنشور");
-            },
-            show: (row) => row.status === "pending"
+            onClick: (row) => handleAcceptReject(row.id, false),
+            show: (row) => !row.isAccepted,
+            disabled: (row) => processingId === row.id,
+            classname: "text-red-600 hover:text-red-700"
         },
         {
             label: "عرض",
@@ -106,6 +119,11 @@ const AdminPostsPage = () => {
             classname: "text-blue-500"
         }
     ];
+
+    // Determine data to display
+    const tableData = selectedCategory === "housing" ? (housesData?.data || []) : [];
+    const totalItems = selectedCategory === "housing" ? (housesData?.count || 0) : 0;
+    const isLoading = selectedCategory === "housing" && housesLoading;
 
     return (
         <DashboardLayout>
@@ -116,21 +134,37 @@ const AdminPostsPage = () => {
 
                 <div className="space-y-6">
                     <AdminPostsFilter
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={setSelectedCategory}
                         searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
+                        setSearchTerm={(term) => {
+                            setSearchTerm(term);
+                            setPageIndex(1); // Reset to page 1 on search
+                        }}
                         filterStatus={filterStatus}
                         setFilterStatus={setFilterStatus}
                     />
 
-                    <UniTable
-                        columns={columns}
-                        data={filteredData}
-                        actions={actions}
-                        totalItems={filteredData.length}
-                        itemsPerPage={5}
-                        currentPage={1}
-                        tableName="المنشورات"
-                    />
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center p-20 bg-background rounded-3xl border border-dashed text-muted-foreground gap-4">
+                            <Loader className="w-10 h-10 animate-spin text-primary" />
+                        </div>
+                    ) : (
+                        <UniTable
+                            columns={selectedCategory === "housing" ? housingColumns : []}
+                            data={tableData}
+                            actions={actions}
+                            totalItems={totalItems}
+                            itemsPerPage={pageSize}
+                            currentPage={pageIndex}
+                            onPageChange={setPageIndex}
+                            tableName={
+                                selectedCategory === "housing" ? "سكن" :
+                                    selectedCategory === "complaints" ? "شكاوى" :
+                                        selectedCategory === "transport" ? "مواصلات" : "أدوات"
+                            }
+                        />
+                    )}
                 </div>
             </div>
         </DashboardLayout>

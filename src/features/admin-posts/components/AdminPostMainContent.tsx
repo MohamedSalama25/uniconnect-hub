@@ -15,12 +15,13 @@ import { PostDetails } from "../types";
 
 interface AdminPostMainContentProps {
     post: PostDetails;
+    facilityNames?: string[];
 }
 
-const AdminPostMainContent: React.FC<AdminPostMainContentProps> = ({ post }) => {
+const AdminPostMainContent: React.FC<AdminPostMainContentProps> = ({ post, facilityNames }) => {
     return (
         <div className="lg:col-span-2 space-y-6">
-            <Card className="border-none shadow-xl overflow-hidden rounded-3xl">
+            <Card className="border-none shadow-xl overflow-hidden rounded-3xl bg-emerald-500/5">
                 {post.images.length > 0 && (
                     <div className="w-full relative group">
                         <Carousel className="w-full" opts={{ direction: 'rtl' }}>
@@ -39,8 +40,8 @@ const AdminPostMainContent: React.FC<AdminPostMainContentProps> = ({ post }) => 
                             </CarouselContent>
                             {post.images.length > 1 && (
                                 <>
-                                    <CarouselPrevious className="right-4 left-auto bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md" />
-                                    <CarouselNext className="left-4 right-auto bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md" />
+                                    <CarouselPrevious className="right-4 rotate-180 left-auto bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md" />
+                                    <CarouselNext className="left-4 rotate-180 right-auto bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md" />
                                 </>
                             )}
                         </Carousel>
@@ -89,9 +90,13 @@ const AdminPostMainContent: React.FC<AdminPostMainContentProps> = ({ post }) => 
                     <CardContent className="p-6">
                         <h4 className="font-bold mb-3">المرافق المتوفرة</h4>
                         <div className="flex flex-wrap gap-2">
-                            {['إنترنت', 'مكيف', 'مطبخ', 'أثاث'].map(f => (
-                                <Badge key={f} variant="secondary" className="rounded-md">{f}</Badge>
-                            ))}
+                            {facilityNames && facilityNames.length > 0 ? (
+                                facilityNames.map(f => (
+                                    <Badge key={f} variant="secondary" className="rounded-md px-3 py-1 bg-emerald-500/10 text-emerald-600 border-none">{f}</Badge>
+                                ))
+                            ) : (
+                                <p className="text-sm text-muted-foreground italic">لا توجد مرافق معلنة</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

@@ -1,30 +1,57 @@
 import { useState } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, Plus, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { accommodations as allAccommodations } from '@/data/mockData';
 import { AccommodationFilters } from '../components/AccommodationFilters';
 import { AccommodationList } from '../components/AccommodationList';
 import { AddAccommodationDialog } from '@/components/globalComponents/AddAccommodationDialog';
-import { Plus } from 'lucide-react';
+import { houseService } from '../services/house.service';
+import { useQuery } from '@tanstack/react-query';
+import { House } from '../types/house.types';
+import { Accommodation } from '@/data/mockData';
 
 export const AccommodationListTemplate = () => {
-    const [priceRange, setPriceRange] = useState([0, 10000]);
+    const [priceRange, setPriceRange] = useState([0, 500000]);
     const [selectedType, setSelectedType] = useState<'all' | 'private' | 'shared'>('all');
     const [showFilters, setShowFilters] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const filteredAccommodations = allAccommodations.filter(acc => {
+    const { data, isLoading } = useQuery({
+        queryKey: ['public-houses', searchQuery, selectedType],
+        queryFn: () => houseService.getAllHouses({
+            Search: searchQuery,
+            TypeId: selectedType === 'private' ? 1 : selectedType === 'shared' ? 2 : undefined, // Assuming IDs
+        })
+    });
+
+    const mapHouseToAccommodation = (house: House): Accommodation => ({
+        id: house.id.toString(),
+        title: house.name,
+        image: house.imageUrls?.[0] || "",
+        images: house.imageUrls || [],
+        price: house.price,
+        distance: 0, 
+        type: house.typeName?.toLowerCase().includes('shared') ? 'shared' : 'private',
+        rating: house.averageRating,
+        location: house.address,
+        bedrooms: house.numberOfRooms,
+        bathrooms: house.numberOfBathrooms,
+        amenities: house.facilityNames || [],
+        description: house.description,
+        hostName: house.createdByName,
+        hostAvatar: house.createdByPhotoUrl,
+        createdById: house.createdById,
+        isFavorite: house.isFavorite,
+    });
+
+    const filteredAccommodations = (data?.data || []).map(mapHouseToAccommodation).filter(acc => {
         const priceMatch = acc.price >= priceRange[0] && acc.price <= priceRange[1];
-        const typeMatch = selectedType === 'all' || acc.type === selectedType;
-        const searchMatch = acc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            acc.location.toLowerCase().includes(searchQuery.toLowerCase());
-        return priceMatch && typeMatch && searchMatch;
+        return priceMatch;
     });
 
     const handleReset = () => {
-        setPriceRange([0, 10000]);
+        setPriceRange([0, 500000]);
         setSelectedType('all');
         setSearchQuery("");
     };
@@ -37,7 +64,7 @@ export const AccommodationListTemplate = () => {
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold">السكن المتاح</h1>
                         <p className="text-muted-foreground mt-1">
-                            {filteredAccommodations.length} وحدة سكنية متاحة
+                            {isLoading ? "جاري التحميل..." : `${filteredAccommodations.length} وحدة سكنية متاحة`}
                         </p>
                     </div>
 
@@ -83,10 +110,16 @@ export const AccommodationListTemplate = () => {
                 )}
 
                 {/* Accommodations Grid */}
-                <AccommodationList
-                    accommodations={filteredAccommodations}
-                    onResetFilters={handleReset}
-                />
+                {isLoading ? (
+                    <div className="flex items-center justify-center p-20">
+                        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    </div>
+                ) : (
+                    <AccommodationList
+                        accommodations={filteredAccommodations}
+                        onResetFilters={handleReset}
+                    />
+                )}
             </div>
         </DashboardLayout>
     );

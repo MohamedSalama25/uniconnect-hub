@@ -9,6 +9,9 @@ export const useAdminUserMutations = () => {
     const onSuccess = (message: string) => {
         toast({ title: "نجاح", description: message });
         queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+        queryClient.invalidateQueries({ queryKey: ["house"] });
+        queryClient.invalidateQueries({ queryKey: ["admin-houses"] });
+        queryClient.invalidateQueries({ queryKey: ["house-detail"] });
     };
 
     const onError = (error: any) => {
@@ -24,23 +27,23 @@ export const useAdminUserMutations = () => {
         onSuccess: () => onSuccess("تم قبول المستخدم بنجاح"),
         onError: () => onError({ response: { data: { message: "فشل في قبول المستخدم" } } }),
     });
-    
+
     const blockUserMutation = useMutation({
-        mutationFn: ({ userId, isBlocked }: { userId: string; isBlocked: boolean }) => 
+        mutationFn: ({ userId, isBlocked }: { userId: string; isBlocked: boolean }) =>
             adminUsersService.blockUser(userId, isBlocked),
         onSuccess: (_, { isBlocked }) => onSuccess(isBlocked ? "تم حظر المستخدم بنجاح" : "تم فك الحظر عن المستخدم بنجاح"),
         onError: () => onError({ response: { data: { message: "فشل في تحديث حالة الحظر" } } }),
     });
 
     const assignRoleMutation = useMutation({
-        mutationFn: ({ username, role }: { username: string; role: string }) => 
+        mutationFn: ({ username, role }: { username: string; role: string }) =>
             adminUsersService.assignRole(username, role),
         onSuccess: (_, { role }) => onSuccess(`تم تعيين دور ${role} بنجاح`),
         onError: () => onError({ response: { data: { message: "فشل في تعيين الدور" } } }),
     });
 
     const removeRoleMutation = useMutation({
-        mutationFn: ({ username, role }: { username: string; role: string }) => 
+        mutationFn: ({ username, role }: { username: string; role: string }) =>
             adminUsersService.removeRole(username, role),
         onSuccess: (_, { role }) => onSuccess(`تم إزالة دور ${role} بنجاح`),
         onError: () => onError({ response: { data: { message: "فشل في إزالة الدور" } } }),
@@ -51,10 +54,10 @@ export const useAdminUserMutations = () => {
         blockUser: blockUserMutation.mutate,
         assignRole: assignRoleMutation.mutate,
         removeRole: removeRoleMutation.mutate,
-        isPending: 
-            acceptUserMutation.isPending || 
-            blockUserMutation.isPending || 
-            assignRoleMutation.isPending || 
+        isPending:
+            acceptUserMutation.isPending ||
+            blockUserMutation.isPending ||
+            assignRoleMutation.isPending ||
             removeRoleMutation.isPending
     };
 };

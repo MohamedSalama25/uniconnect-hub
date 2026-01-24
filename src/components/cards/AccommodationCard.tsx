@@ -6,17 +6,35 @@ import { Action } from '@radix-ui/react-toast';
 import { cn, formatImageUrl } from '@/lib/utils';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { houseService } from '@/features/accommodation-list/services/house.service';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 interface AccommodationCardProps {
   accommodation: Accommodation;
 }
 
 export function AccommodationCard({ accommodation }: AccommodationCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(accommodation.isFavorite || false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleNavigate = () => {
     navigate(`/accommodation/${accommodation.id}`);
+  };
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsLoading(true);
+    try {
+      await houseService.toggleFavorite(Number(accommodation.id));
+      setIsFavorite(!isFavorite);
+      toast.success(!isFavorite ? "تمت الإضافة إلى المفضلة" : "تمت الإزالة من المفضلة");
+    } catch (error) {
+      toast.error("فشل في تحديث المفضلة");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -49,13 +67,18 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
         <Button
           variant="ghost"
           size="icon"
+          disabled={isLoading}
           className={cn(
             'absolute top-3 left-3 rounded-full bg-card/80 backdrop-blur-sm',
             isFavorite && 'text-destructive'
           )}
-          onClick={() => setIsFavorite(!isFavorite)}
+          onClick={handleToggleFavorite}
         >
-          <Heart className={cn('w-5 h-5', isFavorite && 'fill-current')} />
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Heart className={cn('w-5 h-5', isFavorite && 'fill-current')} />
+          )}
         </Button>
 
         {/* Price */}

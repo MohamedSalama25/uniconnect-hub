@@ -24,6 +24,8 @@ export interface Accommodation {
   description: string;
   hostName: string;
   hostAvatar: string;
+  createdById?: string;
+  isFavorite?: boolean;
   lat?: number;
   lng?: number;
 }
