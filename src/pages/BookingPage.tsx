@@ -1,17 +1,7 @@
-import { useParams, Navigate } from "react-router-dom";
-import { accommodations } from "@/data/mockData";
-import { BookingTemplate } from "@/features/booking/templates/BookingTemplate";
-
+import { BookingsTemplate } from "@/features/booking/templates/BookingsTemplate";
 
 const BookingPage = () => {
-    const { id } = useParams();
-    const accommodation = accommodations.find((a) => a.id === id);
-
-    if (!accommodation) {
-        return <Navigate to="/accommodations" replace />;
-    }
-
-    return <BookingTemplate accommodation={accommodation} />;
+    return <BookingsTemplate />;
 };
 
 export default BookingPage;

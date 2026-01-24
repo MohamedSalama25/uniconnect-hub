@@ -102,16 +102,16 @@ export const AccommodationListTemplate = () => {
                 )}
 
                 {/* Accommodations Grid */}
-                {isLoading ? (
-                    <div className="h-[80vh]">
-                        <CustomLoader />
-                    </div>
-                ) : (
-                    <AccommodationList
-                        accommodations={filteredAccommodations}
-                        onResetFilters={handleReset}
-                    />
-                )}
+                <div className="relative min-h-[400px]">
+                    {isLoading ? (
+                        <CustomLoader className="min-h-[400px] rounded-3xl" />
+                    ) : (
+                        <AccommodationList
+                            accommodations={filteredAccommodations}
+                            onResetFilters={handleReset}
+                        />
+                    )}
+                </div>
             </div>
         </DashboardLayout>
     );

@@ -35,10 +35,11 @@ export const API_CONFIG = {
             GET_BY_ID: (id: number) => `/api/House/${id}`,
             DASHBOARD_HOUSES: "/api/House/dashboard/Houses",
             DASHBOARD_HOUSE_BY_ID: (id: number) => `/api/House/dashboard/${id}`,
-            ACCEPT: (id: number) => `/api/House/${id}/accept`,
+            ACCEPT: (id: number) => `/api/House/${id}/status`,
             TOGGLE_FAVORITE: (id: number) => `/api/House/favorite/${id}`,
             DELETE: (id: number) => `/api/House/${id}`,
             UPDATE: (id: number) => `/api/House/${id}`,
+            DELETE_IMAGE: (houseId: number) => `/api/House/houses/${houseId}/images`,
             // House Types
             GET_TYPES: "/api/House/Types",
             GET_TYPE_BY_ID: (id: number) => `/api/House/HouseType/${id}`,
@@ -50,6 +51,12 @@ export const API_CONFIG = {
             DELETE_RATING: (id: number) => `/api/House/rating/${id}`,
             GET_ADMIN_RATINGS: "/api/House/ratingHouse",
             PUBLISH_RATING: (id: number) => `/api/House/${id}/publish`,
+            // Appointments
+            ADD_APPOINTMENT: "/api/House/addAppointment",
+            UPDATE_APPOINTMENT: (id: number) => `/api/House/updateAppointment/${id}`,
+            DELETE_APPOINTMENT: (id: number) => `/api/House/deleteAppointment/${id}`,
+            GET_ALL_APPOINTMENTS: "/api/House/allAppointment",
+            GET_APPOINTMENT: (id: number) => `/api/House/appointment/${id}`,
         }
     },
     SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route

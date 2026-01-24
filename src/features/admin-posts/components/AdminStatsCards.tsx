@@ -9,9 +9,10 @@ interface AdminStatsCardsProps {
         completed: number;
         rejected: number;
     };
+    isLoading?: boolean;
 }
 
-const AdminStatsCards: React.FC<AdminStatsCardsProps> = ({ stats }) => {
+const AdminStatsCards: React.FC<AdminStatsCardsProps> = ({ stats, isLoading }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatsCard

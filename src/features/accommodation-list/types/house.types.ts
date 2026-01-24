@@ -13,6 +13,8 @@ export interface Rating {
   isPublished: boolean;
 }
 
+export type HouseStatus = 'Pending' | 'Accepted' | 'Rejected';
+
 export interface House {
   id: number;
   name: string;
@@ -27,7 +29,7 @@ export interface House {
   typeName: string;
   isAvailable: boolean;
   availableFrom: string;
-  isAccepted: boolean;
+  status: HouseStatus;
   facilityNames: string[];
   imageUrls: string[];
   createdById: string;
@@ -70,12 +72,17 @@ export interface PaginatedHouses {
   pageIndex: number;
   count: number;
   data: House[];
+  totalHouses: number;
+  pendingHouses: number;
+  acceptedHouses: number;
+  rejectedHouses: number;
 }
 
 export interface HousingFilterParams {
   Search?: string;
   sort?: string;
   TypeId?: number;
+  Status?: HouseStatus | 'All';
   pageSize?: number;
   pageIndex?: number;
 }

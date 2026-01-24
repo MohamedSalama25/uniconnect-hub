@@ -37,7 +37,7 @@ const AdminPostDetailsPage = () => {
     const handleApprove = async () => {
         if (!house) return;
         try {
-            await houseService.acceptHouse(house.id, true);
+            await houseService.acceptHouse(house.id, 'Accepted');
             toast.success("تم قبول المنشور بنجاح");
             navigate("/admin/posts");
         } catch (err) {
@@ -48,7 +48,7 @@ const AdminPostDetailsPage = () => {
     const handleReject = async () => {
         if (!house) return;
         try {
-            await houseService.acceptHouse(house.id, false);
+            await houseService.acceptHouse(house.id, 'Rejected');
             toast.error("تم رفض المنشور");
             navigate("/admin/posts");
         } catch (err) {
@@ -117,7 +117,7 @@ const AdminPostDetailsPage = () => {
         phone: "غير متوفر",
         email: "غير متوفر",
         date: formatDate(house.createdAt),
-        status: house.isAccepted ? "completed" as const : "pending" as const,
+        status: house.status === 'Accepted' ? "completed" as const : "pending" as const,
         type: house.typeName || "سكن",
         description: house.description,
         address: house.address,
@@ -134,7 +134,7 @@ const AdminPostDetailsPage = () => {
                     onBack={() => navigate("/admin/posts")}
                     onApprove={handleApprove}
                     onReject={handleReject}
-                    isAccepted={house.isAccepted}
+                    status={house.status}
                     isOwner={isOwner}
                     isAdmin={isAdmin}
                     onEdit={() => setIsAddDialogOpen(true)}

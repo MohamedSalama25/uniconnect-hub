@@ -54,13 +54,14 @@ const AdminPostsPage = () => {
         Search: searchTerm || undefined,
         pageIndex: pageIndex,
         pageSize: pageSize,
+        Status: filterStatus !== 'all' ? (filterStatus as any) : undefined
     });
 
-    const handleAcceptReject = async (id: number, isAccepted: boolean) => {
+    const handleAcceptReject = async (id: number, status: 'Accepted' | 'Rejected') => {
         setProcessingId(id);
         try {
-            await houseService.acceptHouse(id, isAccepted);
-            toast.success(isAccepted ? "تم قبول المنشور بنجاح" : "تم رفض المنشور");
+            await houseService.acceptHouse(id, status);
+            toast.success(status === 'Accepted' ? "تم قبول المنشور بنجاح" : "تم رفض المنشور");
             refetch();
         } catch (error: any) {
             toast.error("فشل في تحديث حالة المنشور");
@@ -103,12 +104,12 @@ const AdminPostsPage = () => {
         }
     };
 
-    // Stats calculation (Mocking for now while waiting for real stats API)
+    // Stats from API response
     const stats = {
-        total: housesData?.count || 0,
-        pending: 0, // Should come from API
-        completed: 0,
-        rejected: 0,
+        total: housesData?.totalHouses || 0,
+        pending: housesData?.pendingHouses || 0,
+        completed: housesData?.acceptedHouses || 0,
+        rejected: housesData?.rejectedHouses || 0,
     };
 
     const housingColumns: ColumnDef<House>[] = [
@@ -137,12 +138,13 @@ const AdminPostsPage = () => {
             cell: ({ row }) => <span>{formatDate(row.original.createdAt)}</span>
         },
         {
-            accessorKey: "isAccepted",
+            accessorKey: "status",
             header: "الحالة",
             cell: ({ row }) => {
-                const isAccepted = row.original.isAccepted;
-                if (!isAccepted) return <Badge className="bg-amber-500 hover:bg-amber-600 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
-                return <Badge className="bg-green-500 hover:bg-green-600 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
+                const status = row.original.status;
+                if (status === 'Pending') return <Badge className="bg-amber-500 hover:bg-amber-600 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
+                if (status === 'Accepted') return <Badge className="bg-green-500 hover:bg-green-600 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
+                return <Badge className="bg-rose-500 hover:bg-rose-600 border-none gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
             }
         }
     ];
@@ -151,15 +153,15 @@ const AdminPostsPage = () => {
         // Admin Actions
         {
             label: "وافق",
-            onClick: (row) => handleAcceptReject(row.id, true),
-            show: (row) => !row.isAccepted && (user?.roles?.includes("Admin") || false),
+            onClick: (row) => handleAcceptReject(row.id, 'Accepted'),
+            show: (row) => row.status === 'Pending' && (user?.roles?.includes("Admin") || false),
             disabled: (row) => processingId === row.id,
             classname: "text-green-600 hover:text-green-700"
         },
         {
             label: "رفض",
-            onClick: (row) => handleAcceptReject(row.id, false),
-            show: (row) => !row.isAccepted && (user?.roles?.includes("Admin") || false),
+            onClick: (row) => handleAcceptReject(row.id, 'Rejected'),
+            show: (row) => row.status === 'Pending' && (user?.roles?.includes("Admin") || false),
             disabled: (row) => processingId === row.id,
             classname: "text-red-600 hover:text-red-700"
         },

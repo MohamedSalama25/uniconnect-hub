@@ -40,6 +40,7 @@ import { useUpdateHouse } from "@/features/accommodation-list/hooks/useUpdateHou
 import { House } from "@/features/accommodation-list/types/house.types";
 import { useHouseDetail } from "@/features/admin-posts/hooks/useHouseDetail";
 import { adminSettingsService } from "@/features/admin-settings/services/admin-settings.service";
+import { houseService } from "@/features/accommodation-list/services/house.service";
 import { useQuery } from "@tanstack/react-query";
 
 const amenitiesOptions = [
@@ -88,6 +89,7 @@ export function AddAccommodationDialog({
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [existingImages, setExistingImages] = useState<string[]>([]); // URLs of existing images for edit
+    const [deletedExistingImages, setDeletedExistingImages] = useState<string[]>([]); // URLs to be deleted from server
     const createHouseMutation = useCreateHouse();
     const updateHouseMutation = useUpdateHouse();
     const isEditMode = !!initialData;
@@ -137,6 +139,7 @@ export function AddAccommodationDialog({
             setExistingImages(activeData.imageUrls || []);
             setImages([]);
             setImagePreviews([]);
+            setDeletedExistingImages([]);
         } else if (!isEditMode && open) {
             form.reset({
                 name: "",
@@ -172,12 +175,25 @@ export function AddAccommodationDialog({
             IsAvailable: true,
             AvailableFrom: new Date().toISOString(),
             Facilities: values.amenities,
-            Images: [...existingImages, ...images], // Combined: existing URLs first, then new Files
+            Images: isEditMode ? images : [...existingImages, ...images], // For edit, only send NEW files as requested
             Latitude: values.location?.lat || 0,
             Longitude: values.location?.lng || 0,
         };
 
         if (isEditMode && initialData) {
+            // 1. Delete images marked for removal
+            if (deletedExistingImages.length > 0) {
+                try {
+                    await Promise.all(deletedExistingImages.map(url =>
+                        houseService.deleteHouseImage(initialData.id, url)
+                    ));
+                } catch (error) {
+                    console.error("Failed to delete some images", error);
+                    // We continue anyway to update the rest of the data
+                }
+            }
+
+            // 2. Perform the update with ONLY new images
             updateHouseMutation.mutate({ id: initialData.id, data: requestData }, {
                 onSuccess: () => {
                     setOpen(false);
@@ -215,6 +231,8 @@ export function AddAccommodationDialog({
     };
 
     const removeExistingImage = (index: number) => {
+        const urlToRemove = existingImages[index];
+        setDeletedExistingImages([...deletedExistingImages, urlToRemove]);
         setExistingImages(existingImages.filter((_, i) => i !== index));
     };
 

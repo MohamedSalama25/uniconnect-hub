@@ -1,7 +1,9 @@
-import { Shield, MessageCircle, Info } from "lucide-react";
+import { Shield, MessageCircle, Info, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { BookingDialog } from "@/features/booking/components/BookingDialog";
 
 interface AccommodationPricingCardProps {
     price: number;
@@ -10,6 +12,7 @@ interface AccommodationPricingCardProps {
 
 export const AccommodationPricingCard = ({ price, id }: AccommodationPricingCardProps) => {
     const navigate = useNavigate();
+    const [isBookingOpen, setIsBookingOpen] = useState(false);
 
     return (
         <div className="bg-card rounded-3xl p-6 md:p-8 border shadow-lg space-y-6">
@@ -27,10 +30,11 @@ export const AccommodationPricingCard = ({ price, id }: AccommodationPricingCard
 
             <div className="space-y-4">
                 <Button
-                    onClick={() => navigate(`/accommodation/${id}/book`)}
-                    className="w-full py-6 text-xl font-bold rounded-2xl shadow-lg shadow-primary/20 btn-hover"
+                    onClick={() => setIsBookingOpen(true)}
+                    className="w-full py-6 text-xl font-bold rounded-2xl shadow-lg shadow-primary/20 btn-hover flex items-center gap-2"
                 >
-                    احجز الآن
+                    <CalendarClock className="w-6 h-6" />
+                    حجز موعد للمعاينة
                 </Button>
                 <Button variant="outline" className="w-full py-6 text-lg font-bold rounded-2xl md:hidden">
                     <MessageCircle className="w-5 h-5 ml-2" />
@@ -44,6 +48,12 @@ export const AccommodationPricingCard = ({ price, id }: AccommodationPricingCard
                 </p>
                 <p className="text-xs text-muted-foreground">إلغاء مجاني خلال أول 48 ساعة من الحجز.</p>
             </div>
+
+            <BookingDialog
+                open={isBookingOpen}
+                onOpenChange={setIsBookingOpen}
+                houseId={Number(id)}
+            />
         </div>
     );
 };

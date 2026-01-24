@@ -27,7 +27,6 @@ import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { GlobalImageViewer } from "./components/globalComponents/GlobalImageViewer";
 
 import ProviderBookingsPage from "./pages/ProviderBookingsPage";
-import BookingDetailPage from "./pages/BookingDetailPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import AdminRatingsPage from "./pages/AdminRatingsPage";
@@ -94,7 +93,6 @@ const App = () => {
             <Route path="/admin/ratings" element={<ProtectedRoute><AdminRatingsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/provider/bookings" element={<ProtectedRoute><ProviderBookingsPage /></ProtectedRoute>} />
-            <Route path="/provider/booking/:id" element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} />
 
             <Route path="*" element={<ProtectedWrapper><NotFound /></ProtectedWrapper>} />
           </Routes>

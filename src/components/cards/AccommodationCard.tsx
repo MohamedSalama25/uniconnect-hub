@@ -95,7 +95,6 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <MapPin className="w-4 h-4" />
           <span>{accommodation.location}</span>
-          <span className="text-primary font-medium">({accommodation.distance} كم)</span>
         </div>
 
         {/* Features */}
@@ -133,9 +132,6 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
           <Button className="flex-1 btn-hover" size="sm">
             <Eye className="w-4 h-4 ml-2" />
             التفاصيل
-          </Button>
-          <Button variant="outline" size="sm" className="btn-hover">
-            <MessageCircle className="w-4 h-4" />
           </Button>
         </div>
       </div>

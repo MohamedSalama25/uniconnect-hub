@@ -84,10 +84,8 @@ export const houseService = {
     return mapHouseImages(response.data);
   },
 
-  acceptHouse: async (id: number, isAccepted: boolean): Promise<House> => {
-    const response = await clientAxios.patch<House>(API_CONFIG.ENDPOINTS.HOUSE.ACCEPT(id), null, {
-      params: { isAccepted }
-    });
+  acceptHouse: async (id: number, status: import('../types/house.types').HouseStatus): Promise<House> => {
+    const response = await clientAxios.patch<House>(API_CONFIG.ENDPOINTS.HOUSE.ACCEPT(id), status);
     return mapHouseImages(response.data);
   },
 
@@ -98,6 +96,12 @@ export const houseService = {
 
   deleteHouse: async (id: number): Promise<void> => {
     await clientAxios.delete(API_CONFIG.ENDPOINTS.HOUSE.DELETE(id));
+  },
+
+  deleteHouseImage: async (houseId: number, imageUrl: string): Promise<void> => {
+    await clientAxios.delete(API_CONFIG.ENDPOINTS.HOUSE.DELETE_IMAGE(houseId), {
+      params: { imageUrl }
+    });
   },
 
   updateHouse: async (id: number, data: CreateHouseRequest): Promise<House> => {

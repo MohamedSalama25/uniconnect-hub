@@ -1,7 +1,7 @@
-import { ProviderBookingsTemplate } from "@/features/provider-bookings/templates/ProviderBookingsTemplate";
+import { BookingsTemplate } from "@/features/booking/templates/BookingsTemplate";
 
 const ProviderBookingsPage = () => {
-    return <ProviderBookingsTemplate />;
+    return <BookingsTemplate />;
 };
 
 export default ProviderBookingsPage;

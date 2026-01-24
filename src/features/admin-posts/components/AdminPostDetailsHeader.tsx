@@ -6,7 +6,7 @@ interface AdminPostDetailsHeaderProps {
     onBack: () => void;
     onApprove: () => void;
     onReject: () => void;
-    isAccepted?: boolean;
+    status?: import('@/features/accommodation-list/types/house.types').HouseStatus;
     isOwner?: boolean;
     onEdit?: () => void;
     onDelete?: () => void;
@@ -17,7 +17,7 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
     onBack,
     onApprove,
     onReject,
-    isAccepted,
+    status,
     isOwner,
     onEdit,
     onDelete,
@@ -59,7 +59,7 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
                     </>
                 )}
 
-                {!isAccepted && isAdmin && (
+                {status === 'Pending' && isAdmin && (
                     <>
                         <Button
                             variant="destructive"
@@ -76,9 +76,14 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
                         </Button>
                     </>
                 )}
-                {isAccepted && (
+                {status === 'Accepted' && (
                     <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 px-6 py-2 rounded-xl text-lg font-bold border-none gap-2">
                         <CheckCircle className="w-5 h-5" /> منشور مقبول
+                    </Badge>
+                )}
+                {status === 'Rejected' && (
+                    <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 px-6 py-2 rounded-xl text-lg font-bold border-none gap-2">
+                        <XCircle className="w-5 h-5" /> منشور مرفوض
                     </Badge>
                 )}
             </div>
