@@ -50,7 +50,7 @@ const AdminPostsPage = () => {
     const [houseToDelete, setHouseToDelete] = useState<number | null>(null);
 
     // Fetching data only for housing for now (can be expanded easily)
-    const { data: housesData, isLoading: housesLoading, refetch } = useAdminHouses({
+    const { data: housesData, isLoading: housesLoading, isFetching: housesFetching, refetch } = useAdminHouses({
         Search: searchTerm || undefined,
         pageIndex: pageIndex,
         pageSize: pageSize,
@@ -189,7 +189,7 @@ const AdminPostsPage = () => {
     // Determine data to display
     const tableData = selectedCategory === "housing" ? (housesData?.data || []) : [];
     const totalItems = selectedCategory === "housing" ? (housesData?.count || 0) : 0;
-    const isLoading = selectedCategory === "housing" && housesLoading;
+    const isDataLoading = selectedCategory === "housing" && (housesLoading || housesFetching);
 
     return (
         <DashboardLayout>
@@ -227,7 +227,7 @@ const AdminPostsPage = () => {
                         setFilterStatus={setFilterStatus}
                     />
 
-                    {isLoading ? (
+                    {isDataLoading ? (
                         <div className="flex flex-col items-center justify-center p-20 bg-background rounded-3xl border border-dashed text-muted-foreground gap-4">
                             <Loader className="w-10 h-10 animate-spin text-primary" />
                         </div>
@@ -253,6 +253,7 @@ const AdminPostsPage = () => {
                     open={isAddDialogOpen}
                     onOpenChange={handleAddDialogClose}
                     initialData={editingHouse}
+                    trigger={null}
                 />
 
                 <ConfirmDialog
@@ -264,6 +265,7 @@ const AdminPostsPage = () => {
                     variant="destructive"
                     confirmText="نعم، حذف"
                     cancelText="إلغاء"
+                    isLoading={processingId === houseToDelete}
                 />
             </div>
         </DashboardLayout>

@@ -22,15 +22,36 @@ interface TopNavbarProps {
 }
 
 export function TopNavbar({ onMenuClick }: TopNavbarProps) {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Check localStorage on initial render
+    return localStorage.getItem('theme') === 'dark';
+  });
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, fullProfile, logout, profileUpdateTick } = useAuthStore();
   const navigate = useNavigate();
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
+
+  // Sync theme on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -148,7 +169,7 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent  className="w-40">
+              <DropdownMenuContent className="w-40">
                 <DropdownMenuItem dir="rtl" className="gap-2 " onClick={() => navigate('/profile')}>
                   <UserIcon className="w-4 h-4" />
                   <span>الملف الشخصي</span>

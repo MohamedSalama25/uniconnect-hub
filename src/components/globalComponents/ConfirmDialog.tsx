@@ -1,15 +1,15 @@
 import React from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button"; // Assuming Button is imported from here
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -20,6 +20,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   variant?: "default" | "destructive" | "warning";
+  isLoading?: boolean;
 }
 
 export function ConfirmDialog({
@@ -31,9 +32,10 @@ export function ConfirmDialog({
   confirmText = "تأكيد",
   cancelText = "إلغاء",
   variant = "default",
+  isLoading = false,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => !isLoading && !open && onClose()}>
       <AlertDialogContent dir="rtl">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-right">{title}</AlertDialogTitle>
@@ -42,20 +44,27 @@ export function ConfirmDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row-reverse gap-2 sm:justify-start">
-          <AlertDialogAction
+          <Button
             onClick={onConfirm}
+            disabled={isLoading}
             className={cn(
-                "rounded-xl font-bold px-6 h-11",
+              "rounded-xl font-bold px-6 h-11 min-w-[100px]",
               variant === "destructive" && "bg-destructive text-destructive-foreground hover:bg-destructive/90",
               variant === "warning" && "bg-amber-500 text-white hover:bg-amber-600 border-none",
               variant === "default" && "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
+            {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
             {confirmText}
-          </AlertDialogAction>
-          <AlertDialogCancel onClick={onClose} className="rounded-xl h-11 px-6 border-muted-foreground/20">
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isLoading}
+            className="rounded-xl h-11 px-6 border-muted-foreground/20"
+          >
             {cancelText}
-          </AlertDialogCancel>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

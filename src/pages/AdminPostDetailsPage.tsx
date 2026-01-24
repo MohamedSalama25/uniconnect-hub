@@ -120,6 +120,7 @@ const AdminPostDetailsPage = () => {
         status: house.isAccepted ? "completed" as const : "pending" as const,
         type: house.typeName || "سكن",
         description: house.description,
+        address: house.address,
         images: house.imageUrls
     };
 

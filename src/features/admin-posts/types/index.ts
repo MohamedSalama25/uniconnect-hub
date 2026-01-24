@@ -13,5 +13,6 @@ export interface PostDetails extends Post {
     phone: string;
     email: string;
     description: string;
+    address: string;
     images: string[];
 }

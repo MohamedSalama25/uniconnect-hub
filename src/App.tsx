@@ -29,6 +29,8 @@ import { GlobalImageViewer } from "./components/globalComponents/GlobalImageView
 import ProviderBookingsPage from "./pages/ProviderBookingsPage";
 import BookingDetailPage from "./pages/BookingDetailPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
+import AdminRatingsPage from "./pages/AdminRatingsPage";
 
 
 const queryClient = new QueryClient();
@@ -88,6 +90,8 @@ const App = () => {
             <Route path="/admin/posts" element={<ProtectedRoute><AdminPostsPage /></ProtectedRoute>} />
             <Route path="/admin/post/:id" element={<ProtectedRoute><AdminPostDetailsPage /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
+            <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
+            <Route path="/admin/ratings" element={<ProtectedRoute><AdminRatingsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/provider/bookings" element={<ProtectedRoute><ProviderBookingsPage /></ProtectedRoute>} />
             <Route path="/provider/booking/:id" element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} />

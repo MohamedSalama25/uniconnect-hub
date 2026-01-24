@@ -343,7 +343,7 @@ const UniTable = <TData extends object>({
                                             {cell.column.id === 'actions' || cell.column.id === 'header-actions' ? (
                                                 flexRender(cell.column.columnDef.cell, cell.getContext())
                                             ) : (
-                                                cell.getValue() ? (
+                                                (cell.getValue() !== undefined && cell.getValue() !== null && cell.getValue() !== '') ? (
                                                     <div className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap mx-auto">
                                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                     </div>

@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { houseService } from "@/features/accommodation-list/services/house.service";
 import { House } from "@/features/accommodation-list/types/house.types";
 import { Accommodation } from "@/data/mockData";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
+import { CustomLoader } from "@/components/ui/loader";
 
 const AccommodationDetail = () => {
     const { id } = useParams();
@@ -14,14 +15,6 @@ const AccommodationDetail = () => {
         queryFn: () => houseService.getPublicHouseById(Number(id)),
         enabled: !!id
     });
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-10 h-10 animate-spin text-primary" />
-            </div>
-        );
-    }
 
     const mapHouseToAccommodation = (house: House | undefined): Accommodation | undefined => {
         if (!house) return undefined;
@@ -39,14 +32,18 @@ const AccommodationDetail = () => {
             bathrooms: house.numberOfBathrooms,
             amenities: house.facilityNames || [],
             description: house.description,
-            hostName: house.createdByName,
-            hostAvatar: house.createdByPhotoUrl,
+            hostName: house.createdUser ? `${house.createdUser.firstName} ${house.createdUser.lastName}` : house.createdByName,
+            hostAvatar: house.createdUser?.profilePictureUrl || house.createdByPhotoUrl,
             createdById: house.createdById,
+            createdUser: house.createdUser,
             isFavorite: house.isFavorite,
+            ratings: house.ratings,
+            lat: house.latitude,
+            lng: house.longitude,
         };
     };
 
-    return <AccommodationDetailTemplate accommodation={mapHouseToAccommodation(house)} />;
+    return <AccommodationDetailTemplate isLoading={isLoading} accommodation={mapHouseToAccommodation(house)} />;
 };
 
 export default AccommodationDetail;

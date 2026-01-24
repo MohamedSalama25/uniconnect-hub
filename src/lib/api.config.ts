@@ -39,6 +39,17 @@ export const API_CONFIG = {
             TOGGLE_FAVORITE: (id: number) => `/api/House/favorite/${id}`,
             DELETE: (id: number) => `/api/House/${id}`,
             UPDATE: (id: number) => `/api/House/${id}`,
+            // House Types
+            GET_TYPES: "/api/House/Types",
+            GET_TYPE_BY_ID: (id: number) => `/api/House/HouseType/${id}`,
+            CREATE_TYPE: "/api/House/HouseType",
+            UPDATE_TYPE: (id: number) => `/api/House/HouseType/${id}`,
+            DELETE_TYPE: (id: number) => `/api/House/DeleteHouse/${id}`,
+            // Ratings
+            ADD_RATING: "/api/House/addRating",
+            DELETE_RATING: (id: number) => `/api/House/rating/${id}`,
+            GET_ADMIN_RATINGS: "/api/House/ratingHouse",
+            PUBLISH_RATING: (id: number) => `/api/House/${id}/publish`,
         }
     },
     SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route

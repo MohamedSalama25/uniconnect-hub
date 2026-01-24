@@ -264,3 +264,19 @@
     transform: scale(1);
   }
 }
+
+/* Leaflet Dark Mode Support */
+.dark .leaflet-container {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.dark .leaflet-tile {
+    filter: brightness(0.6) invert(100%) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.dark .leaflet-marker-icon,
+.dark .leaflet-marker-shadow,
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+    filter: invert(100%) hue-rotate(180deg);
+}

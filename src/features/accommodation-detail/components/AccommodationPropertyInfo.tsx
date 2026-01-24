@@ -1,26 +1,36 @@
-import { MapPin, Star, Bed, Bath, Calendar } from "lucide-react";
+import { MapPin, Star, Bed, Bath, Calendar, Map as MapIcon } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { LocationViewer } from "@/components/globalComponents/LocationViewer";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface AccommodationPropertyInfoProps {
     title: string;
     location: string;
-    distance: number;
+    totalRating: number;
     rating: number;
     bedrooms: number;
     bathrooms: number;
     description: string;
     amenities: string[];
+    lat?: number;
+    lng?: number;
 }
 
 export const AccommodationPropertyInfo = ({
     title,
     location,
-    distance,
+    totalRating,
     rating,
     bedrooms,
     bathrooms,
     description,
     amenities,
+    lat,
+    lng,
 }: AccommodationPropertyInfoProps) => {
+    const [isMapOpen, setIsMapOpen] = useState(false);
     return (
         <div className="bg-card rounded-3xl p-6 md:p-8 border shadow-sm space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -29,13 +39,43 @@ export const AccommodationPropertyInfo = ({
                     <div className="flex items-center gap-2 text-muted-foreground">
                         <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
                         <span className="text-base md:text-lg line-clamp-1">{location}</span>
-                        <span className="text-primary font-bold text-xs md:text-sm whitespace-nowrap">({distance} كم)</span>
+
+                        {(lat !== undefined && lng !== undefined) && (
+                            <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all scale-90 md:scale-100"
+                                        title="عرض على الخريطة"
+                                    >
+                                        <MapIcon className="w-4 h-4" />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-3xl rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+                                    <div className="p-6 bg-card border-b">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                                                <MapPin className="w-5 h-5 text-primary" />
+                                                موقع السكن: {title}
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                    </div>
+                                    <div className="p-4 md:p-6 bg-muted/20">
+                                        <LocationViewer lat={lat} lng={lng} title={title} className="bg-background rounded-2xl p-4 shadow-sm border" />
+                                        <p className="mt-4 text-sm text-muted-foreground text-center">
+                                            {location}
+                                        </p>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        )}
                     </div>
                 </div>
                 <div className="flex items-center gap-2 bg-accent/10 px-3 py-1.5 md:px-4 md:py-2 rounded-2xl w-fit">
                     <Star className="w-5 h-5 md:w-6 md:h-6 text-accent fill-accent" />
                     <span className="text-xl md:text-2xl font-black text-foreground">{rating}</span>
-                    <span className="text-muted-foreground text-xs md:text-sm">(12 تقييم)</span>
+                    <span className="text-muted-foreground text-xs md:text-sm">{totalRating} تقييم</span>
                 </div>
             </div>
 

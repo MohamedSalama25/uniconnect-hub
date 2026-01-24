@@ -25,9 +25,11 @@ export interface Accommodation {
   hostName: string;
   hostAvatar: string;
   createdById?: string;
+  createdUser?: any;
   isFavorite?: boolean;
   lat?: number;
   lng?: number;
+  ratings?: any[]; // Array of ratings
 }
 
 export interface Service {

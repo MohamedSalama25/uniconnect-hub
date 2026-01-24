@@ -56,7 +56,7 @@ export const AccommodationHostCard = ({ hostName, hostAvatar, createdById }: Acc
             <UserProfileTrigger name={hostName} avatar={formatImageUrl(hostAvatar) || hostAvatar} className="w-full">
                 <div className="flex items-center gap-4 p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer">
                     <img
-                        src={formatImageUrl(hostAvatar)}
+                        src={formatImageUrl(hostAvatar) || hostAvatar}
                         alt={hostName}
                         className="w-14 h-14 rounded-2xl object-cover"
                     />

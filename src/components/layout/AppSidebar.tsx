@@ -10,7 +10,9 @@ import {
   ChevronRight,
   GraduationCap,
   FileText,
-  CalendarCheck
+  CalendarCheck,
+  Settings,
+  Star
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -37,11 +39,15 @@ export function AppSidebar() {
   const { user } = useAuthStore();
   const location = useLocation();
 
-  const isAdmin = user?.roles?.includes('Admin')|| "";
-  
+  const isAdmin = user?.roles?.includes('Admin') || "";
+
   const finalNavItems = [
     ...navItems,
-    ...(isAdmin ? [{ to: '/admin/users', icon: User, label: 'المستخدمين' }] : [])
+    ...(isAdmin ? [
+      { to: '/admin/users', icon: User, label: 'المستخدمين' },
+      { to: '/admin/ratings', icon: Star, label: 'التقييمات' },
+      { to: '/admin/settings', icon: Settings, label: 'الإعدادات' }
+    ] : [])
   ];
 
   return (

@@ -12,13 +12,22 @@ import { AccommodationImageSlider } from "../components/AccommodationImageSlider
 import { AccommodationPropertyInfo } from "../components/AccommodationPropertyInfo";
 import { AccommodationPricingCard } from "../components/AccommodationPricingCard";
 import { AccommodationHostCard } from "../components/AccommodationHostCard";
+import { AccommodationReviews } from "../components/AccommodationReviews";
+import { AddRatingForm } from "../components/AddRatingForm";
+import { useAuthStore } from "@/store/useAuthStore";
+import { CustomLoader } from "@/components/ui/loader";
 
 interface AccommodationDetailTemplateProps {
     accommodation: Accommodation | undefined;
+    isLoading: boolean;
 }
 
-export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDetailTemplateProps) => {
+export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLoading }: AccommodationDetailTemplateProps) => {
     const navigate = useNavigate();
+    const { user, fullProfile } = useAuthStore();
+    const currentUserId = fullProfile?.id || (user as any)?.id;
+    const isOwner = String(accommodation?.createdUser?.id) === String(currentUserId);
+
     const [isFavorite, setIsFavorite] = useState(accommodation?.isFavorite || false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +39,7 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
 
     const handleToggleFavorite = async () => {
         if (!accommodation) return;
-        
+
         setIsLoading(true);
         try {
             await houseService.toggleFavorite(Number(accommodation.id));
@@ -47,6 +56,14 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
         navigator.clipboard.writeText(window.location.href);
         toast.success("تم نسخ رابط الصفحة بنجاح");
     };
+
+    if (isPageLoading) {
+        return (
+            <DashboardLayout>
+                <CustomLoader />
+            </DashboardLayout>
+        );
+    }
 
     if (!accommodation) {
         return (
@@ -115,13 +132,24 @@ export const AccommodationDetailTemplate = ({ accommodation }: AccommodationDeta
                         <AccommodationPropertyInfo
                             title={accommodation.title}
                             location={accommodation.location}
-                            distance={accommodation.distance}
+                            totalRating={accommodation.ratings?.length}
                             rating={accommodation.rating}
                             bedrooms={accommodation.bedrooms}
                             bathrooms={accommodation.bathrooms}
                             description={accommodation.description}
                             amenities={accommodation.amenities}
+                            lat={accommodation.lat}
+                            lng={accommodation.lng}
                         />
+
+                        {/* Ratings & Reviews Section */}
+                        <div className="space-y-10 pt-8 border-t">
+                            {!isOwner && <AddRatingForm houseId={Number(accommodation.id)} />}
+                            <AccommodationReviews
+                                houseId={Number(accommodation.id)}
+                                ratings={accommodation.ratings || []}
+                            />
+                        </div>
                     </div>
 
                     {/* Right Column: Pricing & Host */}

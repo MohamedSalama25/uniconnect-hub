@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, SlidersHorizontal, Loader2 } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -9,6 +9,7 @@ import { houseService } from '../services/house.service';
 import { useQuery } from '@tanstack/react-query';
 import { House } from '../types/house.types';
 import { Accommodation } from '@/data/mockData';
+import { CustomLoader } from '@/components/ui/loader';
 
 export const AccommodationListTemplate = () => {
     const [priceRange, setPriceRange] = useState([0, 500000]);
@@ -57,13 +58,13 @@ export const AccommodationListTemplate = () => {
 
     return (
         <DashboardLayout>
-            <div className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-fade-in ">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold">السكن المتاح</h1>
                         <p className="text-muted-foreground mt-1">
-                            {isLoading ? "جاري التحميل..." : `${filteredAccommodations.length} وحدة سكنية متاحة`}
+                            {isLoading ? "" : `${filteredAccommodations.length} وحدة سكنية متاحة`}
                         </p>
                     </div>
 
@@ -102,8 +103,8 @@ export const AccommodationListTemplate = () => {
 
                 {/* Accommodations Grid */}
                 {isLoading ? (
-                    <div className="flex items-center justify-center p-20">
-                        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    <div className="h-[80vh]">
+                        <CustomLoader />
                     </div>
                 ) : (
                     <AccommodationList

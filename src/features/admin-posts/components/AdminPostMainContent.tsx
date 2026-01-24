@@ -69,7 +69,7 @@ const AdminPostMainContent: React.FC<AdminPostMainContentProps> = ({ post, facil
                         </div>
                         <div className="flex items-center gap-1.5 text-sm">
                             <MapPin className="w-4 h-4" />
-                            <span>حي النرجس، الرياض</span>
+                            <span>{post.address}</span>
                         </div>
                     </div>
                 </CardHeader>

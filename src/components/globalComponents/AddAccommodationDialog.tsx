@@ -39,6 +39,8 @@ import { useCreateHouse } from "@/features/accommodation-list/hooks/useCreateHou
 import { useUpdateHouse } from "@/features/accommodation-list/hooks/useUpdateHouse";
 import { House } from "@/features/accommodation-list/types/house.types";
 import { useHouseDetail } from "@/features/admin-posts/hooks/useHouseDetail";
+import { adminSettingsService } from "@/features/admin-settings/services/admin-settings.service";
+import { useQuery } from "@tanstack/react-query";
 
 const amenitiesOptions = [
     { id: "wifi", label: "واي فاي", icon: Wifi },
@@ -56,7 +58,7 @@ const formSchema = z.object({
     rooms: z.string().min(1, { message: "يرجى تحديد عدد الغرف" }),
     bathrooms: z.string().min(1, { message: "يرجى تحديد عدد دورات المياه" }),
     typeId: z.string().min(1, { message: "يرجى اختيار نوع السكن" }),
-    address: z.string().min(5, { message: "يرجى إدخال العنوان بالتفصيل" }),
+    address: z.string().min(5, { message: "يرجى إدخال العنوان بالتفصيل" }).max(30, { message: "العنوان يجب ألا يتجاوز 30 حرفاً" }),
     amenities: z.array(z.string()).default([]),
     location: z.object({
         lat: z.number(),
@@ -89,6 +91,13 @@ export function AddAccommodationDialog({
     const createHouseMutation = useCreateHouse();
     const updateHouseMutation = useUpdateHouse();
     const isEditMode = !!initialData;
+
+    // Fetch house types dynamically
+    const { data: houseTypesData } = useQuery({
+        queryKey: ["house-types"],
+        queryFn: () => adminSettingsService.getHouseTypes({ pageSize: 100 }),
+    });
+    const houseTypes = houseTypesData?.data || [];
 
     // Fetch full detail if editing, to ensure we have all data (images, etc) that might be missing in list view
     const { data: fetchedHouse } = useHouseDetail(initialData?.id?.toString());
@@ -218,14 +227,16 @@ export function AddAccommodationDialog({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {trigger || (
-                    <Button className={cn("gap-2 font-bold shadow-lg shadow-primary/20", triggerClassName)}>
-                        <Plus className="w-5 h-5" />
-                        <span>إضافة سكن</span>
-                    </Button>
-                )}
-            </DialogTrigger>
+            {trigger !== null && (
+                <DialogTrigger asChild>
+                    {trigger || (
+                        <Button className={cn("gap-2 font-bold shadow-lg shadow-primary/20", triggerClassName)}>
+                            <Plus className="w-5 h-5" />
+                            <span>إضافة سكن</span>
+                        </Button>
+                    )}
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold">
@@ -246,7 +257,7 @@ export function AddAccommodationDialog({
                                     <FormItem>
                                         <FormLabel>عنوان الإعلان <span className="text-red-500">*</span></FormLabel>
                                         <FormControl>
-                                            <Input placeholder="مثال: شقة للإيجار حي النرجس..." className="h-12 text-base" {...field} />
+                                            <Input placeholder="مثال: شقة للإيجار حي النرجس..." className="h-12 text-base bg-background" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -261,13 +272,16 @@ export function AddAccommodationDialog({
                                         <FormLabel>نوع السكن <span className="text-red-500">*</span></FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger className="h-12 text-base">
+                                                <SelectTrigger dir="rtl" className="h-12 text-base">
                                                     <SelectValue placeholder="اختر نوع السكن" />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="1">غرفة فردية</SelectItem>
-                                                <SelectItem value="2">سكن مشترك</SelectItem>
+                                            <SelectContent dir="rtl">
+                                                {houseTypes.map((type) => (
+                                                    <SelectItem key={type.id} value={type.id.toString()}>
+                                                        {type.typeName}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -276,8 +290,8 @@ export function AddAccommodationDialog({
                             />
                         </div>
 
-                        <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="md:col-span-2 flex items-center gap-2 text-blue-700 font-bold border-b border-blue-200 pb-2 mb-2">
+                        <div className="bg-background p-6 rounded-2xl border border-border grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2 flex items-center gap-2 text-blue-700 font-bold border-b border-border pb-2 mb-2">
                                 <Home className="w-5 h-5" />
                                 تفاصيل السكن
                             </div>
@@ -291,7 +305,7 @@ export function AddAccommodationDialog({
                                         <FormControl>
                                             <div className="relative">
                                                 <BedDouble className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input type="number" placeholder="مثال: 3" className="h-12 bg-white pr-10" {...field} />
+                                                <Input type="number" placeholder="مثال: 3" className="h-12 bg-background pr-10" {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -308,7 +322,7 @@ export function AddAccommodationDialog({
                                         <FormControl>
                                             <div className="relative">
                                                 <Bath className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input type="number" placeholder="مثال: 2" className="h-12 bg-white pr-10" {...field} />
+                                                <Input type="number" placeholder="مثال: 2" className="h-12 bg-background pr-10" {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -325,7 +339,7 @@ export function AddAccommodationDialog({
                                         <FormControl>
                                             <div className="relative">
                                                 <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input placeholder="الحي، اسم الشارع، رقم المبنى" className="h-12 bg-white pr-10" {...field} />
+                                                <Input placeholder="الحي، اسم الشارع، رقم المبنى" className="h-12 bg-background pr-10" {...field} />
                                             </div>
                                         </FormControl>
                                         <FormMessage />
@@ -403,7 +417,7 @@ export function AddAccommodationDialog({
                                     <FormControl>
                                         <Textarea
                                             placeholder="اوصف السكن والمميزات الإضافية..."
-                                            className="min-h-[120px] resize-none text-base bg-muted/20"
+                                            className="min-h-[120px] resize-none text-base bg-background"
                                             {...field}
                                         />
                                     </FormControl>
@@ -465,7 +479,7 @@ export function AddAccommodationDialog({
                                     <FormItem>
                                         <FormLabel>السعر شهرياً <span className="text-red-500">*</span></FormLabel>
                                         <FormControl>
-                                            <Input placeholder="مثال: 3500 جنيه" className="h-12 bg-white" {...field} />
+                                            <Input placeholder="مثال: 3500 جنيه" className="h-12 bg-background" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

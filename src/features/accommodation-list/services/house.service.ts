@@ -120,7 +120,6 @@ export const houseService = {
         formData.append('Facilities', facility);
       });
     }
-    console.log(data.Images);
     if (data.Images && data.Images.length > 0) {
       data.Images.forEach((image) => {
         // Each item can be a File (new) or a string (existing URL)
@@ -130,5 +129,30 @@ export const houseService = {
 
     const response = await clientAxios.put<House>(API_CONFIG.ENDPOINTS.HOUSE.UPDATE(id), formData);
     return mapHouseImages(response.data);
+  },
+
+  // Rating Methods
+  addRating: async (data: { houseId: number; stars: number; comment: string }): Promise<any> => {
+    const response = await clientAxios.post(API_CONFIG.ENDPOINTS.HOUSE.ADD_RATING, data);
+    return response.data;
+  },
+
+  deleteRating: async (ratingId: number): Promise<void> => {
+    await clientAxios.delete(API_CONFIG.ENDPOINTS.HOUSE.DELETE_RATING(ratingId));
+  },
+
+  getAdminRatings: async (): Promise<import('../types/house.types').Rating[]> => {
+    const response = await clientAxios.get<{ success: boolean, data: import('../types/house.types').Rating[] }>(API_CONFIG.ENDPOINTS.HOUSE.GET_ADMIN_RATINGS);
+    return response.data.data.map(rating => ({
+      ...rating,
+      userPhotoUrl: formatImageUrl(rating.userPhotoUrl) || rating.userPhotoUrl
+    }));
+  },
+
+  togglePublishRating: async (ratingId: number, isPublished: boolean): Promise<any> => {
+    const response = await clientAxios.patch(API_CONFIG.ENDPOINTS.HOUSE.PUBLISH_RATING(ratingId), null, {
+      params: { isPublished }
+    });
+    return response.data;
   }
 };
