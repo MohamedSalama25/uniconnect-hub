@@ -22,6 +22,13 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 // Feature Imports
 import AdminStatsCards from "@/features/admin-posts/components/AdminStatsCards";
@@ -251,21 +258,25 @@ const AdminHousesPage = () => {
                                 />
                             </div>
 
-                            <select
+                            <Select
                                 value={selectedTypeId}
-                                onChange={(e) => {
-                                    setSelectedTypeId(e.target.value);
+                                onValueChange={(value) => {
+                                    setSelectedTypeId(value);
                                     setPageIndex(1);
                                 }}
-                                className="h-12 px-4 bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm outline-none cursor-pointer min-w-[150px]"
                             >
-                                <option value="all">كل الأنواع</option>
-                                {houseTypes.map((type) => (
-                                    <option key={type.id} value={type.id.toString()}>
-                                        {type.typeName}
-                                    </option>
-                                ))}
-                            </select>
+                                <SelectTrigger dir="rtl" className="h-12 w-[180px] bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm">
+                                    <SelectValue dir="rtl" placeholder="كل الأنواع" />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl" className="rounded-xl border-none shadow-2xl">
+                                    <SelectItem dir="rtl" value="all" className="font-bold">كل الأنواع</SelectItem>
+                                    {houseTypes.map((type) => (
+                                        <SelectItem key={type.id} value={type.id.toString()} className="font-bold">
+                                            {type.typeName}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner">

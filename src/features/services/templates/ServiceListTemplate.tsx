@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { AddServiceModal } from '@/components/services/AddServiceModal';
 import { ServiceFilters } from '../components/ServiceFilters';
 import { ServiceList } from '../components/ServiceList';
 import { usePublicServices } from '../hooks/useServices';
@@ -12,7 +10,6 @@ import { Loader2 } from 'lucide-react';
 export const ServiceListTemplate = () => {
     const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: servicesData, isLoading } = usePublicServices({
         Search: searchQuery || undefined,
@@ -39,10 +36,6 @@ export const ServiceListTemplate = () => {
                                 {servicesData?.count || 0} خدمة متاحة في منطقتك
                             </p>
                         </div>
-                        <Button onClick={() => setIsModalOpen(true)} className="gap-2 rounded-full px-6">
-                            <Plus className="w-4 h-4" />
-                            إضافة خدمة
-                        </Button>
                     </div>
 
                     <div className="relative w-full md:w-80">
@@ -57,7 +50,6 @@ export const ServiceListTemplate = () => {
                     </div>
                 </div>
 
-                <AddServiceModal open={isModalOpen} onOpenChange={setIsModalOpen} />
 
                 {/* Category Filters */}
                 <ServiceFilters

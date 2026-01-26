@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminSettingsService } from "@/features/admin-settings/services/admin-settings.service";
 import { useNavigate } from "react-router-dom";
 import UniTable, { Action } from "@/components/globalComponents/UniTable";
@@ -21,6 +21,13 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 // Feature Imports
 import AdminStatsCards from "@/features/admin-posts/components/AdminStatsCards";
@@ -36,6 +43,7 @@ const AdminServicesPage = () => {
     const navigate = useNavigate();
     const { user, fullProfile } = useAuthStore();
     const currentUserId = fullProfile?.id || (user as any)?.id;
+    const queryClient = useQueryClient();
 
     const [filterStatus, setFilterStatus] = useState<string>("all");
     const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
@@ -64,16 +72,23 @@ const AdminServicesPage = () => {
         CatogeryId: selectedCategoryId !== 'all' ? Number(selectedCategoryId) : undefined
     });
 
-    const handleAcceptReject = async (id: number, status: 'Accepted' | 'Rejected') => {
-        setProcessingId(id);
+    const handleApprove = async (service: any) => {
         try {
-            await serviceService.updateServiceStatus(id, status);
-            toast.success(status === 'Accepted' ? "تم قبول الخدمة بنجاح" : "تم رفض الخدمة");
-            refetchServices();
-        } catch (error: any) {
-            toast.error("فشل في تحديث حالة الخدمة");
-        } finally {
-            setProcessingId(null);
+            await serviceService.updateServiceStatus(service, 'Accepted');
+            toast.success("تم قبول الخدمة بنجاح");
+            queryClient.invalidateQueries({ queryKey: ['admin-services'] });
+        } catch (err) {
+            toast.error("فشل في قبول الخدمة");
+        }
+    };
+
+    const handleReject = async (service: any) => {
+        try {
+            await serviceService.updateServiceStatus(service, 'Rejected');
+            toast.error("تم رفض الخدمة");
+            queryClient.invalidateQueries({ queryKey: ['admin-services'] });
+        } catch (err) {
+            toast.error("فشل في رفض الخدمة");
         }
     };
 
@@ -136,12 +151,17 @@ const AdminServicesPage = () => {
         {
             accessorKey: "serviceCategoryName",
             header: "القسم",
-            cell: ({ row }) => (
-                <Badge variant="secondary" className="px-3 py-1 gap-2">
-                    <IconRenderer name={row.original.serviceCategoryName?.toLowerCase() || ""} size={14} />
-                    {row.original.serviceCategoryName || "خدمة"}
-                </Badge>
-            )
+            cell: ({ row }) => {
+                const category = categories.find(c => c.id === row.original.serviceCategoryId);
+                const iconName = category?.icon || row.original.serviceCategoryName?.toLowerCase() || "briefcase";
+
+                return (
+                    <Badge variant="secondary" className="px-3 py-1 gap-2">
+                        <IconRenderer name={iconName} size={14} />
+                        {row.original.serviceCategoryName || "خدمة"}
+                    </Badge>
+                );
+            }
         },
         {
             accessorKey: "createdAt",
@@ -177,20 +197,6 @@ const AdminServicesPage = () => {
 
     const actions: Action<any>[] = [
         {
-            label: "وافق",
-            onClick: (row) => handleAcceptReject(row.id, 'Accepted'),
-            show: (row) => row.status === 'Pending' && (user?.roles?.includes("Admin") || false),
-            disabled: (row) => processingId === row.id,
-            classname: "text-green-600 hover:text-green-700"
-        },
-        {
-            label: "رفض",
-            onClick: (row) => handleAcceptReject(row.id, 'Rejected'),
-            show: (row) => row.status === 'Pending' && (user?.roles?.includes("Admin") || false),
-            disabled: (row) => processingId === row.id,
-            classname: "text-red-600 hover:text-red-700"
-        },
-        {
             label: "تعديل",
             onClick: (row) => handleEdit(row),
             show: (row) => String(row.createdUser?.id) === String(currentUserId),
@@ -203,6 +209,20 @@ const AdminServicesPage = () => {
             show: (row) => String(row.createdUser?.id) === String(currentUserId),
             classname: "text-red-600 hover:text-red-700 font-bold",
             icon: Trash2
+        },
+        {
+            label: "قبول",
+            icon: CheckCircle,
+            show: (row) => row.status !== 'Accepted',
+            onClick: (row) => handleApprove(row),
+            classname: "text-emerald-600"
+        },
+        {
+            label: "رفض",
+            icon: XCircle,
+            show: (row) => row.status !== 'Rejected',
+            onClick: (row) => handleReject(row),
+            classname: "text-rose-600"
         },
         {
             label: "عرض",
@@ -225,7 +245,7 @@ const AdminServicesPage = () => {
                                 setEditingService(undefined);
                                 setIsAddDialogOpen(true);
                             }}
-                            className="gap-2 rounded-full px-6 shadow-lg shadow-primary/20 font-bold h-12 bg-blue-600 hover:bg-blue-700"
+                            className="gap-2 rounded-full px-6 shadow-lg shadow-primary/20 font-bold h-12 bg-primary hover:bg-primary/80"
                         >
                             <Plus className="w-5 h-5" />
                             <span>إضافة خدمة</span>
@@ -251,21 +271,25 @@ const AdminServicesPage = () => {
                                 />
                             </div>
 
-                            <select
+                            <Select
                                 value={selectedCategoryId}
-                                onChange={(e) => {
-                                    setSelectedCategoryId(e.target.value);
+                                onValueChange={(value) => {
+                                    setSelectedCategoryId(value);
                                     setPageIndex(1);
                                 }}
-                                className="h-12 px-4 bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm outline-none cursor-pointer min-w-[150px]"
                             >
-                                <option value="all">كل الأقسام</option>
-                                {categories?.map((cat) => (
-                                    <option key={cat.id} value={cat.id.toString()}>
-                                        {cat.name}
-                                    </option>
-                                ))}
-                            </select>
+                                <SelectTrigger dir="rtl" className="h-12 w-[180px] bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm">
+                                    <SelectValue dir="rtl" placeholder="كل الأقسام" />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl" className="rounded-xl border-none shadow-2xl">
+                                    <SelectItem dir="rtl" value="all" className="font-bold">كل الأقسام</SelectItem>
+                                    {categories?.map((cat) => (
+                                        <SelectItem dir="rtl" key={cat.id} value={cat.id.toString()} className="font-bold">
+                                            {cat.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner">

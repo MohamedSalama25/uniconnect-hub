@@ -22,6 +22,7 @@ import AdminServicesPage from "./pages/AdminServicesPage";
 import AdminHelpRequestsPage from "./pages/AdminHelpRequestsPage";
 import AdminServiceDetailsPage from "./pages/AdminServiceDetailsPage";
 import AdminPostDetailsPage from "./pages/AdminPostDetailsPage";
+import AdminHelpRequestDetailsPage from "./pages/AdminHelpRequestDetailsPage";
 import AccommodationDetail from "@/pages/AccommodationDetail";
 import BookingPage from "./pages/BookingPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
@@ -94,6 +95,7 @@ const App = () => {
             <Route path="/admin/services" element={<ProtectedRoute><AdminServicesPage /></ProtectedRoute>} />
             <Route path="/admin/service/:id" element={<ProtectedRoute><AdminServiceDetailsPage /></ProtectedRoute>} />
             <Route path="/admin/help-requests" element={<ProtectedRoute><AdminHelpRequestsPage /></ProtectedRoute>} />
+            <Route path="/admin/help/:id" element={<ProtectedRoute><AdminHelpRequestDetailsPage /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
             <Route path="/admin/ratings" element={<ProtectedRoute><AdminRatingsPage /></ProtectedRoute>} />

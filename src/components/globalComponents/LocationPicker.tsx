@@ -121,7 +121,7 @@ export function LocationPicker({
                         "⚠️ دقة الموقع ضعيفة، يفضل تحديد موقعك يدويًا على الخريطة"
                     );
                 } else {
-                    toast.success("✅ تم تحديد موقعك الحالي بنجاح");
+                    toast.success("تم تحديد موقعك الحالي بنجاح");
                 }
             },
             (error) => {

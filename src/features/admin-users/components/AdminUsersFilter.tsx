@@ -36,20 +36,20 @@ export function AdminUsersFilter({
             className="pr-10 h-11"
           />
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-2">
           <Select
             value={filters.role}
             onValueChange={(value) => onFilterChange("role", value)}
           >
-            <SelectTrigger dir="rtl" className="w-full md:w-[140px] h-11">
+            <SelectTrigger dir="rtl" className="w-full md:w-[150px] h-12 bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm">
               <SelectValue placeholder="كل الأدوار" />
             </SelectTrigger>
-            <SelectContent dir="rtl">
-              <SelectItem value="all">كل الأدوار</SelectItem>
-              <SelectItem value="Admin">مشرف</SelectItem>
-              <SelectItem value="Student">طالب</SelectItem>
-              <SelectItem value="Service">مقدم خدمة</SelectItem>
+            <SelectContent dir="rtl" className="rounded-xl border-none shadow-2xl">
+              <SelectItem value="all" className="font-bold">كل الأدوار</SelectItem>
+              <SelectItem value="Admin" className="font-bold">مشرف</SelectItem>
+              <SelectItem value="Student" className="font-bold">طالب</SelectItem>
+              <SelectItem value="Service" className="font-bold">مقدم خدمة</SelectItem>
             </SelectContent>
           </Select>
 
@@ -57,27 +57,27 @@ export function AdminUsersFilter({
             value={filters.status}
             onValueChange={(value) => onFilterChange("status", value)}
           >
-            <SelectTrigger dir="rtl" className="w-full md:w-[140px] h-11">
+            <SelectTrigger dir="rtl" className="w-full md:w-[150px] h-12 bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm">
               <SelectValue placeholder="الحالة" />
             </SelectTrigger>
-            <SelectContent dir="rtl">
-              <SelectItem value="all">كل الحالات</SelectItem>
-              <SelectItem value="active">نشط</SelectItem>
-              <SelectItem value="pending">معلق</SelectItem>
-              <SelectItem value="blocked">محظور</SelectItem>
+            <SelectContent dir="rtl" className="rounded-xl border-none shadow-2xl">
+              <SelectItem value="all" className="font-bold">كل الحالات</SelectItem>
+              <SelectItem value="active" className="font-bold">نشط</SelectItem>
+              <SelectItem value="pending" className="font-bold">معلق</SelectItem>
+              <SelectItem value="blocked" className="font-bold">محظور</SelectItem>
             </SelectContent>
           </Select>
 
           {(filters.search || filters.role !== "all" || filters.status !== "all") && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={onClearFilters}
-                className="hover:bg-destructive/10 hover:text-destructive transition-colors"
-                title="مسح الفلاتر"
-              >
-                  <X className="h-5 w-5" />
-              </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClearFilters}
+              className="hover:bg-destructive/10 hover:text-destructive transition-colors"
+              title="مسح الفلاتر"
+            >
+              <X className="h-5 w-5" />
+            </Button>
           )}
         </div>
       </div>

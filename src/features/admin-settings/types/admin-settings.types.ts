@@ -37,3 +37,22 @@ export interface ServiceCategoryParams {
     pageSize?: number;
     pageIndex?: number;
 }
+// Help Request Types
+export interface HelpRequestType {
+    id: number;
+    name: string;
+}
+
+export interface HelpRequestTypeResponse {
+    pageSize: number;
+    pageIndex: number;
+    count: number;
+    data: HelpRequestType[];
+}
+
+export interface HelpRequestTypeParams {
+    Search?: string;
+    sort?: string;
+    pageSize?: number;
+    pageIndex?: number;
+}

@@ -6,7 +6,10 @@ import {
     HouseTypeParams,
     ServiceCategory,
     ServiceCategoryResponse,
-    ServiceCategoryParams
+    ServiceCategoryParams,
+    HelpRequestType,
+    HelpRequestTypeResponse,
+    HelpRequestTypeParams
 } from "../types/admin-settings.types";
 
 export const adminSettingsService = {
@@ -72,5 +75,44 @@ export const adminSettingsService = {
 
     deleteServiceCategory: async (id: number): Promise<void> => {
         await clientAxios.delete(API_CONFIG.ENDPOINTS.SERVICE_CATEGORY.DELETE(id));
+    },
+
+    // Help Request Types
+    getHelpRequestTypes: async (params?: HelpRequestTypeParams): Promise<HelpRequestTypeResponse | any> => {
+        const response = await clientAxios.get<HelpRequestTypeResponse | any>(API_CONFIG.ENDPOINTS.REQUEST_TYPE.GET_ALL, {
+            params,
+        });
+        // Handle cases where API returns ApiResponse<T[]> instead of paginated object
+        if (Array.isArray(response.data)) {
+            return {
+                data: response.data,
+                count: response.data.length,
+                pageIndex: 1,
+                pageSize: 100
+            };
+        }
+        if (response.data.success && Array.isArray(response.data.data)) {
+            return {
+                data: response.data.data,
+                count: response.data.data.length,
+                pageIndex: 1,
+                pageSize: 100
+            };
+        }
+        return response.data;
+    },
+
+    createHelpRequestType: async (name: string): Promise<any> => {
+        const response = await clientAxios.post(API_CONFIG.ENDPOINTS.REQUEST_TYPE.CREATE, { name });
+        return response.data;
+    },
+
+    updateHelpRequestType: async (id: number, name: string): Promise<any> => {
+        const response = await clientAxios.put(API_CONFIG.ENDPOINTS.REQUEST_TYPE.UPDATE(id), { name });
+        return response.data;
+    },
+
+    deleteHelpRequestType: async (id: number): Promise<void> => {
+        await clientAxios.delete(API_CONFIG.ENDPOINTS.REQUEST_TYPE.DELETE(id));
     },
 };

@@ -48,11 +48,10 @@ export const serviceService = {
         await clientAxios.delete(API_CONFIG.ENDPOINTS.SERVICES.DELETE(id));
     },
 
-    updateServiceStatus: async (id: number, status: 'Accepted' | 'Rejected'): Promise<Service> => {
-        const response = await clientAxios.patch<ApiResponse<Service>>(API_CONFIG.ENDPOINTS.SERVICES.UPDATE_STATUS(id), status, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+    updateServiceStatus: async (service: Service, status: 'Accepted' | 'Rejected'): Promise<Service> => {
+        const response = await clientAxios.put<ApiResponse<Service>>(API_CONFIG.ENDPOINTS.SERVICES.UPDATE_STATUS(service.id), {
+            ...service,
+            status: status
         });
         return response.data.data;
     }

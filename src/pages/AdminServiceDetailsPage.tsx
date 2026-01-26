@@ -36,7 +36,7 @@ const AdminServiceDetailsPage = () => {
     const handleApprove = async () => {
         if (!service) return;
         try {
-            await serviceService.updateServiceStatus(service.id, 'Accepted');
+            await serviceService.updateServiceStatus(service, 'Accepted');
             toast.success("تم قبول الخدمة بنجاح");
             navigate("/admin/services");
         } catch (err) {
@@ -47,7 +47,7 @@ const AdminServiceDetailsPage = () => {
     const handleReject = async () => {
         if (!service) return;
         try {
-            await serviceService.updateServiceStatus(service.id, 'Rejected');
+            await serviceService.updateServiceStatus(service, 'Rejected');
             toast.error("تم رفض الخدمة");
             navigate("/admin/services");
         } catch (err) {

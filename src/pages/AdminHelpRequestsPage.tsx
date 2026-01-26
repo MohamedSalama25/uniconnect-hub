@@ -7,55 +7,121 @@ import {
     Clock,
     XCircle,
     Loader,
+    Plus,
+    Edit,
+    Trash2,
     Search,
     AlertCircle,
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { helpRequestService } from "@/features/help/services/help-request.service";
+import { useAdminHelpRequests } from "@/features/help/hooks/useAdminHelpRequests";
+import { HelpRequest } from "@/features/help/types/help-request.types";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // Feature Imports
 import AdminStatsCards from "@/features/admin-posts/components/AdminStatsCards";
 
 const AdminHelpRequestsPage = () => {
     const navigate = useNavigate();
+    const { user, fullProfile } = useAuthStore();
+    const currentUserId = fullProfile?.id || (user as any)?.id;
+    const queryClient = useQueryClient();
 
     const [filterStatus, setFilterStatus] = useState<string>("all");
+    const [selectedTypeId, setSelectedTypeId] = useState<string>("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [pageIndex, setPageIndex] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize] = useState(10);
 
-    // Placeholder data
-    const helpRequestsData = {
-        count: 0,
-        data: [],
-        total: 0,
-        pending: 0,
-        accepted: 0,
-        rejected: 0
-    };
+    const { data: requestTypesData } = useQuery({
+        queryKey: ["help-request-types"],
+        queryFn: () => helpRequestService.getRequestTypes({ pageSize: 100 }),
+    });
+    const requestTypes = requestTypesData?.data || [];
+
+    const { data: helpData, isLoading, refetch } = useAdminHelpRequests({
+        Search: searchTerm || undefined,
+        PageIndex: pageIndex,
+        PageSize: pageSize,
+        Status: filterStatus !== 'all' ? (filterStatus as any) : undefined,
+        TypeId: selectedTypeId !== 'all' ? Number(selectedTypeId) : undefined
+    });
+
+    const helpRequests = helpData?.data || [];
+    const totalCount = helpData?.count || 0;
 
     const stats = {
-        total: 0,
-        pending: 0,
-        completed: 0,
-        rejected: 0,
+        total: helpData?.totalHelpRequests || 0,
+        pending: helpData?.pendingHelpRequests || 0,
+        completed: helpData?.acceptedHelpRequests || 0,
+        rejected: helpData?.rejectedHelpRequests || 0,
     };
 
-    const columns: ColumnDef<any>[] = [
+    const handleApprove = async (request: HelpRequest) => {
+        try {
+            await helpRequestService.updateHelpRequestStatus(request, 'Accepted');
+            toast.success("تم قبول الطلب بنجاح");
+            queryClient.invalidateQueries({ queryKey: ['admin-help-requests'] });
+        } catch (err) {
+            toast.error("فشل في قبول الطلب");
+        }
+    };
+
+    const handleReject = async (request: HelpRequest) => {
+        try {
+            await helpRequestService.updateHelpRequestStatus(request, 'Rejected');
+            toast.error("تم رفض الطلب");
+            queryClient.invalidateQueries({ queryKey: ['admin-help-requests'] });
+        } catch (err) {
+            toast.error("فشل في رفض الطلب");
+        }
+    };
+
+    const handleDelete = async (id: number) => {
+        try {
+            await helpRequestService.deleteHelpRequest(id);
+            toast.success("تم حذف الطلب بنجاح");
+            queryClient.invalidateQueries({ queryKey: ['admin-help-requests'] });
+        } catch (err) {
+            toast.error("فشل في حذف الطلب");
+        }
+    };
+
+    const columns: ColumnDef<HelpRequest>[] = [
         {
             accessorKey: "title",
             header: "عنوان الطلب",
             cell: ({ row }) => <span className="font-bold text-primary">{row.original.title}</span>
         },
         {
-            accessorKey: "user",
+            accessorKey: "createdUser",
             header: "صاحب الطلب",
             cell: ({ row }) => (
                 <span className="font-medium hover:text-primary transition-colors cursor-pointer border-b text-center border-dashed border-muted-foreground/50 hover:border-primary">
-                    {row.original.user || "غير معروف"}
+                    {row.original.createdUser?.username || "غير معروف"}
                 </span>
+            )
+        },
+        {
+            accessorKey: "helpRequestTypeName",
+            header: "النوع",
+            cell: ({ row }) => (
+                <Badge variant="secondary" className="px-3 py-1 font-bold">
+                    {row.original.helpRequestTypeName || "عام"}
+                </Badge>
             )
         },
         {
@@ -68,14 +134,41 @@ const AdminHelpRequestsPage = () => {
             header: "الحالة",
             cell: ({ row }) => {
                 const status = row.original.status;
-                if (status === 'Pending') return <Badge className="bg-amber-500 hover:bg-amber-600 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
-                if (status === 'Accepted') return <Badge className="bg-green-500 hover:bg-green-600 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
-                return <Badge className="bg-rose-500 hover:bg-rose-600 border-none gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
+                if (status === 'Pending') return <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
+                if (status === 'Accepted') return <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/20 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
+                return <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-none gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
             }
         }
     ];
 
-    const actions: Action<any>[] = [
+    const actions: Action<HelpRequest>[] = [
+        {
+            label: "تعديل",
+            onClick: (row) => navigate(`/admin/help/edit/${row.id}`),
+            show: (row) => String(row.createdUser?.id) === String(currentUserId),
+            icon: Edit
+        },
+        {
+            label: "حذف",
+            onClick: (row) => handleDelete(row.id),
+            show: (row) => String(row.createdUser?.id) === String(currentUserId) || user?.roles?.includes("Admin"),
+            classname: "text-rose-600 hover:text-rose-700",
+            icon: Trash2
+        },
+        {
+            label: "قبول",
+            icon: CheckCircle,
+            show: (row) => row.status !== 'Accepted' && user?.roles?.includes("Admin"),
+            onClick: (row) => handleApprove(row),
+            classname: "text-emerald-600"
+        },
+        {
+            label: "رفض",
+            icon: XCircle,
+            show: (row) => row.status !== 'Rejected' && user?.roles?.includes("Admin"),
+            onClick: (row) => handleReject(row),
+            classname: "text-rose-600"
+        },
         {
             label: "عرض",
             onClick: (row) => navigate(`/admin/help/${row.id}`),
@@ -97,17 +190,39 @@ const AdminHelpRequestsPage = () => {
 
                 <div className="bg-background p-6 rounded-3xl shadow-sm border space-y-6">
                     <div className="flex flex-wrap gap-4 items-center justify-between">
-                        <div className="relative flex-1 min-w-[280px] max-w-[350px]">
-                            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input
-                                placeholder="البحث في الطلبات..."
-                                className="pr-12 h-12 bg-muted/40 border-none rounded-2xl focus-visible:ring-1 focus-visible:ring-primary/20 transition-all font-medium"
-                                value={searchTerm}
-                                onChange={(e) => {
-                                    setSearchTerm(e.target.value);
+                        <div className="flex flex-wrap items-center gap-4 flex-1">
+                            <div className="relative min-w-[280px] max-w-[350px]">
+                                <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                    placeholder="البحث في الطلبات..."
+                                    className="pr-12 h-12 bg-muted/40 border-none rounded-2xl focus-visible:ring-1 focus-visible:ring-primary/20 transition-all font-medium"
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setPageIndex(1);
+                                    }}
+                                />
+                            </div>
+
+                            <Select
+                                value={selectedTypeId}
+                                onValueChange={(value) => {
+                                    setSelectedTypeId(value);
                                     setPageIndex(1);
                                 }}
-                            />
+                            >
+                                <SelectTrigger dir="rtl" className="h-12 w-[180px] bg-muted/40 border-none rounded-2xl focus:ring-1 focus:ring-primary/20 transition-all font-bold text-sm">
+                                    <SelectValue dir="rtl" placeholder="كل الأنواع" />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl" className="rounded-xl border-none shadow-2xl">
+                                    <SelectItem dir="rtl" value="all" className="font-bold">كل الأنواع</SelectItem>
+                                    {requestTypes.map((type) => (
+                                        <SelectItem dir="rtl" key={type.id} value={type.id.toString()} className="font-bold">
+                                            {type.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner">
@@ -128,10 +243,18 @@ const AdminHelpRequestsPage = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-center justify-center p-20 border border-dashed rounded-3xl text-muted-foreground gap-4">
-                        <AlertCircle className="w-12 h-12 text-primary/40" />
-                        <p className="text-xl font-bold">لا توجد طلبات مساعدة حالياً</p>
-                        <p className="font-medium text-sm">سيتم عرض قائمة الطلبات هنا فور توفرها.</p>
+                    <div className="overflow-hidden rounded-2xl border bg-card">
+                        <UniTable
+                            columns={columns}
+                            data={helpRequests}
+                            actions={actions}
+                            totalItems={totalCount}
+                            itemsPerPage={pageSize}
+                            currentPage={pageIndex}
+                            onPageChange={(page) => setPageIndex(page)}
+                            tableName="طلبات المساعدة"
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
             </div>

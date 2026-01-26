@@ -65,7 +65,7 @@ export const API_CONFIG = {
             CREATE: "/api/Services",
             UPDATE: (id: number) => `/api/Services/${id}`,
             DELETE: (id: number) => `/api/Services/${id}`,
-            UPDATE_STATUS: (id: number) => `/api/Services/${id}/status`,
+            UPDATE_STATUS: (id: number) => `/api/Services/${id}`,
         },
         SERVICE_CATEGORY: {
             GET_ALL: "/ServiceCategory",
@@ -73,6 +73,23 @@ export const API_CONFIG = {
             CREATE: "/ServiceCategory",
             UPDATE: (id: number) => `/ServiceCategory/${id}`,
             DELETE: (id: number) => `/ServiceCategory/${id}`,
+        },
+        HELP_REQUEST: {
+            GET_ALL: "/api/HelpRequest",
+            GET_BY_ID: (id: number) => `/api/HelpRequest/${id}`,
+            DASHBOARD_GET_ALL: "/api/HelpRequest/dashboard",
+            DASHBOARD_GET_BY_ID: (id: number) => `/api/HelpRequest/dashboard/${id}`,
+            CREATE: "/api/HelpRequest",
+            UPDATE: (id: number) => `/api/HelpRequest/${id}`,
+            DELETE: (id: number) => `/api/HelpRequest/${id}`,
+            UPDATE_STATUS: (id: number) => `/api/HelpRequest/${id}`,
+        },
+        REQUEST_TYPE: {
+            GET_ALL: "/requestTypes",
+            GET_BY_ID: (id: number) => `/requestTypes/${id}`,
+            CREATE: "/requestTypes",
+            UPDATE: (id: number) => `/requestTypes/${id}`,
+            DELETE: (id: number) => `/requestTypes/${id}`,
         }
     },
     SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route
