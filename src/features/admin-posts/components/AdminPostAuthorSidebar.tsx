@@ -20,6 +20,7 @@ import { useAdminUserMutations } from "@/features/admin-users/hooks/useAdminUser
 import { formatDateArabic } from "@/lib/utils";
 import { PostDetails } from "../types";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface AdminPostAuthorSidebarProps {
     post: PostDetails;
@@ -32,6 +33,9 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
     const [isSending, setIsSending] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+    const { user: currentUser, fullProfile } = useAuthStore();
+    const currentUserId = fullProfile?.id || (currentUser as any)?.id;
+
     const { blockUser, isPending: isMutationPending } = useAdminUserMutations();
 
     const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : post.author;
@@ -41,6 +45,7 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
     const university = user?.universityName || post.university;
     const joinDate = user?.isAcceptedDate || "2024-09-01T00:00:00";
     const isBlocked = user?.isBlocked;
+    const isSelf = String(user?.id) === String(currentUserId);
 
     const handleSendMessage = async () => {
         if (!message.trim() || !user?.id) return;
@@ -89,31 +94,35 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                         </div>
                         <div className="w-full pt-4 space-y-3">
                             <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                    variant="outline"
-                                    className="rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5 flex-1"
-                                    onClick={() => setIsMessageDialogOpen(true)}
-                                >
-                                    <MessageCircle className="w-4 h-4" /> مراسلة
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className={cn(
-                                        "rounded-xl gap-2 font-bold flex-1",
-                                        isBlocked
-                                            ? "border-green-500/20 text-green-600 hover:bg-green-500/5"
-                                            : "border-red-500/20 text-red-600 hover:bg-red-500/5"
-                                    )}
-                                    onClick={handleToggleBlock}
-                                    disabled={isMutationPending}
-                                >
-                                    {isMutationPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        isBlocked ? <ShieldAlert className="w-4 h-4" /> : <Ban className="w-4 h-4" />
-                                    )}
-                                    {isBlocked ? "فك الحظر" : "حظر"}
-                                </Button>
+                                {!isSelf && (
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5 flex-1"
+                                        onClick={() => setIsMessageDialogOpen(true)}
+                                    >
+                                        <MessageCircle className="w-4 h-4" /> مراسلة
+                                    </Button>
+                                )}
+                                {!isSelf && (
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "rounded-xl gap-2 font-bold flex-1",
+                                            isBlocked
+                                                ? "border-green-500/20 text-green-600 hover:bg-green-500/5"
+                                                : "border-red-500/20 text-red-600 hover:bg-red-500/5"
+                                        )}
+                                        onClick={handleToggleBlock}
+                                        disabled={isMutationPending}
+                                    >
+                                        {isMutationPending ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            isBlocked ? <ShieldAlert className="w-4 h-4" /> : <Ban className="w-4 h-4" />
+                                        )}
+                                        {isBlocked ? "فك الحظر" : "حظر"}
+                                    </Button>
+                                )}
                             </div>
 
                             <div className="flex items-center gap-3 bg-muted/50 p-3 rounded-xl transition-colors hover:bg-muted">
@@ -147,11 +156,18 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                     </div>
                     <div className="flex justify-between w-full text-sm">
                         <span className="text-muted-foreground">إجمالي المنشورات</span>
-                        <span className="font-bold text-primary">12 منشور</span>
+                        <span className="font-bold text-primary">
+                            {(user?.houseCount || 0) + (user?.servicesCount || 0)} منشور
+                        </span>
                     </div>
                     <div className="flex justify-between w-full text-sm">
                         <span className="text-muted-foreground">الحساب موثق</span>
-                        <Badge className="bg-emerald-500/10 text-emerald-600 border-none">نعم</Badge>
+                        <Badge className={cn(
+                            "border-none",
+                            user?.isAccepted ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
+                        )}>
+                            {user?.isAccepted ? "نعم" : "لا"}
+                        </Badge>
                     </div>
                 </CardFooter>
             </Card>

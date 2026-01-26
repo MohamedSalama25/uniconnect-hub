@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building, Briefcase, HelpCircle, Settings } from "lucide-react";
 import { HouseTypesTable } from "../components/HouseTypesTable";
+import { ServiceCategoriesTable } from "../components/ServiceCategoriesTable";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export const AdminSettingsTemplate = () => {
@@ -38,11 +39,7 @@ export const AdminSettingsTemplate = () => {
                     </TabsContent>
 
                     <TabsContent value="services" className="bg-card p-6 rounded-2xl border shadow-md animate-in fade-in-50 duration-500">
-                        <div className="text-center py-12">
-                            <Briefcase className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
-                            <h3 className="text-lg font-medium">إعدادات الخدمات قريباً</h3>
-                            <p className="text-muted-foreground">هذا القسم قيد التطوير</p>
-                        </div>
+                        <ServiceCategoriesTable />
                     </TabsContent>
 
                     <TabsContent value="help" className="bg-card p-6 rounded-2xl border shadow-md animate-in fade-in-50 duration-500">

@@ -1,34 +1,40 @@
-import { Utensils, Pill, Hospital, Shirt, Bus, Briefcase } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import type { Service } from '@/data/mockData';
-import { LucideIcon } from 'lucide-react';
-
-export const categories: { id: Service['category'] | 'all'; label: string; icon: LucideIcon }[] = [
-    { id: 'all', label: 'الكل', icon: Briefcase },
-    { id: 'restaurant', label: 'مطاعم', icon: Utensils },
-    { id: 'pharmacy', label: 'صيدليات', icon: Pill },
-    { id: 'hospital', label: 'مستشفيات', icon: Hospital },
-    { id: 'laundry', label: 'مغاسل', icon: Shirt },
-    { id: 'transportation', label: 'مواصلات', icon: Bus },
-];
+import { useQuery } from '@tanstack/react-query';
+import { adminSettingsService } from '@/features/admin-settings/services/admin-settings.service';
+import { IconRenderer } from '@/components/globalComponents/IconRenderer';
+import { Briefcase } from 'lucide-react';
 
 interface ServiceFiltersProps {
-    selectedCategory: Service['category'] | 'all';
-    setSelectedCategory: (category: Service['category'] | 'all') => void;
+    selectedCategory: string | 'all';
+    setSelectedCategory: (category: string | 'all') => void;
 }
 
 export const ServiceFilters = ({ selectedCategory, setSelectedCategory }: ServiceFiltersProps) => {
+    const { data: categoriesData } = useQuery({
+        queryKey: ["service-categories"],
+        queryFn: () => adminSettingsService.getServiceCategories({ pageSize: 100 }),
+    });
+    const categories = categoriesData?.data || [];
+
     return (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
+            <Badge
+                variant={selectedCategory === 'all' ? "default" : "outline"}
+                className="cursor-pointer px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-105 flex items-center gap-2 border-primary/20"
+                onClick={() => setSelectedCategory('all')}
+            >
+                <Briefcase className="w-4 h-4" />
+                الكل
+            </Badge>
             {categories.map((category) => (
                 <Badge
                     key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
-                    className="cursor-pointer px-4 py-2 text-sm transition-all hover:scale-105 flex items-center gap-2"
-                    onClick={() => setSelectedCategory(category.id)}
+                    variant={selectedCategory === category.id.toString() ? "default" : "outline"}
+                    className="cursor-pointer px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-105 flex items-center gap-2 border-primary/20 shadow-sm"
+                    onClick={() => setSelectedCategory(category.id.toString())}
                 >
-                    <category.icon className="w-4 h-4" />
-                    {category.label}
+                    <IconRenderer name={category.icon?.toLowerCase() || ""} size={16} />
+                    {category.name}
                 </Badge>
             ))}
         </div>

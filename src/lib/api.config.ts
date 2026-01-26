@@ -57,6 +57,22 @@ export const API_CONFIG = {
             DELETE_APPOINTMENT: (id: number) => `/api/House/deleteAppointment/${id}`,
             GET_ALL_APPOINTMENTS: "/api/House/allAppointment",
             GET_APPOINTMENT: (id: number) => `/api/House/appointment/${id}`,
+        },
+        SERVICES: {
+            GET_ALL: "/api/Services/dashboard/Services",
+            GET_BY_ID: (id: number) => `/api/Services/${id}`,
+            DASHBOARD_GET_BY_ID: (id: number) => `/api/Services/dashboard/${id}`,
+            CREATE: "/api/Services",
+            UPDATE: (id: number) => `/api/Services/${id}`,
+            DELETE: (id: number) => `/api/Services/${id}`,
+            UPDATE_STATUS: (id: number) => `/api/Services/${id}/status`,
+        },
+        SERVICE_CATEGORY: {
+            GET_ALL: "/ServiceCategory",
+            GET_BY_ID: (id: number) => `/ServiceCategory/${id}`,
+            CREATE: "/ServiceCategory",
+            UPDATE: (id: number) => `/ServiceCategory/${id}`,
+            DELETE: (id: number) => `/ServiceCategory/${id}`,
         }
     },
     SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route

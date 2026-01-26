@@ -34,7 +34,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LocationPicker } from "./LocationPicker";
-import { cn, formatImageUrl } from "@/lib/utils";
+import { cn, formatImageUrl, extractRelativeImageUrl } from "@/lib/utils";
 import { useCreateHouse } from "@/features/accommodation-list/hooks/useCreateHouse";
 import { useUpdateHouse } from "@/features/accommodation-list/hooks/useUpdateHouse";
 import { House } from "@/features/accommodation-list/types/house.types";
@@ -89,7 +89,7 @@ export function AddAccommodationDialog({
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [existingImages, setExistingImages] = useState<string[]>([]); // URLs of existing images for edit
-    const [deletedExistingImages, setDeletedExistingImages] = useState<string[]>([]); // URLs to be deleted from server
+    const [deletingImages, setDeletingImages] = useState<string[]>([]); // URLs of images currently being deleted
     const createHouseMutation = useCreateHouse();
     const updateHouseMutation = useUpdateHouse();
     const isEditMode = !!initialData;
@@ -139,7 +139,6 @@ export function AddAccommodationDialog({
             setExistingImages(activeData.imageUrls || []);
             setImages([]);
             setImagePreviews([]);
-            setDeletedExistingImages([]);
         } else if (!isEditMode && open) {
             form.reset({
                 name: "",
@@ -181,19 +180,7 @@ export function AddAccommodationDialog({
         };
 
         if (isEditMode && initialData) {
-            // 1. Delete images marked for removal
-            if (deletedExistingImages.length > 0) {
-                try {
-                    await Promise.all(deletedExistingImages.map(url =>
-                        houseService.deleteHouseImage(initialData.id, url)
-                    ));
-                } catch (error) {
-                    console.error("Failed to delete some images", error);
-                    // We continue anyway to update the rest of the data
-                }
-            }
-
-            // 2. Perform the update with ONLY new images
+            // Perform the update with ONLY new images (existing ones are now handled immediately)
             updateHouseMutation.mutate({ id: initialData.id, data: requestData }, {
                 onSuccess: () => {
                     setOpen(false);
@@ -230,10 +217,27 @@ export function AddAccommodationDialog({
         setImagePreviews(imagePreviews.filter((_, i) => i !== index));
     };
 
-    const removeExistingImage = (index: number) => {
+    const removeExistingImage = async (index: number) => {
+        if (!initialData) return;
+
         const urlToRemove = existingImages[index];
-        setDeletedExistingImages([...deletedExistingImages, urlToRemove]);
-        setExistingImages(existingImages.filter((_, i) => i !== index));
+        const relativeUrl = extractRelativeImageUrl(urlToRemove);
+
+        setDeletingImages(prev => [...prev, urlToRemove]);
+        const promise = houseService.deleteHouseImage(initialData.id, relativeUrl);
+
+        toast.promise(promise, {
+            loading: 'جاري حذف الصورة من السيرفر...',
+            success: () => {
+                setExistingImages(prev => prev.filter((_, i) => i !== index));
+                setDeletingImages(prev => prev.filter(url => url !== urlToRemove));
+                return 'تم حذف الصورة بنجاح';
+            },
+            error: (err) => {
+                setDeletingImages(prev => prev.filter(url => url !== urlToRemove));
+                return 'فشل حذف الصورة، يرجى المحاولة مرة أخرى';
+            }
+        });
     };
 
     // Note: We cannot "remove" existing images easily with current API unless there's a specific endpoint or logic for it.
@@ -241,7 +245,8 @@ export function AddAccommodationDialog({
     // However, usually "Update" might replace all or be partial. Assuming backend just adds new images or replaces. 
     // Given the task, we'll keep it simple: We just show existing. Removing existing is complex without backend support.
 
-    const isLoading = createHouseMutation.isPending || updateHouseMutation.isPending;
+    const isDeleting = deletingImages.length > 0;
+    const isLoading = createHouseMutation.isPending || updateHouseMutation.isPending || isDeleting;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -452,15 +457,23 @@ export function AddAccommodationDialog({
                                 {/* Existing Images */}
                                 {isEditMode && existingImages.map((img, idx) => (
                                     <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border bg-muted group shadow-sm">
-                                        <img src={formatImageUrl(img)} alt="existing" className="w-full h-full object-cover" />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeExistingImage(idx)}
-                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black/40 py-1 text-[10px] text-white text-center">صورة حالية</div>
+                                        <img src={formatImageUrl(img)} alt="existing" className={cn("w-full h-full object-cover", deletingImages.includes(img) && "opacity-40 grayscale")} />
+                                        {deletingImages.includes(img) ? (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                                                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeExistingImage(idx)}
+                                                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/40 py-1 text-[10px] text-white text-center">
+                                            {deletingImages.includes(img) ? "جاري الحذف..." : "صورة حالية"}
+                                        </div>
                                     </div>
                                 ))}
 

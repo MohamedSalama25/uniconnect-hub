@@ -31,7 +31,9 @@ const navItems = [
   { to: '/chat', icon: MessageCircle, label: 'المحادثات' },
   { to: '/help', icon: HelpCircle, label: 'طلبات المساعدة' },
   { to: '/profile', icon: User, label: 'الملف الشخصي' },
-  { to: '/admin/posts', icon: FileText, label: 'المنشورات' },
+  { to: '/admin/houses', icon: Building, label: 'إدارة السكن' },
+  { to: '/admin/services', icon: Briefcase, label: 'إدارة الخدمات' },
+  { to: '/admin/help-requests', icon: HelpCircle, label: 'طلبات المساعدة' },
 ];
 
 export function AppSidebar() {

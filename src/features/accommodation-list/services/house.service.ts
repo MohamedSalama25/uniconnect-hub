@@ -100,7 +100,7 @@ export const houseService = {
 
   deleteHouseImage: async (houseId: number, imageUrl: string): Promise<void> => {
     await clientAxios.delete(API_CONFIG.ENDPOINTS.HOUSE.DELETE_IMAGE(houseId), {
-      params: { imageUrl }
+      params: { houseId, imageUrl }
     });
   },
 

@@ -3,21 +3,24 @@ import { Search, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { services as allServices, Service } from '@/data/mockData';
 import { AddServiceModal } from '@/components/services/AddServiceModal';
 import { ServiceFilters } from '../components/ServiceFilters';
 import { ServiceList } from '../components/ServiceList';
+import { usePublicServices } from '../hooks/useServices';
+import { Loader2 } from 'lucide-react';
 
 export const ServiceListTemplate = () => {
-    const [selectedCategory, setSelectedCategory] = useState<Service['category'] | 'all'>('all');
+    const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const filteredServices = allServices.filter(service => {
-        const categoryMatch = selectedCategory === 'all' || service.category === selectedCategory;
-        const searchMatch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
-        return categoryMatch && searchMatch;
+    const { data: servicesData, isLoading } = usePublicServices({
+        Search: searchQuery || undefined,
+        CatogeryId: selectedCategory !== 'all' ? parseInt(selectedCategory) : undefined,
+        PageSize: 100
     });
+
+    const services = servicesData?.data || [];
 
     const handleReset = () => {
         setSelectedCategory('all');
@@ -31,9 +34,9 @@ export const ServiceListTemplate = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold">الخدمات القريبة</h1>
-                            <p className="text-muted-foreground mt-1">
-                                {filteredServices.length} خدمة متاحة في منطقتك
+                            <h1 className="text-2xl md:text-3xl font-black tracking-tight">الخدمات القريبة</h1>
+                            <p className="text-muted-foreground mt-1 font-bold">
+                                {servicesData?.count || 0} خدمة متاحة في منطقتك
                             </p>
                         </div>
                         <Button onClick={() => setIsModalOpen(true)} className="gap-2 rounded-full px-6">
@@ -63,10 +66,17 @@ export const ServiceListTemplate = () => {
                 />
 
                 {/* Services Grid */}
-                <ServiceList
-                    services={filteredServices}
-                    onResetFilters={handleReset}
-                />
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                        <p className="font-bold text-muted-foreground">جاري تحميل الخدمات...</p>
+                    </div>
+                ) : (
+                    <ServiceList
+                        services={services as any}
+                        onResetFilters={handleReset}
+                    />
+                )}
             </div>
         </DashboardLayout>
     );

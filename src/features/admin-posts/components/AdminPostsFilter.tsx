@@ -68,7 +68,7 @@ const AdminPostsFilter: React.FC<AdminPostsFilterProps> = ({
                         الكل
                     </button>
                     <button
-                        onClick={() => setFilterStatus("pending")}
+                        onClick={() => setFilterStatus("0")}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 hover:text-foreground ${filterStatus === "pending"
                             ? "bg-amber-500 text-white shadow-md"
                             : "text-muted-foreground hover:bg-amber-50/50"

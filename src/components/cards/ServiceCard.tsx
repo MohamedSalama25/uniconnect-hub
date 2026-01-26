@@ -1,78 +1,78 @@
-import { MapPin, Star, Phone, Clock, Utensils, Pill, Hospital, Shirt, Bus } from 'lucide-react';
+import { MapPin, Star, Phone, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import type { Service } from '@/data/mockData';
+import { Service } from '@/features/services/types/service.types';
 import { cn } from '@/lib/utils';
-import { LucideIcon } from 'lucide-react';
+import { IconRenderer } from '@/components/globalComponents/IconRenderer';
 
 interface ServiceCardProps {
   service: Service;
 }
 
-const categoryConfig: Record<Service['category'], { 
-  icon: LucideIcon; 
-  label: string; 
-  color: string;
-}> = {
-  restaurant: { icon: Utensils, label: 'مطعم', color: 'bg-accent text-accent-foreground' },
-  pharmacy: { icon: Pill, label: 'صيدلية', color: 'bg-success text-success-foreground' },
-  hospital: { icon: Hospital, label: 'مستشفى', color: 'bg-destructive text-destructive-foreground' },
-  laundry: { icon: Shirt, label: 'مغسلة', color: 'bg-primary text-primary-foreground' },
-  transportation: { icon: Bus, label: 'مواصلات', color: 'bg-secondary text-secondary-foreground' },
-};
-
 export function ServiceCard({ service }: ServiceCardProps) {
-  const config = categoryConfig[service.category];
-  const Icon = config.icon;
+  const categoryIcon = service.serviceCategoryName?.toLowerCase() || "briefcase";
+
+  const formatTime = (time: any) => {
+    if (!time) return "";
+    if (typeof time === 'string') return time.split(':').slice(0, 2).join(':');
+    if (time.hours !== undefined && time.minutes !== undefined) {
+      return `${time.hours}:${time.minutes.toString().padStart(2, '0')}`;
+    }
+    return "";
+  };
 
   return (
-    <div className="bg-card rounded-2xl p-5 shadow-card card-hover">
-      <div className="flex items-start gap-4">
+    <div className="bg-card/50 backdrop-blur-sm rounded-3xl p-6 border border-white/5 shadow-xl hover:shadow-primary/5 transition-all duration-300 group">
+      <div className="flex items-start gap-5">
         {/* Icon */}
-        <div className={cn('p-3 rounded-xl', config.color)}>
-          <Icon className="w-6 h-6" />
+        <div className="p-4 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+          <IconRenderer name={categoryIcon} size={28} />
         </div>
 
         {/* Content */}
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-bold text-lg">{service.name}</h3>
-              <Badge variant="outline" className="mt-1">
-                {config.label}
+              <h3 className="font-black text-xl tracking-tight group-hover:text-primary transition-colors">{service.name}</h3>
+              <Badge variant="secondary" className="mt-2 bg-primary/5 text-primary border-none font-bold px-3">
+                {service.serviceCategoryName}
               </Badge>
             </div>
-            <div className="flex items-center gap-1 text-accent">
-              <Star className="w-4 h-4 fill-current" />
-              <span className="font-bold">{service.rating}</span>
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-500 rounded-full">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <span className="font-black text-sm">4.8</span>
             </div>
           </div>
 
-          <div className="space-y-1.5 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              <span>{service.address}</span>
-              <span className="text-primary font-medium">({service.distance} كم)</span>
+          <div className="space-y-2 text-sm text-muted-foreground font-medium">
+            <div className="flex items-center gap-2.5">
+              <MapPin className="w-4 h-4 text-primary/70" />
+              <span className="line-clamp-1">{service.address}</span>
+              <span className="text-primary font-black shrink-0">(0.5 كم)</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
+            <div className="flex items-center gap-2.5">
+              <Phone className="w-4 h-4 text-primary/70" />
               <span dir="ltr">{service.phone}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>{service.hours}</span>
+            <div className="flex items-center gap-2.5">
+              <Clock className="w-4 h-4 text-primary/70" />
+              <span>
+                {formatTime(service.workingFrom)} - {formatTime(service.workingTo)}
+              </span>
             </div>
           </div>
 
           <div className="flex gap-2 pt-2">
-            <Button size="sm" className="btn-hover">
-              <Phone className="w-4 h-4 ml-2" />
-              اتصل
-            </Button>
-            <Button variant="outline" size="sm" className="btn-hover">
-              <MapPin className="w-4 h-4 ml-2" />
-              الاتجاهات
-            </Button>
+            <div className="flex gap-3 pt-3">
+              <Button size="sm" className="rounded-xl px-6 font-bold bg-primary hover:scale-105 transition-transform h-10">
+                <Phone className="w-4 h-4 ml-2" />
+                اتصل
+              </Button>
+              <Button variant="outline" size="sm" className="rounded-xl px-6 font-bold border-muted hover:bg-muted/50 transition-colors h-10">
+                <MapPin className="w-4 h-4 ml-2" />
+                الاتجاهات
+              </Button>
+            </div>
           </div>
         </div>
       </div>

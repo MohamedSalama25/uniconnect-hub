@@ -6,7 +6,7 @@ interface AdminPostDetailsHeaderProps {
     onBack: () => void;
     onApprove: () => void;
     onReject: () => void;
-    status?: import('@/features/accommodation-list/types/house.types').HouseStatus;
+    status?: string;
     isOwner?: boolean;
     onEdit?: () => void;
     onDelete?: () => void;

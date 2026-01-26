@@ -37,3 +37,28 @@ export function formatDateArabic(date: string | Date | undefined | null) {
     year: "numeric",
   });
 }
+
+export function extractRelativeImageUrl(url: string | undefined | null): string {
+  if (!url) return "";
+
+  // Clean base URL (remove trailing slash)
+  const baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, "");
+
+  let relativePath = url;
+
+  if (url.startsWith(baseUrl)) {
+    relativePath = url.replace(baseUrl, "");
+  } else if (url.includes("localhost:7012")) {
+    relativePath = url.replace("https://localhost:7012", "");
+  } else if (url.startsWith("http")) {
+    try {
+      const urlObj = new URL(url);
+      relativePath = urlObj.pathname;
+    } catch {
+      relativePath = url;
+    }
+  }
+
+  // Remove leading slash if exists
+  return relativePath.replace(/^\//, "");
+}

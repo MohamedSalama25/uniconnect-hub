@@ -17,7 +17,10 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import AdminPostsPage from "./pages/AdminPostsPage";
+import AdminHousesPage from "./pages/AdminHousesPage";
+import AdminServicesPage from "./pages/AdminServicesPage";
+import AdminHelpRequestsPage from "./pages/AdminHelpRequestsPage";
+import AdminServiceDetailsPage from "./pages/AdminServiceDetailsPage";
 import AdminPostDetailsPage from "./pages/AdminPostDetailsPage";
 import AccommodationDetail from "@/pages/AccommodationDetail";
 import BookingPage from "./pages/BookingPage";
@@ -86,8 +89,11 @@ const App = () => {
             <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><HelpRequests /></ProtectedRoute>} />
-            <Route path="/admin/posts" element={<ProtectedRoute><AdminPostsPage /></ProtectedRoute>} />
+            <Route path="/admin/houses" element={<ProtectedRoute><AdminHousesPage /></ProtectedRoute>} />
             <Route path="/admin/post/:id" element={<ProtectedRoute><AdminPostDetailsPage /></ProtectedRoute>} />
+            <Route path="/admin/services" element={<ProtectedRoute><AdminServicesPage /></ProtectedRoute>} />
+            <Route path="/admin/service/:id" element={<ProtectedRoute><AdminServiceDetailsPage /></ProtectedRoute>} />
+            <Route path="/admin/help-requests" element={<ProtectedRoute><AdminHelpRequestsPage /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
             <Route path="/admin/ratings" element={<ProtectedRoute><AdminRatingsPage /></ProtectedRoute>} />
