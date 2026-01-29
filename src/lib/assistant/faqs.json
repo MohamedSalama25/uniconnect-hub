@@ -1,0 +1,36 @@
+{
+    "ar": [
+        {
+            "id": "intro",
+            "question": "من أنت؟",
+            "answer": "أنا مساعدك الذكي من يوني كونكت هب. أنا هنا لمساعدتك في التعرف على خدماتنا والإجابة على استفساراتك المتعلقة بالسكن والخدمات الطلابية."
+        },
+        {
+            "id": "about_uniconnect",
+            "question": "ما هو يوني كونكت هب؟",
+            "answer": "يوني كونكت هب هو منصة متكاملة تهدف لربط الطلاب بالخدمات الأساسية مثل السكن المريح والخدمات التعليمية والتقنية في مكان واحد."
+        },
+        {
+            "id": "how_to_book",
+            "question": "كيف يمكنني حجز سكن؟",
+            "answer": "يمكنك تصفح قسم السكن، اختيار المكان المناسب، ثم الضغط على زر الحجز واتباع الخطوات البسيطة."
+        }
+    ],
+    "en": [
+        {
+            "id": "intro",
+            "question": "Who are you?",
+            "answer": "I am your intelligent assistant from UniConnect Hub. I am here to help you learn about our services and answer your inquiries regarding housing and student services."
+        },
+        {
+            "id": "about_uniconnect",
+            "question": "What is UniConnect Hub?",
+            "answer": "UniConnect Hub is an integrated platform aimed at connecting students with essential services like comfortable housing and educational and technical services in one place."
+        },
+        {
+            "id": "how_to_book",
+            "question": "How can I book a house?",
+            "answer": "You can browse the housing section, choose the appropriate place, then click on the booking button and follow the simple steps."
+        }
+    ]
+}

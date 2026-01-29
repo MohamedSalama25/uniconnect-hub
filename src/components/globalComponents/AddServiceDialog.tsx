@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { LocationPicker } from "./LocationPicker";
+import { TimePicker } from "@/components/ui/time-picker";
 import { cn } from "@/lib/utils";
 import { useCreateService } from "@/features/services/hooks/useCreateService";
 import { useUpdateService } from "@/features/services/hooks/useUpdateService";
@@ -263,10 +264,11 @@ export function AddServiceDialog({
                                         <FormItem>
                                             <FormLabel>من ساعة</FormLabel>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                    <Input type="time" className="h-12 bg-background pr-10" {...field} />
-                                                </div>
+                                                <TimePicker
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    placeholder="اختر وقت البدء"
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -279,10 +281,11 @@ export function AddServiceDialog({
                                         <FormItem>
                                             <FormLabel>إلى ساعة</FormLabel>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                    <Input type="time" className="h-12 bg-background pr-10" {...field} />
-                                                </div>
+                                                <TimePicker
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    placeholder="اختر وقت الانتهاء"
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

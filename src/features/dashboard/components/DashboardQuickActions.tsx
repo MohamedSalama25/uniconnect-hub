@@ -1,11 +1,13 @@
 import { Building, Briefcase, MessageCircle, HelpCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const DashboardQuickActions = () => {
+    const navigate = useNavigate();
     const actions = [
-        { icon: Building, label: 'البحث عن سكن', color: 'gradient-primary' },
-        { icon: Briefcase, label: 'استكشاف الخدمات', color: 'gradient-accent' },
-        { icon: HelpCircle, label: 'طلب مساعدة', color: 'bg-success text-white' },
-        { icon: MessageCircle, label: 'بدء محادثة', color: 'bg-secondary' },
+        { icon: Building, label: 'البحث عن سكن', color: 'gradient-primary', path: '/accommodations' },
+        { icon: Briefcase, label: 'استكشاف الخدمات', color: 'gradient-accent', path: '/services' },
+        { icon: HelpCircle, label: 'طلب مساعدة', color: 'bg-success text-white', path: '/help' },
+        { icon: MessageCircle, label: 'بدء محادثة', color: 'bg-secondary', path: '/chat' },
     ];
 
     return (
@@ -15,8 +17,9 @@ export const DashboardQuickActions = () => {
                 {actions.map((action, index) => (
                     <button
                         key={index}
+                        onClick={() => navigate(action.path)}
                         className={`p-6 rounded-2xl text-center transition-all duration-300 hover:scale-105 hover:shadow-lg ${action.color} ${action.color.includes('gradient') ? 'text-primary-foreground' :
-                                action.color.includes('bg-success') ? 'text-success-foreground' : 'text-secondary-foreground'
+                            action.color.includes('bg-success') ? 'text-success-foreground' : 'text-secondary-foreground'
                             }`}
                     >
                         <action.icon className="w-8 h-8 mx-auto mb-3" />

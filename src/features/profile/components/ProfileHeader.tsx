@@ -31,7 +31,8 @@ export const ProfileHeader = ({ user, onEditClick }: ProfileHeaderProps) => {
         : (user?.displayName || user?.name || "مستخدم");
 
     // Use global profileUpdateTick for cache busting
-    const avatarSrc = `${formatImageUrl(user?.profilePictureUrl) || user?.avatar}${user?.profilePictureUrl ? `?t=${profileUpdateTick}` : ''}`;
+    const profilePicUrl = formatImageUrl(user?.profilePictureUrl);
+    const avatarSrc = profilePicUrl ? `${profilePicUrl}?t=${profileUpdateTick}` : undefined;
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

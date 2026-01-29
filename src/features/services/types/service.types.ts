@@ -34,13 +34,14 @@ export interface Service {
     latitude: number;
     longitude: number;
     phone: string;
-    workingFrom: TimeSpan;
-    workingTo: TimeSpan;
+    workingFrom: string | TimeSpan;
+    workingTo: string | TimeSpan;
     status: ServiceStatus;
     serviceCategoryId: number;
     serviceCategoryName: string;
     createdUser: UserDto;
     updatedUser: UserDto;
+    servicesAverageRating?: number;
     createdAt: string;
     updatedAt: string;
 }

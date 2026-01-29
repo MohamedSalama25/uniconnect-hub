@@ -24,6 +24,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { TimePicker } from "@/components/ui/time-picker";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useCreateAppointment, useUpdateAppointment } from "../hooks/useAppointments";
 import { Appointment } from "../services/appointment.service";
 import { cn } from "@/lib/utils";
@@ -123,10 +125,11 @@ export function BookingDialog({
                                     <FormItem>
                                         <FormLabel>التاريخ</FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input type="date" className="h-12 bg-background pr-10" {...field} min={new Date().toISOString().split('T')[0]} />
-                                            </div>
+                                            <DatePicker
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="اختر تاريخ المعاينة"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -140,10 +143,11 @@ export function BookingDialog({
                                     <FormItem>
                                         <FormLabel>الوقت</FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input type="time" className="h-12 bg-background pr-10" {...field} />
-                                            </div>
+                                            <TimePicker
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="اختر وقت المعاينة"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

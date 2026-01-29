@@ -67,7 +67,7 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                     <div className="flex flex-col items-center text-center space-y-4">
                         <div className="relative">
                             <Avatar className="w-24 h-24 border-4 border-background shadow-xl">
-                                <AvatarImage src={user?.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`} />
+                                <AvatarImage src={user?.profilePictureUrl} />
                                 <AvatarFallback>{displayName[0]}</AvatarFallback>
                             </Avatar>
                             <div className="absolute bottom-0 right-0 bg-green-500 border-2 border-background w-6 h-6 rounded-full flex items-center justify-center">
@@ -122,7 +122,7 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                             <UserProfileTrigger
                                 userId={user?.id || post.authorId}
                                 name={displayName}
-                                avatar={user?.profilePictureUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`}
+                                avatar={user?.profilePictureUrl}
                                 className="w-full"
                             >
                                 <Button

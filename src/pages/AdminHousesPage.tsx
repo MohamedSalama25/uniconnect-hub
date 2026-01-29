@@ -120,7 +120,7 @@ const AdminHousesPage = () => {
     };
 
     const stats = {
-        total: housesData?.totalHouses || 0,
+        total: housesData?.count || 0,
         pending: housesData?.pendingHouses || 0,
         completed: housesData?.acceptedHouses || 0,
         rejected: housesData?.rejectedHouses || 0,

@@ -29,6 +29,7 @@ import ServiceDetailPage from "./pages/ServiceDetailPage";
 import LocationPrompt from "./components/globalComponents/LocationPrompt";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { GlobalImageViewer } from "./components/globalComponents/GlobalImageViewer";
+import { AIAssistant } from "./components/assistant/AIAssistant";
 
 import ProviderBookingsPage from "./pages/ProviderBookingsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
@@ -104,6 +105,7 @@ const App = () => {
 
             <Route path="*" element={<ProtectedWrapper><NotFound /></ProtectedWrapper>} />
           </Routes>
+          <AIAssistant />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

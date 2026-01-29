@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { Briefcase, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceCard } from "@/components/cards/ServiceCard";
-import type { Service } from "@/data/mockData";
+import { Service } from "@/features/services/types/service.types";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -20,10 +20,6 @@ export const LandingFeaturedServices = ({ sectionRef, isVisible, services }: Lan
             <div className="container mx-auto px-6 text-right">
                 <div className={cn("flex flex-col md:flex-row items-end justify-between mb-16 gap-6 border-r-4 border-purple-500 pr-6", isVisible ? "animate-slide-right" : "opacity-0 translate-x-[-20px]")}>
                     <div className="space-y-4">
-                        {/* <div className="flex items-center gap-2 justify-end text-purple-500 font-bold">
-                            <Briefcase className="w-6 h-6" />
-                            <span className="uppercase tracking-widest text-sm">خدماتنا</span>
-                        </div> */}
                         <h2 className="text-4xl md:text-5xl font-black">خدمات قريبة منك</h2>
                         <p className="text-muted-foreground text-lg max-w-lg">كل ما تحتاجه من خدمات أساسية في محيطك الجامعي بأسعار منافسة.</p>
                     </div>

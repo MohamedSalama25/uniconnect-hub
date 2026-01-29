@@ -1,35 +1,33 @@
-import { Building, Briefcase, MessageCircle, HelpCircle } from 'lucide-react';
+import { Building, Briefcase, HelpCircle } from 'lucide-react';
 import { StatCard } from '@/components/cards/StatCard';
-import type { stats } from '@/data/mockData';
 
 interface DashboardStatsProps {
-    stats: typeof stats;
+    stats: {
+        acceptedHouses: number;
+        acceptedServices: number;
+        acceptedHelpRequests: number;
+    };
 }
 
 export const DashboardStats = ({ stats }: DashboardStatsProps) => {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <StatCard
                 title="السكن المتاح"
-                value={stats.availableAccommodations}
+                value={stats.acceptedHouses}
                 icon={Building}
                 variant="primary"
                 trend={{ value: 12, isPositive: true }}
             />
             <StatCard
                 title="الخدمات القريبة"
-                value={stats.nearbyServices}
+                value={stats.acceptedServices}
                 icon={Briefcase}
                 trend={{ value: 5, isPositive: true }}
             />
             <StatCard
-                title="المحادثات النشطة"
-                value={stats.activeChats}
-                icon={MessageCircle}
-            />
-            <StatCard
                 title="طلبات المساعدة"
-                value={stats.helpRequests}
+                value={stats.acceptedHelpRequests}
                 icon={HelpCircle}
                 variant="accent"
             />

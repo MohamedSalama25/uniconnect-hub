@@ -1,0 +1,56 @@
+{
+    "ar": [
+        {
+            "id": "what_is_uniconnect_hub",
+            "question": "ماذا يقدم يوني كونكت هب؟",
+            "answer": "نقدم خدمات البحث عن سكن، حجز خدمات متنوعة، ونظام إدارة متكامل لتسهيل حياة الطلاب."
+        },
+        {
+            "id": "housing_types",
+            "question": "ما هي أنواع السكن المتوفرة؟",
+            "answer": "يتوفر لدينا سكن فردي، سكن مشترك، وشقق مفروشة بالكامل قريبة من الجامعات."
+        },
+        {
+            "id": "tech_support",
+            "question": "كيف أحصل على دعم فني؟",
+            "answer": "يمكنك مراسلتنا عبر قسم المساعدة أو الاتصال بالدعم الفني المباشر المتاح على مدار الساعة."
+        },
+        {
+            "id": "payment_methods",
+            "question": "ما هي طرق الدفع المتاحة؟",
+            "answer": "نقبل الدفع عبر بطاقات مدى، فيزا، ماستركارد، وأبل باي بكل أمان."
+        },
+        {
+            "id": "transportation",
+            "question": "هل تتوفر خدمة توصيل؟",
+            "answer": "نعم، لبعض المواقع السكنية نوفر حافلات خاصة لنقل الطلاب من وإلى الحرم الجامعي."
+        }
+    ],
+    "en": [
+        {
+            "id": "what_is_uniconnect_hub",
+            "question": "What does UniConnect Hub offer?",
+            "answer": "We offer housing search services, booking various services, and an integrated management system to facilitate student life."
+        },
+        {
+            "id": "housing_types",
+            "question": "What types of housing are available?",
+            "answer": "We offer single rooms, shared accommodation, and fully furnished apartments near universities."
+        },
+        {
+            "id": "tech_support",
+            "question": "How do I get technical support?",
+            "answer": "You can message us through the Help section or contact our live technical support available 24/7."
+        },
+        {
+            "id": "payment_methods",
+            "question": "What are the available payment methods?",
+            "answer": "We accept payments via Mada, Visa, Mastercard, and Apple Pay securely."
+        },
+        {
+            "id": "transportation",
+            "question": "Is there a transportation service?",
+            "answer": "Yes, for some housing locations, we provide private buses to transport students to and from the campus."
+        }
+    ]
+}

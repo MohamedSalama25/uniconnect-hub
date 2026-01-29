@@ -44,7 +44,7 @@ export const AccommodationHostCard = ({ hostName, hostAvatar, createdById, isAcc
             >
                 <div className="flex items-center gap-4 p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer">
                     <img
-                        src={formatImageUrl(hostAvatar) || hostAvatar || "https://github.com/shadcn.png"}
+                        src={formatImageUrl(hostAvatar) || "https://github.com/shadcn.png"}
                         alt={hostName}
                         className="w-14 h-14 rounded-2xl object-cover"
                     />

@@ -46,10 +46,6 @@ export function StatCard({ title, value, icon: Icon, trend, variant = 'default' 
               'text-sm font-medium flex items-center gap-1',
               trend.isPositive ? 'text-success' : 'text-destructive'
             )}>
-              {trend.isPositive ? '↑' : '↓'} {trend.value}%
-              <span className={variant === 'default' ? 'text-muted-foreground' : 'opacity-70'}>
-                هذا الأسبوع
-              </span>
             </p>
           )}
         </div>

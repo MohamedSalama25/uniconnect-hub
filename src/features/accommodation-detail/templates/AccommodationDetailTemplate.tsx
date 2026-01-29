@@ -61,7 +61,7 @@ export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLo
     if (isPageLoading) {
         return (
             <DashboardLayout>
-                <CustomLoader />
+                <CustomLoader fullPage={true} />
             </DashboardLayout>
         );
     }

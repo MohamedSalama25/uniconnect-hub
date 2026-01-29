@@ -1,0 +1,16 @@
+{
+    "ar": [
+        {
+            "id": "intro_detailed",
+            "title": "عن يوني كونكت",
+            "content": "يوني كونكت هب هو رفيقك الرقمي لرحلة جامعية أسهل، نوفر لك حلولاً تقنية ومكانية متكاملة."
+        }
+    ],
+    "en": [
+        {
+            "id": "intro_detailed",
+            "title": "About UniConnect",
+            "content": "UniConnect Hub is your digital companion for an easier university journey, providing integrated technical and spatial solutions."
+        }
+    ]
+}

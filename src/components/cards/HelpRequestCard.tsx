@@ -1,4 +1,4 @@
-import { Clock, User, Home, GraduationCap, Users, AlertTriangle, HelpCircle, Send } from 'lucide-react';
+import { Clock, Home, GraduationCap, Users, AlertTriangle, HelpCircle, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { HelpRequest } from '@/features/help/types/help-request.types';
@@ -10,6 +10,7 @@ import { SendMessageDialog } from '@/components/globalComponents/SendMessageDial
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface HelpRequestCardProps {
   helpRequest: HelpRequest;
@@ -50,65 +51,75 @@ export function HelpRequestCard({ helpRequest }: HelpRequestCardProps) {
 
   return (
     <>
-      <div className={cn(
-        'group relative bg-card/60 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-xl border border-border/50 transition-all hover:border-primary/30 hover:shadow-primary/5 text-right overflow-hidden overflow-visible pointer-events-auto'
-      )}>
-        {/* Decorative border accent */}
-        <div className="absolute top-0 bottom-0 right-0 w-1 bg-primary/20 group-hover:bg-primary transition-colors rounded-full my-8" />
+      <div
+        className={cn(
+          'group relative bg-card/40 backdrop-blur-md rounded-[2rem] p-5 shadow-2xl border border-white/5 transition-all duration-500 hover:shadow-primary/10 text-right overflow-hidden flex flex-col h-full'
+        )}
+        dir="rtl"
+      >
+        {/* Decorative background glow */}
+        <div className="absolute -top-32 -left-32 w-80 h-80 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors duration-500" />
 
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row-reverse items-start justify-between gap-6">
-            <div className="flex-1 space-y-2">
-              <h3 className="font-black text-2xl tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                {helpRequest.title}
-              </h3>
-              <div className="flex flex-row-reverse items-center gap-6 mt-3 text-sm text-muted-foreground font-bold">
-                <div
-                  className="flex flex-row-reverse items-center gap-2 cursor-pointer hover:text-primary transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsProfileOpen(true);
-                  }}
-                >
-                  <div className="p-1.5 rounded-lg bg-muted/50">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <span className="hover:underline">{helpRequest.createdUser?.username || "غير معروف"}</span>
-                </div>
-                <div className="flex flex-row-reverse items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-muted/50">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <span>{formatDate(helpRequest.createdAt)}</span>
-                </div>
+        <div className="relative flex flex-col h-full space-y-6">
+          {/* Header Area */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between flex-row-reverse">
+              <Badge className={cn('border-none px-4 py-2 rounded-xl font-black text-xs shadow-sm backdrop-blur-sm', config.color)}>
+                <Icon className="w-4 h-4 ml-1.5" />
+                {helpRequest.helpRequestTypeName || config.label}
+              </Badge>
+              <div className="flex flex-row-reverse items-center gap-2">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground font-black tracking-tight">{formatDate(helpRequest.createdAt)}</span>
               </div>
             </div>
 
-            <Badge className={cn('border-none px-5 py-2 rounded-2xl font-black text-sm shadow-sm', config.color)}>
-              <Icon className="w-4 h-4 ml-2" />
-              {helpRequest.helpRequestTypeName || config.label}
-            </Badge>
+            <h3 className="font-black text-3xl md:text-4xl tracking-tight text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+              {helpRequest.title}
+            </h3>
           </div>
 
-          {/* Description */}
-          <p className="text-muted-foreground text-lg leading-relaxed font-medium line-clamp-3">
-            {helpRequest.description}
-          </p>
+          {/* Body Section */}
+          <div className="flex-1 space-y-5">
+            <p className="text-muted-foreground text-base leading-relaxed font-medium line-clamp-3">
+              {helpRequest.description}
+            </p>
 
-          {/* Footer with Contact Button */}
-          <div className="flex flex-col sm:flex-row-reverse items-center justify-between gap-6 pt-4 border-t border-border/50">
-            <div />
-            {!isOwner && (
+            {/* User Profile Hookup */}
+            <div
+              className="flex items-center gap-3 p-3 rounded-2xl bg-muted/20 hover:bg-muted/40 transition-all cursor-pointer group/user border border-white/5 self-end w-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsProfileOpen(true);
+              }}
+            >
+              <Avatar className="h-10 w-10 border-2 border-primary/20 group-hover/user:border-primary/50 transition-colors shadow-lg">
+                <AvatarImage src={helpRequest.createdUser?.profilePictureUrl} className="object-cover" />
+                <AvatarFallback className="bg-primary/10 text-primary font-black text-base">
+                  {helpRequest.createdUser?.username?.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col items-start flex-1 text-right">
+                <span className="font-black text-sm group-hover/user:text-primary transition-colors">
+                  {helpRequest.createdUser?.username || "غير معروف"}
+                </span>
+                <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-black">طالب المساعدة</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Area */}
+          {!isOwner && (
+            <div className="pt-2">
               <Button
                 onClick={handleOpenMessage}
-                className="w-full sm:w-auto h-12 px-8 rounded-2xl font-black bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
+                className="w-full h-12 rounded-xl font-black text-base bg-primary text-primary-foreground hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group/btn"
               >
-                <Send className="w-5 h-5 ml-3" />
-                تواصل خاص
+                <Send className="w-5 h-5 ml-1" />
+                تواصل خاص الآن
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

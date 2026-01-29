@@ -8,8 +8,8 @@ import { AccommodationList } from '../components/AccommodationList';
 import { houseService } from '../services/house.service';
 import { useQuery } from '@tanstack/react-query';
 import { House } from '../types/house.types';
-import { Accommodation } from '@/data/mockData';
 import { CustomLoader } from '@/components/ui/loader';
+import { mapHouseToAccommodation } from '@/lib/house-mapper';
 
 export const AccommodationListTemplate = () => {
     const [priceRange, setPriceRange] = useState([0, 500000]);
@@ -25,25 +25,6 @@ export const AccommodationListTemplate = () => {
         })
     });
 
-    const mapHouseToAccommodation = (house: House): Accommodation => ({
-        id: house.id.toString(),
-        title: house.name,
-        image: house.imageUrls?.[0] || "",
-        images: house.imageUrls || [],
-        price: house.price,
-        distance: 0,
-        type: house.typeName?.toLowerCase().includes('shared') ? 'shared' : 'private',
-        rating: house.averageRating,
-        location: house.address,
-        bedrooms: house.numberOfRooms,
-        bathrooms: house.numberOfBathrooms,
-        amenities: house.facilityNames || [],
-        description: house.description,
-        hostName: house.createdByName,
-        hostAvatar: house.createdByPhotoUrl,
-        createdById: house.createdById,
-        isFavorite: house.isFavorite,
-    });
 
     const filteredAccommodations = (data?.data || []).map(mapHouseToAccommodation).filter(acc => {
         const priceMatch = acc.price >= priceRange[0] && acc.price <= priceRange[1];

@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { services, accommodations } from "@/data/mockData";
 import { LandingNavbar } from "../components/LandingNavbar";
 import { LandingHero } from "../components/LandingHero";
 import { LandingFeatures } from "../components/LandingFeatures";
 import { LandingFeaturedAccommodations } from "../components/LandingFeaturedAccommodations";
 import { LandingFeaturedServices } from "../components/LandingFeaturedServices";
 import { LandingFooter } from "../components/LandingFooter";
+import { useMainPageData } from "@/features/dashboard/hooks/useMainPageData";
 
 export const LandingTemplate = () => {
+    const { data } = useMainPageData();
     const [isDark, setIsDark] = useState(false);
 
     // Refs for IntersectionObserver
@@ -96,8 +97,8 @@ export const LandingTemplate = () => {
         }
     };
 
-    const featuredServices = services.slice(0, 2);
-    const featuredAccommodations = accommodations.slice(0, 3);
+    const featuredServices = data?.readServices?.slice(0, 2) || [];
+    const featuredAccommodations = data?.readHouse?.slice(0, 3) || [];
 
     return (
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden transition-colors duration-300" dir="rtl">

@@ -96,6 +96,9 @@ export const API_CONFIG = {
             CREATE: "/requestTypes",
             UPDATE: (id: number) => `/requestTypes/${id}`,
             DELETE: (id: number) => `/requestTypes/${id}`,
+        },
+        PAGES: {
+            MAIN_PAGE: "/api/Pages/mainPage",
         }
     },
     SIGNALR_HUB_URL: "/hubs/chat", // Adjust path as needed, typically hub route
