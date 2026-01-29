@@ -1,4 +1,5 @@
 import axios from '@/lib/axios';
+import { API_CONFIG } from '@/lib/api.config';
 import { ApiResponse, Conversation, ChatMessage, ChatUser, PaginatedResponse } from '../types';
 
 export const chatApi = {
@@ -35,35 +36,40 @@ export const chatApi = {
   // Users API
   getUsers: async (): Promise<ApiResponse<ChatUser[]>> => {
     try {
-        const response = await axios.get('/api/Users/users');
-        // The API returns a structure like { users: { data: [...] } } or similar based on admin service.
-        // Let's inspect the admin service types:
-        // UsersPageResponse { users: { data: UserDto[], ... } }
-        // So axios.get returns { data: UsersPageResponse, ... }
-        // We need to return ApiResponse<ChatUser[]> which implies { success: true, data: ChatUser[] } wrapper for consistency?
-        // Or just return the array. The hook expects `res.data`.
-        // Let's standardise on returning { success: true, data: [...] } so the hook logic remains simple.
-        
-        const pageResponse = response.data as any; 
-        // access data deeply
-        const userList = pageResponse?.users?.data || pageResponse?.data || [];
-        
-        const mappedUsers: ChatUser[] = userList.map((u: any) => ({
-            id: u.id,
-            firstName: u.firstName,
-            lastName: u.lastName,
-            email: u.email,
-            avatar: u.profilePictureUrl
-        }));
+      const response = await axios.get('/api/Users/users');
+      // The API returns a structure like { users: { data: [...] } } or similar based on admin service.
+      // Let's inspect the admin service types:
+      // UsersPageResponse { users: { data: UserDto[], ... } }
+      // So axios.get returns { data: UsersPageResponse, ... }
+      // We need to return ApiResponse<ChatUser[]> which implies { success: true, data: ChatUser[] } wrapper for consistency?
+      // Or just return the array. The hook expects `res.data`.
+      // Let's standardise on returning { success: true, data: [...] } so the hook logic remains simple.
 
-        return {
-            success: true,
-            message: "Success",
-            data: mappedUsers
-        };
+      const pageResponse = response.data as any;
+      // access data deeply
+      const userList = pageResponse?.users?.data || pageResponse?.data || [];
+
+      const mappedUsers: ChatUser[] = userList.map((u: any) => ({
+        id: u.id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        email: u.email,
+        avatar: u.profilePictureUrl
+      }));
+
+      return {
+        success: true,
+        message: "Success",
+        data: mappedUsers
+      };
     } catch (e) {
-        console.error("Failed to fetch users", e);
-        return { success: false, message: "Failed", data: [] };
+      console.error("Failed to fetch users", e);
+      return { success: false, message: "Failed", data: [] };
     }
+  },
+
+  deleteConversation: async (conversationId: number): Promise<ApiResponse<boolean>> => {
+    const response = await axios.delete(API_CONFIG.ENDPOINTS.CHAT.DELETE_CONVERSATION(conversationId));
+    return response.data;
   }
 };

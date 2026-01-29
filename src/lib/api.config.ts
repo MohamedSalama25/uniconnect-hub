@@ -23,12 +23,14 @@ export const API_CONFIG = {
             REMOVE_ROLE: "/api/Users/removeRole",
             ACCEPT: (userId: string) => `/api/Users/${userId}/accept`,
             BLOCK: (userId: string) => `/api/Users/${userId}/block`,
+            GET_USER_POSTS: (userId: string) => `/api/House/Users/${userId}/Posts`,
         },
         CHAT: {
             CONVERSATIONS: "/api/Chat/conversations",
             MESSAGES: (conversationId: number) => `/api/Chat/messages/${conversationId}`,
             MARK_READ: (conversationId: number) => `/api/Chat/markAsRead/${conversationId}`,
-            ONLINE: (userId: string) => `/api/Chat/online/${userId}`, // NoteBased on screenshot, seems to be a GET status check
+            ONLINE: (userId: string) => `/api/Chat/online/${userId}`,
+            DELETE_CONVERSATION: (id: number) => `/api/Chat/conversations/${id}`,
         },
         HOUSE: {
             GET_ALL: "/api/House/Houses",
@@ -37,6 +39,7 @@ export const API_CONFIG = {
             DASHBOARD_HOUSE_BY_ID: (id: number) => `/api/House/dashboard/${id}`,
             ACCEPT: (id: number) => `/api/House/${id}/status`,
             TOGGLE_FAVORITE: (id: number) => `/api/House/favorite/${id}`,
+            GET_FAVORITES: "/api/House/favorites",
             DELETE: (id: number) => `/api/House/${id}`,
             UPDATE: (id: number) => `/api/House/${id}`,
             DELETE_IMAGE: (houseId: number) => `/api/House/houses/${houseId}/images`,
@@ -65,7 +68,10 @@ export const API_CONFIG = {
             CREATE: "/api/Services",
             UPDATE: (id: number) => `/api/Services/${id}`,
             DELETE: (id: number) => `/api/Services/${id}`,
-            UPDATE_STATUS: (id: number) => `/api/Services/${id}`,
+            UPDATE_STATUS: (id: number) => `/api/Services/${id}/status`,
+            ADD_RATING: "/api/Services/services/ratings",
+            DELETE_RATING: (id: number) => `/api/Services/services/ratings/${id}`,
+            GET_RATINGS: "/api/Services/services/ratingsById",
         },
         SERVICE_CATEGORY: {
             GET_ALL: "/ServiceCategory",
@@ -82,7 +88,7 @@ export const API_CONFIG = {
             CREATE: "/api/HelpRequest",
             UPDATE: (id: number) => `/api/HelpRequest/${id}`,
             DELETE: (id: number) => `/api/HelpRequest/${id}`,
-            UPDATE_STATUS: (id: number) => `/api/HelpRequest/${id}`,
+            UPDATE_STATUS: (id: number) => `/helpRequests/${id}/status`,
         },
         REQUEST_TYPE: {
             GET_ALL: "/requestTypes",

@@ -24,9 +24,10 @@ interface AccommodationDetailTemplateProps {
 
 export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLoading }: AccommodationDetailTemplateProps) => {
     const navigate = useNavigate();
-    const { user, fullProfile } = useAuthStore();
-    const currentUserId = fullProfile?.id || (user as any)?.id;
+    const { fullProfile, isAuthenticated } = useAuthStore();
+    const currentUserId = fullProfile?.id;
     const isOwner = String(accommodation?.createdUser?.id) === String(currentUserId);
+    const hasAlreadyRated = accommodation?.ratings?.some(r => String(r.userId) === String(currentUserId));
 
     const [isFavorite, setIsFavorite] = useState(accommodation?.isFavorite || false);
     const [isLoading, setIsLoading] = useState(false);
@@ -144,7 +145,9 @@ export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLo
 
                         {/* Ratings & Reviews Section */}
                         <div className="space-y-10 pt-8 border-t">
-                            {!isOwner && <AddRatingForm houseId={Number(accommodation.id)} />}
+                            {!isOwner && !hasAlreadyRated && isAuthenticated && (
+                                <AddRatingForm houseId={Number(accommodation.id)} />
+                            )}
                             <AccommodationReviews
                                 houseId={Number(accommodation.id)}
                                 ratings={accommodation.ratings || []}
@@ -154,11 +157,19 @@ export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLo
 
                     {/* Right Column: Pricing & Host */}
                     <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-                        <AccommodationPricingCard price={accommodation.price} id={accommodation.id} />
+                        <AccommodationPricingCard
+                            price={accommodation.price}
+                            id={accommodation.id}
+                            isOwner={isOwner}
+                            hostName={accommodation.hostName}
+                            hostId={accommodation.createdUser?.id || accommodation.createdById}
+                        />
                         <AccommodationHostCard
                             hostName={accommodation.hostName}
                             hostAvatar={accommodation.hostAvatar}
-                            createdById={accommodation.createdById}
+                            createdById={accommodation.createdUser?.id || accommodation.createdById}
+                            isAcceptedDate={accommodation.createdUser?.isAcceptedDate || accommodation.isAcceptedDate}
+                            isAccepted={accommodation.createdUser?.isAccepted || accommodation.isAccepted}
                         />
                     </div>
                 </div>

@@ -10,7 +10,7 @@ import {
 
 export const helpRequestService = {
     getHelpRequests: async (params?: HelpRequestFilterParams): Promise<PaginatedHelpRequests> => {
-        const response = await clientAxios.get<PaginatedHelpRequests>(API_CONFIG.ENDPOINTS.HELP_REQUEST.GET_ALL, {
+        const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HELP_REQUEST.GET_ALL, {
             params: {
                 Search: params?.Search,
                 Sort: params?.Sort,
@@ -19,11 +19,19 @@ export const helpRequestService = {
                 PageIndex: params?.PageIndex,
             }
         });
-        return response.data;
+
+        // Handle new wrapped response structure: { data: { pageSize, data, ... }, statistics: { ... } }
+        const body = response.data;
+        const paginatedData = body?.data || body;
+
+        return {
+            ...paginatedData,
+            data: paginatedData.data || []
+        };
     },
 
     getDashboardHelpRequests: async (params?: HelpRequestFilterParams): Promise<PaginatedHelpRequests> => {
-        const response = await clientAxios.get<PaginatedHelpRequests>(API_CONFIG.ENDPOINTS.HELP_REQUEST.DASHBOARD_GET_ALL, {
+        const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HELP_REQUEST.DASHBOARD_GET_ALL, {
             params: {
                 Search: params?.Search,
                 Sort: params?.Sort,
@@ -33,7 +41,21 @@ export const helpRequestService = {
                 Status: params?.Status !== 'All' ? params?.Status : undefined
             }
         });
-        return response.data;
+
+        // Handle new wrapped response structure: { data: { pageSize, data, ... }, statistics: { ... } }
+        const body = response.data;
+        const paginatedData = body?.data || body;
+        const stats = body?.statistics;
+
+        return {
+            ...paginatedData,
+            data: paginatedData.data || [],
+            // Map new statistics structure to expected format
+            totalHelpRequests: stats?.total ?? paginatedData?.totalHelpRequests ?? 0,
+            pendingHelpRequests: stats?.pendingTotal ?? paginatedData?.pendingHelpRequests ?? 0,
+            acceptedHelpRequests: stats?.acceptedTotal ?? paginatedData?.acceptedHelpRequests ?? 0,
+            rejectedHelpRequests: stats?.rejectedTotal ?? paginatedData?.rejectedHelpRequests ?? 0,
+        };
     },
 
     getHelpRequestById: async (id: number): Promise<HelpRequest> => {
@@ -51,10 +73,14 @@ export const helpRequestService = {
         return response.data.data;
     },
 
-    updateHelpRequestStatus: async (request: HelpRequest, status: 'Accepted' | 'Rejected'): Promise<HelpRequest> => {
-        const response = await clientAxios.put<ApiResponse<HelpRequest>>(API_CONFIG.ENDPOINTS.HELP_REQUEST.UPDATE_STATUS(request.id), {
-            ...request,
-            status: status
+    updateHelpRequest: async (id: number, data: { title: string; description: string; helpRequestTypeId: number }): Promise<HelpRequest> => {
+        const response = await clientAxios.put<ApiResponse<HelpRequest>>(API_CONFIG.ENDPOINTS.HELP_REQUEST.UPDATE(id), data);
+        return response.data.data;
+    },
+
+    updateHelpRequestStatus: async (id: number, status: string): Promise<HelpRequest> => {
+        const response = await clientAxios.patch<ApiResponse<HelpRequest>>(API_CONFIG.ENDPOINTS.HELP_REQUEST.UPDATE_STATUS(id), null, {
+            params: { status }
         });
         return response.data.data;
     },

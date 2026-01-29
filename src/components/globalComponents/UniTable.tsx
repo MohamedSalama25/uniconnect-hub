@@ -14,11 +14,13 @@ import {
     Plus,
     Check,
     X,
-    ArrowDownToLine
+    ArrowDownToLine,
+    Loader
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import NoDataMsg from './NoDataMsg'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const translations = {
     ar: {
@@ -77,6 +79,7 @@ const UniTable = <TData extends object>({
     currentPage,
     tableName,
     onRowClick,
+    isLoading = false,
     hidePagination = false
 }: UniTableProps<TData>) => {
     const locale = 'ar';
@@ -282,129 +285,146 @@ const UniTable = <TData extends object>({
 
     return (
         <div className="overflow-visible w-full" dir="rtl">
-            {hasNoData ? (
+            {isLoading && hasNoData ? (
+                <div className="flex flex-col items-center justify-center p-20 gap-4 bg-card/50 backdrop-blur-sm rounded-2xl border min-h-[400px]">
+                    <Loader className="w-10 h-10 animate-spin text-primary" />
+                    <p className="text-muted-foreground font-medium animate-pulse">جاري تحميل البيانات...</p>
+                </div>
+            ) : hasNoData ? (
                 <NoDataMsg
                     title={t('noData')}
                     description={t('noDataDescription')}
                     additionalMessage={t('noDataMessage')}
                 />
             ) : (
-                <div className="rounded-2xl overflow-x-auto max-w-full shadow-lg border bg-card/50 backdrop-blur-sm">
-                    <table className="w-full divide-y divide-border">
-                        <thead className="bg-muted/30">
-                            {table.getHeaderGroups().map(headerGroup => (
-                                <tr key={headerGroup.id}>
-                                    {headerGroup.headers.map(header => (
-                                        <th
-                                            key={header.id}
-                                            className="p-5 text-sm font-bold text-muted-foreground uppercase tracking-wider text-center"
-                                        >
-                                            {header.column.getCanSort() ? (
-                                                <div
-                                                    className="flex items-center justify-center cursor-pointer select-none group gap-2"
-                                                    onClick={header.column.getToggleSortingHandler()}
-                                                >
-                                                    {flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                                    <span className="relative w-4 flex-none">
-                                                        {{
-                                                            asc: (<ChevronRight className="h-4 w-4 -rotate-90" />),
-                                                            desc: (<ChevronRight className="h-4 w-4 rotate-90" />),
-                                                        }[header.column.getIsSorted() as string] ?? (
-                                                                <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-40 transition-opacity" />
-                                                            )}
-                                                    </span>
-                                                </div>
-                                            ) : (
-                                                flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )
-                                            )}
-                                        </th>
-                                    ))}
-                                </tr>
-                            ))}
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                            {table.getRowModel().rows.map(row => (
-                                <tr
-                                    key={row.id}
-                                    className={`hover:bg-primary/5 transition-colors duration-200 ${onRowClick ? 'cursor-pointer' : ''}`}
-                                    onClick={() => onRowClick && onRowClick(row.original)}
-                                >
-                                    {row.getVisibleCells().map(cell => (
-                                        <td
-                                            key={cell.id}
-                                            className="px-4 md:px-6 py-4 md:py-5 whitespace-nowrap text-sm text-foreground font-medium text-center"
-                                        >
-                                            {cell.column.id === 'actions' || cell.column.id === 'header-actions' ? (
-                                                flexRender(cell.column.columnDef.cell, cell.getContext())
-                                            ) : (
-                                                (cell.getValue() !== undefined && cell.getValue() !== null && cell.getValue() !== '') ? (
-                                                    <div className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap mx-auto">
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-muted-foreground/30">—</span>
-                                                )
-                                            )}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-
-                    {!hidePagination && (
-                        <div className="border-t bg-muted/10 py-5 px-8 flex items-center justify-between text-sm text-muted-foreground font-bold flex-wrap gap-4">
-                            <span className="flex items-center gap-1">
-                                {tableName ? `${tableName}: ` : ''}
-                                {data.length} {t('of')} {totalItems} {t('records')}
-                            </span>
-                            <div className="flex items-center gap-8 rtl:flex-row-reverse">
-                                <div className="flex items-center text-sm font-bold">
-                                    {t('page')} {currentPage || 1} {t('of')} {Math.ceil(totalItems / itemsPerPage) || 1}
-                                </div>
-                                <div className="flex items-center gap-2 rtl:flex-row-reverse">
-                                    <Button
-                                        variant="outline"
-                                        className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
-                                        onClick={() => onPageChange?.(1)}
-                                        disabled={currentPage === 1}
-                                    >
-                                        <ChevronsRight className="h-5 w-5" />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
-                                        onClick={() => onPageChange?.((currentPage || 1) - 1)}
-                                        disabled={currentPage === 1}
-                                    >
-                                        <ChevronRight className="h-5 w-5" />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
-                                        onClick={() => onPageChange?.((currentPage || 1) + 1)}
-                                        disabled={currentPage === Math.ceil(totalItems / itemsPerPage) || totalItems === 0}
-                                    >
-                                        <ChevronLeft className="h-5 w-5" />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
-                                        onClick={() => onPageChange?.(Math.ceil(totalItems / itemsPerPage) || 1)}
-                                        disabled={currentPage === Math.ceil(totalItems / itemsPerPage) || totalItems === 0}
-                                    >
-                                        <ChevronsLeft className="h-5 w-5" />
-                                    </Button>
-                                </div>
+                <div className="relative">
+                    {isLoading && (
+                        <div className="absolute inset-x-0 top-0 z-50 rounded-t-2xl overflow-hidden">
+                            <div className="h-1 w-full bg-primary/10 overflow-hidden">
+                                <div className="h-full bg-primary animate-[shimmer_1.5s_infinite_linear] w-[30%]" />
                             </div>
                         </div>
                     )}
+                    <div className={cn(
+                        "rounded-2xl overflow-x-auto max-w-full shadow-lg border bg-card/50 backdrop-blur-sm transition-opacity duration-300",
+                        isLoading ? "opacity-60 pointer-events-none" : "opacity-100"
+                    )}>
+                        <table className="w-full divide-y divide-border">
+                            <thead className="bg-muted/30">
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <tr key={headerGroup.id}>
+                                        {headerGroup.headers.map(header => (
+                                            <th
+                                                key={header.id}
+                                                className="p-5 text-sm font-bold text-muted-foreground uppercase tracking-wider text-center"
+                                            >
+                                                {header.column.getCanSort() ? (
+                                                    <div
+                                                        className="flex items-center justify-center cursor-pointer select-none group gap-2"
+                                                        onClick={header.column.getToggleSortingHandler()}
+                                                    >
+                                                        {flexRender(
+                                                            header.column.columnDef.header,
+                                                            header.getContext()
+                                                        )}
+                                                        <span className="relative w-4 flex-none">
+                                                            {{
+                                                                asc: (<ChevronRight className="h-4 w-4 -rotate-90" />),
+                                                                desc: (<ChevronRight className="h-4 w-4 rotate-90" />),
+                                                            }[header.column.getIsSorted() as string] ?? (
+                                                                    <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-40 transition-opacity" />
+                                                                )}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )
+                                                )}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {table.getRowModel().rows.map(row => (
+                                    <tr
+                                        key={row.id}
+                                        className={`hover:bg-primary/5 transition-colors duration-200 ${onRowClick ? 'cursor-pointer' : ''}`}
+                                        onClick={() => onRowClick && onRowClick(row.original)}
+                                    >
+                                        {row.getVisibleCells().map(cell => (
+                                            <td
+                                                key={cell.id}
+                                                className="px-4 md:px-6 py-4 md:py-5 whitespace-nowrap text-sm text-foreground font-medium text-center"
+                                            >
+                                                {cell.column.id === 'actions' || cell.column.id === 'header-actions' ? (
+                                                    flexRender(cell.column.columnDef.cell, cell.getContext())
+                                                ) : (
+                                                    (cell.getValue() !== undefined && cell.getValue() !== null && cell.getValue() !== '') ? (
+                                                        <div className="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap mx-auto">
+                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground/30">—</span>
+                                                    )
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        {!hidePagination && (
+                            <div className="border-t bg-muted/10 py-5 px-8 flex items-center justify-between text-sm text-muted-foreground font-bold flex-wrap gap-4">
+                                <span className="flex items-center gap-1">
+                                    {tableName ? `${tableName}: ` : ''}
+                                    {data.length} {t('of')} {totalItems} {t('records')}
+                                </span>
+                                <div className="flex items-center gap-8 rtl:flex-row-reverse">
+                                    <div className="flex items-center text-sm font-bold">
+                                        {t('page')} {currentPage || 1} {t('of')} {Math.ceil(totalItems / itemsPerPage) || 1}
+                                    </div>
+                                    <div className="flex items-center gap-2 rtl:flex-row-reverse">
+                                        <Button
+                                            variant="outline"
+                                            className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
+                                            onClick={() => onPageChange?.(1)}
+                                            disabled={currentPage === 1 || isLoading}
+                                        >
+                                            <ChevronsRight className="h-5 w-5" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
+                                            onClick={() => onPageChange?.((currentPage || 1) - 1)}
+                                            disabled={currentPage === 1 || isLoading}
+                                        >
+                                            <ChevronRight className="h-5 w-5" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
+                                            onClick={() => onPageChange?.((currentPage || 1) + 1)}
+                                            disabled={currentPage === Math.ceil(totalItems / itemsPerPage) || totalItems === 0 || isLoading}
+                                        >
+                                            <ChevronLeft className="h-5 w-5" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="h-10 w-10 p-0 rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm"
+                                            onClick={() => onPageChange?.(Math.ceil(totalItems / itemsPerPage) || 1)}
+                                            disabled={currentPage === Math.ceil(totalItems / itemsPerPage) || totalItems === 0 || isLoading}
+                                        >
+                                            <ChevronsLeft className="h-5 w-5" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

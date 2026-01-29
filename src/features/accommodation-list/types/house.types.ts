@@ -13,7 +13,7 @@ export interface Rating {
   isPublished: boolean;
 }
 
-export type HouseStatus = 'Pending' | 'Accepted' | 'Rejected';
+export type HouseStatus = 'Pending' | 'Accepted' | 'Rejected' | 'Cancelled' | 0 | 1 | 2 | 3;
 
 export interface House {
   id: number;
@@ -82,7 +82,7 @@ export interface HousingFilterParams {
   Search?: string;
   sort?: string;
   TypeId?: number;
-  Status?: HouseStatus | 'All';
+  Status?: HouseStatus | 'all';
   pageSize?: number;
   pageIndex?: number;
 }

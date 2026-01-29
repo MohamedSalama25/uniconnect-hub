@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { helpRequestService } from '../services/help-request.service';
@@ -16,14 +16,37 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { HelpRequest } from '../types/help-request.types';
 
-export const AddHelpRequestDialog = () => {
-    const [open, setOpen] = useState(false);
+interface AddHelpRequestDialogProps {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    initialData?: HelpRequest;
+    trigger?: React.ReactNode;
+}
+
+export const AddHelpRequestDialog = ({ open: externalOpen, onOpenChange: setExternalOpen, initialData, trigger }: AddHelpRequestDialogProps) => {
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    const open = externalOpen !== undefined ? externalOpen : internalOpen;
+    const setOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
+
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
 
+    const isEditing = !!initialData;
     const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (initialData) {
+            setTitle(initialData.title);
+            setDescription(initialData.description);
+            setSelectedTypeId(initialData.helpRequestTypeId);
+        } else {
+            resetForm();
+        }
+    }, [initialData, open]);
 
     const { data: typesData } = useQuery({
         queryKey: ['help-request-types'],
@@ -32,15 +55,21 @@ export const AddHelpRequestDialog = () => {
     const types = typesData?.data || [];
 
     const mutation = useMutation({
-        mutationFn: helpRequestService.createHelpRequest,
+        mutationFn: (data: any) => isEditing && initialData
+            ? helpRequestService.updateHelpRequest(initialData.id, data)
+            : helpRequestService.createHelpRequest(data),
         onSuccess: () => {
-            toast.success("تم نشر طلب المساعدة بنجاح");
+            toast.success(isEditing ? "تم تحديث طلب المساعدة بنجاح" : "تم نشر طلب المساعدة بنجاح");
             queryClient.invalidateQueries({ queryKey: ['help-requests'] });
+            queryClient.invalidateQueries({ queryKey: ['admin-help-requests'] });
+            if (isEditing && initialData) {
+                queryClient.invalidateQueries({ queryKey: ['help-request-detail', initialData.id.toString()] });
+            }
             setOpen(false);
-            resetForm();
+            if (!isEditing) resetForm();
         },
         onError: () => {
-            toast.error("فشل في نشر الطلب. يرجى المحاولة مرة أخرى.");
+            toast.error("فشل في العملية. يرجى المحاولة مرة أخرى.");
         }
     });
 
@@ -60,15 +89,19 @@ export const AddHelpRequestDialog = () => {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className="h-14 px-8 rounded-2xl font-black bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
-                    <Plus className="w-5 h-5 ml-3" />
-                    طلب مساعدة جديد
-                </Button>
-            </DialogTrigger>
-            <DialogContent dir="rtl" className="max-w-xl rounded-[2.5rem] bg-card border-white/5 p-8 shadow-2xl">
+            {trigger !== null && (trigger || (
+                <DialogTrigger asChild>
+                    <Button className="h-14 px-8 rounded-2xl font-black bg-primary text-primary-foreground hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
+                        <Plus className="w-5 h-5 ml-3" />
+                        طلب مساعدة جديد
+                    </Button>
+                </DialogTrigger>
+            ))}
+            <DialogContent dir="rtl" className="max-w-xl rounded-[2.5rem] bg-card border-border p-8 shadow-2xl">
                 <DialogHeader>
-                    <DialogTitle className="text-3xl font-black tracking-tight mb-2">طلب مساعدة جديد</DialogTitle>
+                    <DialogTitle className="text-3xl font-black tracking-tight mb-2">
+                        {isEditing ? "تعديل طلب المساعدة" : "طلب مساعدة جديد"}
+                    </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-6 pt-6 text-right">
                     <div className="space-y-3">
@@ -119,7 +152,7 @@ export const AddHelpRequestDialog = () => {
                             className="w-full h-16 rounded-2xl text-xl font-black bg-primary text-primary-foreground hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-primary/20"
                             onClick={handleSubmit}
                         >
-                            {mutation.isPending ? "جاري النشر..." : "نشر الطلب الآن"}
+                            {mutation.isPending ? "جاري الحفظ..." : (isEditing ? "حفظ التغييرات" : "نشر الطلب الآن")}
                         </Button>
                     </div>
                 </div>

@@ -58,6 +58,7 @@ export const ProfileSettings = () => {
                     PhoneNumber: formData.phone,
                     CurrentAddress: formData.city,
                     IntroductionNote: formData.introductionNote,
+                    UniversityName: formData.university,
                 };
 
                 const updatedProfile = await authService.updateCurrentUser(token, updateData);
@@ -116,6 +117,7 @@ export const ProfileSettings = () => {
                             formData={formData}
                             setFormData={setFormData}
                             handleSave={handleSave}
+                            isLoading={isLoading}
                         />
                     </TabsContent>
 

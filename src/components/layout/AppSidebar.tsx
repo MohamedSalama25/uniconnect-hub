@@ -33,7 +33,7 @@ const navItems = [
   { to: '/profile', icon: User, label: 'الملف الشخصي' },
   { to: '/admin/houses', icon: Building, label: 'إدارة السكن' },
   { to: '/admin/services', icon: Briefcase, label: 'إدارة الخدمات' },
-  { to: '/admin/help-requests', icon: HelpCircle, label: 'طلبات المساعدة' },
+  { to: '/admin/help-requests', icon: HelpCircle, label: 'ادارة الطلبات' },
 ];
 
 export function AppSidebar() {
@@ -56,7 +56,7 @@ export function AppSidebar() {
     <aside
       className={cn(
         'fixed right-0 top-0 z-40 h-screen transition-all duration-300 bg-sidebar border-l border-sidebar-border',
-        collapsed ? 'w-20' : 'w-64'
+        collapsed ? 'w-20' : 'w-80'
       )}
     >
       {/* Logo */}

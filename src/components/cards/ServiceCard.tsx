@@ -2,14 +2,17 @@ import { MapPin, Star, Phone, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Service } from '@/features/services/types/service.types';
-import { cn } from '@/lib/utils';
 import { IconRenderer } from '@/components/globalComponents/IconRenderer';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface ServiceCardProps {
   service: Service;
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
+  const navigate = useNavigate();
+  const { fullProfile } = useAuthStore();
   const categoryIcon = service.serviceCategoryName?.toLowerCase() || "briefcase";
 
   const formatTime = (time: any) => {
@@ -40,7 +43,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-500 rounded-full">
               <Star className="w-3.5 h-3.5 fill-current" />
-              <span className="font-black text-sm">4.8</span>
+              <span className="font-black text-sm">{1}</span>
             </div>
           </div>
 
@@ -48,7 +51,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
             <div className="flex items-center gap-2.5">
               <MapPin className="w-4 h-4 text-primary/70" />
               <span className="line-clamp-1">{service.address}</span>
-              <span className="text-primary font-black shrink-0">(0.5 كم)</span>
             </div>
             <div className="flex items-center gap-2.5">
               <Phone className="w-4 h-4 text-primary/70" />
@@ -62,17 +64,32 @@ export function ServiceCard({ service }: ServiceCardProps) {
             </div>
           </div>
 
-          <div className="flex gap-2 pt-2">
-            <div className="flex gap-3 pt-3">
-              <Button size="sm" className="rounded-xl px-6 font-bold bg-primary hover:scale-105 transition-transform h-10">
-                <Phone className="w-4 h-4 ml-2" />
-                اتصل
-              </Button>
-              <Button variant="outline" size="sm" className="rounded-xl px-6 font-bold border-muted hover:bg-muted/50 transition-colors h-10">
-                <MapPin className="w-4 h-4 ml-2" />
-                الاتجاهات
-              </Button>
-            </div>
+          <div className="flex flex-wrap gap-2 pt-4">
+            <Button
+              size="sm"
+              className="rounded-xl px-6 font-bold bg-primary hover:scale-105 transition-transform h-10"
+              onClick={() => window.location.href = `tel:${service.phone}`}
+            >
+              <Phone className="w-4 h-4 ml-2" />
+              اتصل
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl px-6 font-bold border-muted hover:bg-muted/50 transition-colors h-10"
+              onClick={() => window.open(`https://www.google.com/maps?q=${service.latitude},${service.longitude}`, '_blank')}
+            >
+              <MapPin className="w-4 h-4 ml-2" />
+              الاتجاهات
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-xl px-6 font-bold bg-muted/50 hover:bg-muted transition-colors h-10 w-full sm:w-auto"
+              onClick={() => navigate(`/service/${service.id}`)}
+            >
+              التفاصيل
+            </Button>
           </div>
         </div>
       </div>

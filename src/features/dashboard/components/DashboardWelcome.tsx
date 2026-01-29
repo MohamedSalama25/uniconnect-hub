@@ -1,7 +1,3 @@
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import type { currentStudent } from '@/data/mockData';
-import { CreatePostDialog } from '@/components/globalComponents/CreatePostDialog';
 
 interface DashboardWelcomeProps {
     user: any;
@@ -29,9 +25,7 @@ export const DashboardWelcome = ({ user }: DashboardWelcomeProps) => {
                         className="pr-12 h-12 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus-visible:ring-primary-foreground/30 text-right"
                     />
                 </div> */}
-                <div className="w-[150px] ">
-                    <CreatePostDialog triggerClassName="bg-foreground hover:bg-foreground/90 text-primary-foreground" />
-                </div>
+
             </div>
         </div>
     );

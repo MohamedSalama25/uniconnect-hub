@@ -2,28 +2,23 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import UniTable, { Action } from "@/components/globalComponents/UniTable";
-import { Badge } from "@/components/ui/badge";
-import { Star, MessageSquare, User, Eye, EyeOff, Loader, Building, Briefcase } from "lucide-react";
+import { Star, Loader } from "lucide-react";
 import { houseService } from "@/features/accommodation-list/services/house.service";
 import { Rating } from "@/features/accommodation-list/types/house.types";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 
 const AdminRatingsPage = () => {
     const queryClient = useQueryClient();
     const [pageIndex, setPageIndex] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize] = useState(10);
     const [confirmToggle, setConfirmToggle] = useState<{ id: number; status: boolean } | null>(null);
 
-    const [selectedCategory, setSelectedCategory] = useState<"housing" | "services">("housing");
-
-    const { data: ratings, isLoading } = useQuery({
-        queryKey: ["admin-ratings", selectedCategory],
-        queryFn: () => houseService.getAdminRatings(), // assuming same endpoint for now or handling in service
+    const { data: ratings, isLoading, isFetching } = useQuery({
+        queryKey: ["admin-ratings"],
+        queryFn: () => houseService.getAdminRatings(),
     });
 
     const publishMutation = useMutation({
@@ -42,7 +37,7 @@ const AdminRatingsPage = () => {
     const columns = [
         {
             accessorKey: "houseName",
-            header: selectedCategory === "housing" ? "اسم السكن" : "اسم الخدمة",
+            header: "اسم السكن",
             cell: ({ row }: any) => <span className="font-bold text-primary">{row.original.houseName}</span>,
         },
         {
@@ -77,7 +72,6 @@ const AdminRatingsPage = () => {
                     checked={row.original.isPublished}
                     onCheckedChange={(checked) => setConfirmToggle({ id: row.original.id, status: checked })}
                 />
-
             ),
         },
     ];
@@ -87,52 +81,22 @@ const AdminRatingsPage = () => {
     return (
         <DashboardLayout>
             <div className="p-8 space-y-8 bg-muted/30 min-h-screen" dir="rtl">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-black text-foreground">إدارة التقييمات</h1>
-                        <p className="text-muted-foreground">راجع تقييمات المستخدمين وقم بإدارة ظهورها على المنصة.</p>
-                    </div>
-
-                    <div className="flex bg-card p-1 items-center rounded-2xl border shadow-sm self-start">
-                        <button
-                            onClick={() => setSelectedCategory("housing")}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all",
-                                selectedCategory === "housing" ? "bg-primary text-primary-foreground shadow-md" : "hover:bg-muted"
-                            )}
-                        >
-                            <Building className="w-4 h-4" />
-                            السكن
-                        </button>
-                        <button
-                            onClick={() => setSelectedCategory("services")}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all",
-                                selectedCategory === "services" ? "bg-primary text-primary-foreground shadow-md" : "hover:bg-muted"
-                            )}
-                        >
-                            <Briefcase className="w-4 h-4" />
-                            الخدمات
-                        </button>
-                    </div>
+                <div className="flex flex-col gap-2">
+                    <h1 className="text-3xl font-black text-foreground">إدارة التقييمات</h1>
+                    <p className="text-muted-foreground">راجع تقييمات المستخدمين وقم بإدارة ظهورها على المنصة.</p>
                 </div>
 
-                {isLoading ? (
-                    <div className="flex items-center justify-center p-20">
-                        <Loader className="w-10 h-10 animate-spin text-primary" />
-                    </div>
-                ) : (
-                    <UniTable
-                        columns={columns as any}
-                        data={ratings || []}
-                        actions={actions}
-                        tableName="تقييمات"
-                        currentPage={pageIndex}
-                        onPageChange={setPageIndex}
-                        totalItems={ratings?.length || 0}
-                        itemsPerPage={pageSize}
-                    />
-                )}
+                <UniTable
+                    columns={columns as any}
+                    data={ratings || []}
+                    actions={actions}
+                    tableName="تقييمات"
+                    currentPage={pageIndex}
+                    onPageChange={setPageIndex}
+                    totalItems={ratings?.length || 0}
+                    itemsPerPage={pageSize}
+                    isLoading={isLoading || isFetching}
+                />
 
                 <ConfirmDialog
                     isOpen={!!confirmToggle}

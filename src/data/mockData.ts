@@ -27,6 +27,8 @@ export interface Accommodation {
   createdById?: string;
   createdUser?: any;
   isFavorite?: boolean;
+  isAccepted?: boolean;
+  isAcceptedDate?: string | null;
   lat?: number;
   lng?: number;
   ratings?: any[]; // Array of ratings

@@ -39,7 +39,7 @@ const AdminPostDetailsPage = () => {
         try {
             await houseService.acceptHouse(house.id, 'Accepted');
             toast.success("تم قبول المنشور بنجاح");
-            navigate("/admin/posts");
+            navigate("/admin/houses");
         } catch (err) {
             toast.error("فشل في قبول المنشور");
         }
@@ -50,7 +50,7 @@ const AdminPostDetailsPage = () => {
         try {
             await houseService.acceptHouse(house.id, 'Rejected');
             toast.error("تم رفض المنشور");
-            navigate("/admin/posts");
+            navigate("/admin/houses");
         } catch (err) {
             toast.error("فشل في رفض المنشور");
         }
@@ -62,7 +62,7 @@ const AdminPostDetailsPage = () => {
             await houseService.deleteHouse(house.id);
             toast.success("تم حذف المنشور بنجاح");
             setIsDeleteDialogOpen(false);
-            navigate("/admin/posts");
+            navigate("/admin/houses");
         } catch (err) {
             toast.error("فشل في حذف المنشور");
         }
@@ -96,7 +96,7 @@ const AdminPostDetailsPage = () => {
                         <p className="text-xl font-bold text-red-600 mb-2">عذراً، المنشور غير موجود</p>
                         <p className="text-muted-foreground mb-6">{errorMsg}</p>
                         <button
-                            onClick={() => navigate("/admin/posts")}
+                            onClick={() => navigate("/admin/houses")}
                             className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition-all w-full shadow-lg shadow-red-200"
                         >
                             العودة لقائمة المنشورات
@@ -131,7 +131,7 @@ const AdminPostDetailsPage = () => {
         <DashboardLayout>
             <div className="p-4 md:p-8 space-y-8 bg-muted/30 min-h-screen" dir="rtl">
                 <AdminPostDetailsHeader
-                    onBack={() => navigate("/admin/posts")}
+                    onBack={() => navigate("/admin/houses")}
                     onApprove={handleApprove}
                     onReject={handleReject}
                     status={house.status}

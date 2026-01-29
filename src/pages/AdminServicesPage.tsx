@@ -44,6 +44,7 @@ const AdminServicesPage = () => {
     const { user, fullProfile } = useAuthStore();
     const currentUserId = fullProfile?.id || (user as any)?.id;
     const queryClient = useQueryClient();
+    const isAdmin = user?.roles?.includes("Admin");
 
     const [filterStatus, setFilterStatus] = useState<string>("all");
     const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
@@ -68,27 +69,33 @@ const AdminServicesPage = () => {
         Search: searchTerm || undefined,
         PageIndex: pageIndex,
         PageSize: pageSize,
-        Status: filterStatus !== 'all' ? (filterStatus as any) : undefined,
+        Status: filterStatus !== 'all' ? (Number(filterStatus) as any) : undefined,
         CatogeryId: selectedCategoryId !== 'all' ? Number(selectedCategoryId) : undefined
     });
 
-    const handleApprove = async (service: any) => {
+    const handleApprove = async (id: number) => {
+        setProcessingId(id);
         try {
-            await serviceService.updateServiceStatus(service, 'Accepted');
+            await serviceService.updateServiceStatus(id, 'Accepted');
             toast.success("تم قبول الخدمة بنجاح");
             queryClient.invalidateQueries({ queryKey: ['admin-services'] });
         } catch (err) {
             toast.error("فشل في قبول الخدمة");
+        } finally {
+            setProcessingId(null);
         }
     };
 
-    const handleReject = async (service: any) => {
+    const handleReject = async (id: number) => {
+        setProcessingId(id);
         try {
-            await serviceService.updateServiceStatus(service, 'Rejected');
+            await serviceService.updateServiceStatus(id, 'Rejected');
             toast.error("تم رفض الخدمة");
             queryClient.invalidateQueries({ queryKey: ['admin-services'] });
         } catch (err) {
             toast.error("فشل في رفض الخدمة");
+        } finally {
+            setProcessingId(null);
         }
     };
 
@@ -173,16 +180,22 @@ const AdminServicesPage = () => {
             header: "الحالة",
             cell: ({ row }) => {
                 const status = row.original.status;
-                if (status === 'Pending') return (
+                if (status === 'Pending' || (status as any) === 0) return (
                     <Badge className="bg-amber-500/10 text-amber-600 border border-border hover:bg-amber-500/20 gap-1.5 py-1 px-3 shadow-none">
                         <Clock className="w-3.5 h-3.5" />
                         قيد المراجعة
                     </Badge>
                 );
-                if (status === 'Accepted') return (
+                if (status === 'Accepted' || (status as any) === 1) return (
                     <Badge className="bg-emerald-500/10 text-emerald-600 border border-emerald-200/50 hover:bg-emerald-500/20 gap-1.5 py-1 px-3 shadow-none">
                         <CheckCircle className="w-3.5 h-3.5" />
                         مقبول
+                    </Badge>
+                );
+                if (status === 'Rejected' || (status as any) === 2) return (
+                    <Badge className="bg-rose-500/10 text-rose-600 border border-rose-200/50 hover:bg-rose-500/20 gap-1.5 py-1 px-3 shadow-none">
+                        <XCircle className="w-3.5 h-3.5" />
+                        مرفوض
                     </Badge>
                 );
                 return (
@@ -213,15 +226,17 @@ const AdminServicesPage = () => {
         {
             label: "قبول",
             icon: CheckCircle,
-            show: (row) => row.status !== 'Accepted',
-            onClick: (row) => handleApprove(row),
+            show: (row) => isAdmin && (row.status !== 'Accepted' && (row.status as any) !== 1),
+            onClick: (row) => handleApprove(row.id),
+            disabled: (row) => processingId === row.id,
             classname: "text-emerald-600"
         },
         {
             label: "رفض",
             icon: XCircle,
-            show: (row) => row.status !== 'Rejected',
-            onClick: (row) => handleReject(row),
+            show: (row) => isAdmin && String(row.createdUser?.id) !== String(currentUserId) && (row.status !== 'Rejected' && (row.status as any) !== 2),
+            onClick: (row) => handleReject(row.id),
+            disabled: (row) => processingId === row.id,
             classname: "text-rose-600"
         },
         {
@@ -293,7 +308,7 @@ const AdminServicesPage = () => {
                         </div>
 
                         <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner">
-                            {['all', 'Pending', 'Accepted', 'Rejected'].map((status) => (
+                            {['all', '0', '1', '2'].map((status) => (
                                 <button
                                     key={status}
                                     onClick={() => setFilterStatus(status)}
@@ -303,29 +318,24 @@ const AdminServicesPage = () => {
                                         }`}
                                 >
                                     {status === 'all' ? 'الكل' :
-                                        status === 'Pending' ? 'قيد المراجعة' :
-                                            status === 'Accepted' ? 'المقبولة' : 'المرفوضة'}
+                                        status === '0' ? 'قيد المراجعة' :
+                                            status === '1' ? 'المقبولة' : 'المرفوضة'}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {servicesLoading || servicesFetching ? (
-                        <div className="flex flex-col items-center justify-center p-20 gap-4">
-                            <Loader className="w-10 h-10 animate-spin text-primary" />
-                        </div>
-                    ) : (
-                        <UniTable
-                            columns={columns}
-                            data={servicesData?.data || []}
-                            actions={actions}
-                            totalItems={servicesData?.count || 0}
-                            itemsPerPage={pageSize}
-                            currentPage={pageIndex}
-                            onPageChange={setPageIndex}
-                            tableName="إدارة الخدمات"
-                        />
-                    )}
+                    <UniTable
+                        columns={columns}
+                        data={servicesData?.data || []}
+                        actions={actions}
+                        totalItems={servicesData?.count || 0}
+                        itemsPerPage={pageSize}
+                        currentPage={pageIndex}
+                        onPageChange={setPageIndex}
+                        tableName="إدارة الخدمات"
+                        isLoading={servicesLoading || servicesFetching}
+                    />
                 </div>
 
                 <AddServiceDialog

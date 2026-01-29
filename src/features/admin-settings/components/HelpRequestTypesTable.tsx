@@ -74,11 +74,11 @@ export function HelpRequestTypesTable() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">أنواع طلبات المساعدة</h2>
                 <Button onClick={() => { setSelectedType(null); setIsDialogOpen(true); }} className="gap-2">
                     <Plus className="w-4 h-4" />
                     إضافة نوع
                 </Button>
+                <h2 className="text-xl font-bold">أنواع طلبات المساعدة</h2>
             </div>
 
             <UniTable

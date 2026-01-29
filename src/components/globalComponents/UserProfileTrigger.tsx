@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { UserProfileModal } from "./UserProfileModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserDto } from "@/features/admin-users/types";
 
 interface UserProfileTriggerProps {
     name: string;
     avatar?: string;
     userId?: string;
+    user?: UserDto;
     children?: React.ReactNode;
     className?: string;
 }
 
-export const UserProfileTrigger = ({ name, avatar, userId, children, className }: UserProfileTriggerProps) => {
+export const UserProfileTrigger = ({ name, avatar, userId, user, children, className }: UserProfileTriggerProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleClick = (e: React.MouseEvent) => {
@@ -41,6 +43,7 @@ export const UserProfileTrigger = ({ name, avatar, userId, children, className }
                 userName={name}
                 userAvatar={avatar}
                 userId={userId}
+                user={user}
             />
         </>
     );

@@ -1,10 +1,9 @@
-import { Building, Briefcase, Bus } from 'lucide-react';
+import { Building, Briefcase } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export const mapFiltersConfig = [
     { id: 'accommodations', label: 'السكن', icon: Building, color: 'bg-primary' },
     { id: 'services', label: 'الخدمات', icon: Briefcase, color: 'bg-accent' },
-    { id: 'transportation', label: 'المواصلات', icon: Bus, color: 'bg-success' },
 ];
 
 interface MapFiltersPanelProps {

@@ -1,9 +1,15 @@
 import { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
+import { Search, MoreVertical, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -22,7 +28,7 @@ interface ChatSidebarProps {
     conversations: SidebarConversation[];
     selectedId: number;
     onSelect: (conversation: SidebarConversation) => void;
-    onNewChat?: () => void;
+    onDelete: (id: number) => void;
     showConversations: boolean;
     isLoading?: boolean;
 }
@@ -31,14 +37,14 @@ export const ChatSidebar = ({
     conversations,
     selectedId,
     onSelect,
-    onNewChat,
+    onDelete,
     showConversations,
     isLoading
 }: ChatSidebarProps) => {
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredConversations = conversations.filter(c => 
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredConversations = conversations.filter(c =>
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.lastMessage?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -51,11 +57,6 @@ export const ChatSidebar = ({
             <div className="p-4 border-b border-border space-y-3">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-semibold text-lg">المحادثات</h2>
-                    {onNewChat && (
-                        <Button variant="ghost" size="icon" onClick={onNewChat} title="محادثة جديدة">
-                            <Plus className="w-5 h-5" />
-                        </Button>
-                    )}
                 </div>
                 <div className="relative">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -83,13 +84,13 @@ export const ChatSidebar = ({
                             </div>
                         )}
                         {filteredConversations.map((conversation) => (
-                            <button
+                            <div
                                 key={conversation.id}
-                                onClick={() => onSelect(conversation)}
                                 className={cn(
-                                    'w-full flex items-center gap-3 p-4 bg-primary/10 hover:bg-primary/20 transition-colors rounded-sm my-2 text-right',
+                                    'group relative flex items-center gap-3 p-4 bg-primary/10 hover:bg-primary/20 transition-colors rounded-sm my-2 text-right cursor-pointer',
                                     selectedId === conversation.id && 'bg-primary/20'
                                 )}
+                                onClick={() => onSelect(conversation)}
                             >
                                 <div className="relative">
                                     <Avatar className="w-12 h-12 border-2 border-background">
@@ -109,14 +110,34 @@ export const ChatSidebar = ({
                                         {conversation.lastMessage || "..."}
                                     </p>
                                 </div>
-                                {conversation.unread > 0 && (
-                                      <span>
-                                          <Badge className=" min-w-[20px] h-5 px-1 flex items-center justify-center text-[10px] bg-primary animate-in zoom-in">
+                                <div className="flex flex-col items-end gap-2">
+                                    {conversation.unread > 0 && (
+                                        <Badge className=" min-w-[20px] h-5 px-1 flex items-center justify-center text-[10px] bg-primary animate-in zoom-in">
                                             {conversation.unread}
                                         </Badge>
-                                      </span>
                                     )}
-                            </button>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <MoreVertical className="w-4 h-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                className="text-destructive gap-2 text-right flex-row-reverse"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onDelete(conversation.id);
+                                                }}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                <span>حذف المحادثة</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
                         ))}
                     </>
                 )}

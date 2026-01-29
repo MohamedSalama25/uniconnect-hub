@@ -87,11 +87,11 @@ export function ServiceCategoriesTable() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">أقسام الخدمات</h2>
                 <Button onClick={() => { setSelectedCategory(null); setIsDialogOpen(true); }} className="gap-2">
                     <Plus className="w-4 h-4" />
                     إضافة قسم
                 </Button>
+                <h2 className="text-xl font-bold">أقسام الخدمات</h2>
             </div>
 
             <UniTable

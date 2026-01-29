@@ -30,6 +30,7 @@ import { helpRequestService } from "@/features/help/services/help-request.servic
 import { useAdminHelpRequests } from "@/features/help/hooks/useAdminHelpRequests";
 import { HelpRequest } from "@/features/help/types/help-request.types";
 import { useAuthStore } from "@/store/useAuthStore";
+import { AddHelpRequestDialog } from "@/features/help/components/AddHelpRequestDialog";
 
 // Feature Imports
 import AdminStatsCards from "@/features/admin-posts/components/AdminStatsCards";
@@ -38,6 +39,7 @@ const AdminHelpRequestsPage = () => {
     const navigate = useNavigate();
     const { user, fullProfile } = useAuthStore();
     const currentUserId = fullProfile?.id || (user as any)?.id;
+    const isAdmin = user?.roles?.includes("Admin");
     const queryClient = useQueryClient();
 
     const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -45,6 +47,8 @@ const AdminHelpRequestsPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize] = useState(10);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editingRequest, setEditingRequest] = useState<HelpRequest | undefined>(undefined);
 
     const { data: requestTypesData } = useQuery({
         queryKey: ["help-request-types"],
@@ -52,11 +56,11 @@ const AdminHelpRequestsPage = () => {
     });
     const requestTypes = requestTypesData?.data || [];
 
-    const { data: helpData, isLoading, refetch } = useAdminHelpRequests({
+    const { data: helpData, isLoading, isFetching } = useAdminHelpRequests({
         Search: searchTerm || undefined,
         PageIndex: pageIndex,
         PageSize: pageSize,
-        Status: filterStatus !== 'all' ? (filterStatus as any) : undefined,
+        Status: filterStatus !== 'all' ? (Number(filterStatus) as any) : undefined,
         TypeId: selectedTypeId !== 'all' ? Number(selectedTypeId) : undefined
     });
 
@@ -70,9 +74,9 @@ const AdminHelpRequestsPage = () => {
         rejected: helpData?.rejectedHelpRequests || 0,
     };
 
-    const handleApprove = async (request: HelpRequest) => {
+    const handleApprove = async (id: number) => {
         try {
-            await helpRequestService.updateHelpRequestStatus(request, 'Accepted');
+            await helpRequestService.updateHelpRequestStatus(id, 'Accepted');
             toast.success("تم قبول الطلب بنجاح");
             queryClient.invalidateQueries({ queryKey: ['admin-help-requests'] });
         } catch (err) {
@@ -80,9 +84,9 @@ const AdminHelpRequestsPage = () => {
         }
     };
 
-    const handleReject = async (request: HelpRequest) => {
+    const handleReject = async (id: number) => {
         try {
-            await helpRequestService.updateHelpRequestStatus(request, 'Rejected');
+            await helpRequestService.updateHelpRequestStatus(id, 'Rejected');
             toast.error("تم رفض الطلب");
             queryClient.invalidateQueries({ queryKey: ['admin-help-requests'] });
         } catch (err) {
@@ -134,8 +138,9 @@ const AdminHelpRequestsPage = () => {
             header: "الحالة",
             cell: ({ row }) => {
                 const status = row.original.status;
-                if (status === 'Pending') return <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
-                if (status === 'Accepted') return <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/20 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
+                if ((status as any) === 'Pending' || (status as any) === 0) return <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border-none gap-1"><Clock className="w-3 h-3" /> قيد المراجعة</Badge>;
+                if ((status as any) === 'Accepted' || (status as any) === 1) return <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/20 border-none gap-1"><CheckCircle className="w-3 h-3" /> مقبول</Badge>;
+                if ((status as any) === 'Rejected' || (status as any) === 2) return <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-none gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
                 return <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-none gap-1"><XCircle className="w-3 h-3" /> مرفوض</Badge>;
             }
         }
@@ -144,29 +149,32 @@ const AdminHelpRequestsPage = () => {
     const actions: Action<HelpRequest>[] = [
         {
             label: "تعديل",
-            onClick: (row) => navigate(`/admin/help/edit/${row.id}`),
+            onClick: (row) => {
+                setEditingRequest(row);
+                setIsEditDialogOpen(true);
+            },
             show: (row) => String(row.createdUser?.id) === String(currentUserId),
             icon: Edit
         },
         {
             label: "حذف",
             onClick: (row) => handleDelete(row.id),
-            show: (row) => String(row.createdUser?.id) === String(currentUserId) || user?.roles?.includes("Admin"),
+            show: (row) => String(row.createdUser?.id) === String(currentUserId),
             classname: "text-rose-600 hover:text-rose-700",
             icon: Trash2
         },
         {
             label: "قبول",
             icon: CheckCircle,
-            show: (row) => row.status !== 'Accepted' && user?.roles?.includes("Admin"),
-            onClick: (row) => handleApprove(row),
+            show: (row) => isAdmin && ((row.status as any) !== 'Accepted' && (row.status as any) !== 1),
+            onClick: (row) => handleApprove(row.id),
             classname: "text-emerald-600"
         },
         {
             label: "رفض",
             icon: XCircle,
-            show: (row) => row.status !== 'Rejected' && user?.roles?.includes("Admin"),
-            onClick: (row) => handleReject(row),
+            show: (row) => isAdmin && String(row.createdUser?.id) !== String(currentUserId) && ((row.status as any) !== 'Rejected' && (row.status as any) !== 2),
+            onClick: (row) => handleReject(row.id),
             classname: "text-rose-600"
         },
         {
@@ -226,7 +234,7 @@ const AdminHelpRequestsPage = () => {
                         </div>
 
                         <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner">
-                            {['all', 'Pending', 'Accepted', 'Rejected'].map((status) => (
+                            {['all', '0', '1', '2'].map((status) => (
                                 <button
                                     key={status}
                                     onClick={() => setFilterStatus(status)}
@@ -236,8 +244,8 @@ const AdminHelpRequestsPage = () => {
                                         }`}
                                 >
                                     {status === 'all' ? 'الكل' :
-                                        status === 'Pending' ? 'قيد المراجعة' :
-                                            status === 'Accepted' ? 'المقبولة' : 'المرفوضة'}
+                                        status === '0' ? 'قيد المراجعة' :
+                                            status === '1' ? 'المقبولة' : 'المرفوضة'}
                                 </button>
                             ))}
                         </div>
@@ -253,11 +261,21 @@ const AdminHelpRequestsPage = () => {
                             currentPage={pageIndex}
                             onPageChange={(page) => setPageIndex(page)}
                             tableName="طلبات المساعدة"
-                            isLoading={isLoading}
+                            isLoading={isLoading || isFetching}
                         />
                     </div>
                 </div>
             </div>
+
+            <AddHelpRequestDialog
+                open={isEditDialogOpen}
+                onOpenChange={(open) => {
+                    setIsEditDialogOpen(open);
+                    if (!open) setEditingRequest(undefined);
+                }}
+                initialData={editingRequest}
+                trigger={null}
+            />
         </DashboardLayout>
     );
 };

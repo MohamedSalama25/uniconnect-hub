@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Phone, Video, MoreVertical, ArrowRight, X } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Phone, Video, MoreVertical, ArrowRight, X, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -11,31 +11,47 @@ import { useChat } from '../hooks/useChat';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useSearchParams } from 'react-router-dom';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { Spinner } from '@/components/ui/spinner';
 
 export const ChatTemplate = () => {
-    const { 
-        conversations, 
-        activeConversation, 
-        selectConversation, 
-        messages, 
+    const [searchParams] = useSearchParams();
+    const userId = searchParams.get('userId');
+
+    const {
+        conversations,
+        activeConversation,
+        selectConversation,
+        messages,
         sendMessage,
         users,
         startChatWithUser,
+        deleteConversation,
         isLoading
     } = useChat();
 
     const [showConversations, setShowConversations] = useState(true);
-    const [isNewChatOpen, setIsNewChatOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [convToDelete, setConvToDelete] = useState<number | null>(null);
 
-    const { fullProfile, user } = useAuthStore();
-    
+    useEffect(() => {
+        if (userId && users.length > 0 && !activeConversation) {
+            startChatWithUser(userId);
+            setShowConversations(false);
+        }
+    }, [userId, users, conversations, activeConversation, startChatWithUser]);
+
+    const { fullProfile } = useAuthStore();
+
     // Get ID from fullProfile or fallback to localStorage if set there
-    // The user's senderId in JSON is a UUID.
-    const currentUserId = fullProfile?.id || localStorage.getItem('userId') || localStorage.getItem('id') || ''; 
-
+    const currentUserId = fullProfile?.id || localStorage.getItem('userId') || localStorage.getItem('id') || '';
 
     const sidebarConversations: SidebarConversation[] = useMemo(() => {
         return conversations.map(c => {
@@ -44,7 +60,7 @@ export const ChatTemplate = () => {
                 name: c.otherUserName || 'Unknown User',
                 avatar: c.otherUserImageUrl,
                 lastMessage: c.lastMessage,
-                time: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '',
+                time: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
                 unread: c.unreadCount || 0,
                 otherUserId: c.otherUserId,
                 isOnline: c.isOnline
@@ -54,15 +70,20 @@ export const ChatTemplate = () => {
 
     const activeSidebarConv = sidebarConversations.find(c => c.id === activeConversation?.conversationId);
 
-    const filteredUsers = users.filter(u => 
-        (u.firstName?.toLowerCase() + " " + u.lastName?.toLowerCase()).includes(searchQuery.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const handleDeleteClick = (id: number) => {
+        setConvToDelete(id);
+        setIsDeleteConfirmOpen(true);
+    };
 
-    const handleUserSelect = (userId: string) => {
-        startChatWithUser(userId);
-        setIsNewChatOpen(false);
-        setShowConversations(false);
+    const confirmDelete = async () => {
+        if (convToDelete) {
+            await deleteConversation(convToDelete);
+            setIsDeleteConfirmOpen(false);
+            setConvToDelete(null);
+            if (activeConversation?.conversationId === convToDelete) {
+                setShowConversations(true);
+            }
+        }
     };
 
     return (
@@ -80,8 +101,8 @@ export const ChatTemplate = () => {
                                 setShowConversations(false);
                             }
                         }}
+                        onDelete={handleDeleteClick}
                         showConversations={showConversations}
-                        onNewChat={() => setIsNewChatOpen(true)}
                         isLoading={isLoading}
                     />
 
@@ -125,15 +146,22 @@ export const ChatTemplate = () => {
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        {/* <Button variant="ghost" size="icon" className="rounded-xl">
-                                            <Phone className="w-5 h-5" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" className="rounded-xl">
-                                            <Video className="w-5 h-5" />
-                                        </Button> */}
-                                        <Button variant="ghost" size="icon" className="rounded-xl">
-                                            <MoreVertical className="w-5 h-5" />
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="rounded-xl">
+                                                    <MoreVertical className="w-5 h-5" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    className="text-destructive gap-2 text-right flex-row-reverse"
+                                                    onClick={() => handleDeleteClick(activeConversation.conversationId)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    <span>حذف المحادثة</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
 
@@ -142,9 +170,9 @@ export const ChatTemplate = () => {
                                         <Spinner size={40} />
                                     </div>
                                 ) : (
-                                    <ChatMessageList 
-                                        messages={messages} 
-                                        currentUserId={currentUserId} 
+                                    <ChatMessageList
+                                        messages={messages}
+                                        currentUserId={currentUserId}
                                         otherUserId={activeConversation.otherUserId}
                                     />
                                 )}
@@ -159,47 +187,25 @@ export const ChatTemplate = () => {
                 </div>
             </div>
 
-            {/* New Chat Dialog */}
-            <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
-                <DialogContent className="sm:max-w-md">
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+                <DialogContent className="sm:max-w-md" dir="rtl">
                     <DialogHeader>
-                        <DialogTitle>محادثة جديدة</DialogTitle>
+                        <DialogTitle className="text-right">حذف المحادثة</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-4">
-                        <Input
-                            placeholder="ابحث عن مستخدم..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <div className="h-[300px] overflow-y-auto space-y-2">
-                             {filteredUsers.length === 0 && (
-                                <p className="text-center text-sm text-muted-foreground py-4">لا يوجد مستخدمين</p>
-                             )}
-                            {filteredUsers.map(user => (
-                                <button
-                                    key={user.id}
-                                    onClick={() => handleUserSelect(user.id)}
-                                    className="w-full flex items-center gap-3 p-3 hover:bg-secondary rounded-lg transition-colors text-right"
-                                >
-                                    <Avatar>
-                                        <AvatarImage src={user.avatar} />
-                                        <AvatarFallback>{user.firstName?.[0]}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <div className="font-medium">{user.firstName} {user.lastName}</div>
-                                        <div className="text-xs text-muted-foreground">{user.email}</div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
+                    <div className="py-4 text-right">
+                        هل أنت متأكد من رغبتك في حذف هذه المحادثة؟ لا يمكن التراجع عن هذا الإجراء.
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <Button variant="ghost" onClick={() => setIsDeleteConfirmOpen(false)}>
+                            إلغاء
+                        </Button>
+                        <Button variant="destructive" onClick={confirmDelete}>
+                            حذف الآن
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>
         </DashboardLayout>
     );
 };
-
-
-
-
-

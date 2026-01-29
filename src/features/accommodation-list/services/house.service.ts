@@ -52,36 +52,60 @@ export const houseService = {
 
   // Public Methods
   getAllHouses: async (params?: import('../types/house.types').HousingFilterParams): Promise<import('../types/house.types').PaginatedHouses> => {
-    const response = await clientAxios.get<import('../types/house.types').PaginatedHouses>(API_CONFIG.ENDPOINTS.HOUSE.GET_ALL, {
+    const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HOUSE.GET_ALL, {
       params
     });
 
+    // Handle new wrapped response structure: { data: { pageSize, data, ... }, statistics: { ... } }
+    const body = response.data;
+    const paginatedData = body?.data || body;
+    const stats = body?.statistics;
+
     return {
-      ...response.data,
-      data: response.data.data.map(mapHouseImages)
+      ...paginatedData,
+      data: (paginatedData.data || []).map(mapHouseImages),
+      // Map new statistics structure to expected format
+      totalHouses: stats?.total ?? paginatedData?.totalHouses ?? 0,
+      pendingHouses: stats?.pendingTotal ?? paginatedData?.pendingHouses ?? 0,
+      acceptedHouses: stats?.acceptedTotal ?? paginatedData?.acceptedHouses ?? 0,
+      rejectedHouses: stats?.rejectedTotal ?? paginatedData?.rejectedHouses ?? 0,
     };
   },
 
   getPublicHouseById: async (id: number): Promise<House> => {
-    const response = await clientAxios.get<House>(API_CONFIG.ENDPOINTS.HOUSE.GET_BY_ID(id));
-    return mapHouseImages(response.data);
+    const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HOUSE.GET_BY_ID(id));
+    // Handle potential { data: House } or just House structure
+    const house = response.data?.data || response.data;
+    return mapHouseImages(house);
   },
 
   // Dashboard Methods (Admin/Provider)
   getHouses: async (params?: import('../types/house.types').HousingFilterParams): Promise<import('../types/house.types').PaginatedHouses> => {
-    const response = await clientAxios.get<import('../types/house.types').PaginatedHouses>(API_CONFIG.ENDPOINTS.HOUSE.DASHBOARD_HOUSES, {
+    const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HOUSE.DASHBOARD_HOUSES, {
       params
     });
 
+    // Handle new wrapped response structure: { data: { pageSize, data, ... }, statistics: { ... } }
+    const body = response.data;
+    const paginatedData = body?.data || body;
+    const stats = body?.statistics;
+
     return {
-      ...response.data,
-      data: response.data.data.map(mapHouseImages)
+      ...paginatedData,
+      data: (paginatedData.data || []).map(mapHouseImages),
+      // Map new statistics structure to expected format
+      totalHouses: stats?.total ?? paginatedData?.totalHouses ?? 0,
+      pendingHouses: stats?.pendingTotal ?? paginatedData?.pendingHouses ?? 0,
+      acceptedHouses: stats?.acceptedTotal ?? paginatedData?.acceptedHouses ?? 0,
+      rejectedHouses: stats?.rejectedTotal ?? paginatedData?.rejectedHouses ?? 0,
     };
   },
 
   getHouseById: async (id: number): Promise<House> => {
-    const response = await clientAxios.get<House>(API_CONFIG.ENDPOINTS.HOUSE.DASHBOARD_HOUSE_BY_ID(id));
-    return mapHouseImages(response.data);
+    const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HOUSE.DASHBOARD_HOUSE_BY_ID(id));
+    // Handle potential { data: House } or just House structure
+    const house = response.data?.data || response.data;
+    return mapHouseImages(house);
   },
 
   acceptHouse: async (id: number, status: import('../types/house.types').HouseStatus): Promise<House> => {
@@ -92,6 +116,25 @@ export const houseService = {
   toggleFavorite: async (id: number): Promise<any> => {
     const response = await clientAxios.post(API_CONFIG.ENDPOINTS.HOUSE.TOGGLE_FAVORITE(id));
     return response.data;
+  },
+
+  getFavorites: async (): Promise<House[]> => {
+    const response = await clientAxios.get<any>(API_CONFIG.ENDPOINTS.HOUSE.GET_FAVORITES);
+    const body = response.data;
+    let results = [];
+
+    if (Array.isArray(body)) {
+      results = body;
+    } else if (body && Array.isArray(body.data)) {
+      results = body.data;
+    } else if (body && body.data && Array.isArray(body.data.data)) {
+      results = body.data.data;
+    } else if (body && typeof body === 'object' && (body.id || body.success === false)) {
+      // If singular object or failed response
+      results = body.id ? [body] : [];
+    }
+
+    return results.map(mapHouseImages);
   },
 
   deleteHouse: async (id: number): Promise<void> => {

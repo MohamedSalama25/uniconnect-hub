@@ -6,7 +6,7 @@ interface AdminPostDetailsHeaderProps {
     onBack: () => void;
     onApprove: () => void;
     onReject: () => void;
-    status?: string;
+    status?: string | number;
     isOwner?: boolean;
     onEdit?: () => void;
     onDelete?: () => void;
@@ -23,6 +23,9 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
     onDelete,
     isAdmin
 }) => {
+    const isAccepted = status === 'Accepted' || status === 1;
+    const isRejected = status === 'Rejected' || status === 2;
+
     return (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
@@ -59,29 +62,31 @@ const AdminPostDetailsHeader: React.FC<AdminPostDetailsHeaderProps> = ({
                     </>
                 )}
 
-                {status === 'Pending' && isAdmin && (
-                    <>
-                        <Button
-                            variant="destructive"
-                            className="flex-1 md:flex-none rounded-xl gap-2 font-bold px-6"
-                            onClick={onReject}
-                        >
-                            <XCircle className="w-4 h-4" /> رفض
-                        </Button>
-                        <Button
-                            className="flex-1 md:flex-none rounded-xl gap-2 font-bold px-6 bg-green-600 hover:bg-green-700"
-                            onClick={onApprove}
-                        >
-                            <CheckCircle className="w-4 h-4" /> قبول
-                        </Button>
-                    </>
+                {isAdmin && !isAccepted && (
+                    <Button
+                        className="flex-1 md:flex-none rounded-xl gap-2 font-bold px-6 bg-green-600 hover:bg-green-700"
+                        onClick={onApprove}
+                    >
+                        <CheckCircle className="w-4 h-4" /> قبول
+                    </Button>
                 )}
-                {status === 'Accepted' && (
+
+                {isAdmin && !isOwner && !isRejected && (
+                    <Button
+                        variant="destructive"
+                        className="flex-1 md:flex-none rounded-xl gap-2 font-bold px-6"
+                        onClick={onReject}
+                    >
+                        <XCircle className="w-4 h-4" /> رفض
+                    </Button>
+                )}
+
+                {isAccepted && (
                     <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 px-6 py-2 rounded-xl text-lg font-bold border-none gap-2">
                         <CheckCircle className="w-5 h-5" /> منشور مقبول
                     </Badge>
                 )}
-                {status === 'Rejected' && (
+                {isRejected && (
                     <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 px-6 py-2 rounded-xl text-lg font-bold border-none gap-2">
                         <XCircle className="w-5 h-5" /> منشور مرفوض
                     </Badge>

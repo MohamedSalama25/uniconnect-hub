@@ -29,7 +29,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div className={cn(
         'transition-all duration-300',
-        collapsed ? 'md:mr-20' : 'md:mr-64'
+        collapsed ? 'md:mr-20' : 'md:mr-80'
       )}>
         <TopNavbar onMenuClick={() => setMobileMenuOpen(true)} />
         <main className="p-4 md:p-6 lg:p-8 relative">

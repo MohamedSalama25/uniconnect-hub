@@ -121,16 +121,38 @@ export const ProfileHeader = ({ user, onEditClick }: ProfileHeaderProps) => {
 
                     <div className="flex-1 md:mb-4 text-right">
                         <h1 className="text-3xl font-black text-foreground drop-shadow-sm">{fullName}</h1>
-                        <p className="text-muted-foreground mt-1 font-medium">طالب في {user?.universityName || 'الجامعة'} • عضو منذ 2024</p>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 font-medium text-muted-foreground">
+                            {user?.roles?.includes('Student') && (
+                                <span>طالب في {user?.universityName || 'الجامعة'} •</span>
+                            )}
+                            {(user?.roles?.includes('Provider') || user?.roles?.includes('Service')) && (() => {
+                                const hAvg = user?.houseAverageRating || 0;
+                                const hCount = user?.houseRatingCount || 0;
+                                const sAvg = user?.servicesAverageRating || 0;
+                                const sCount = user?.servicesRatingCount || 0;
+                                const totalCount = hCount + sCount;
+                                const weightedRating = totalCount > 0
+                                    ? ((hAvg * hCount) + (sAvg * sCount)) / totalCount
+                                    : 0;
+
+                                return (
+                                    <div className="flex items-center gap-2">
+                                        <RatingStars rating={weightedRating} size="sm" />
+                                        <span className="text-foreground/80 font-bold">
+                                            ({weightedRating.toFixed(1)})
+                                        </span>
+                                        <span>•</span>
+                                    </div>
+                                );
+                            })()}
+                            <span>عضو منذ {user?.isAcceptedDate ? new Date(user.isAcceptedDate).getFullYear() : '2026'}</span>
+                        </div>
                     </div>
 
                     <div className="flex gap-3 h-fit md:mb-4">
                         <Button onClick={onEditClick} variant="outline" className="h-12 px-6 rounded-2xl gap-2 font-bold border-2 hover:bg-secondary transition-all shadow-sm">
                             <Edit className="w-4 h-4" />
                             تعديل الملف
-                        </Button>
-                        <Button onClick={onEditClick} variant="secondary" size="icon" className="h-12 w-12 rounded-2xl shadow-sm border-2 border-transparent hover:border-border transition-all">
-                            <Settings className="w-5 h-5" />
                         </Button>
                     </div>
                 </div>

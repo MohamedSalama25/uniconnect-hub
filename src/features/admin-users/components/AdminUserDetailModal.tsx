@@ -1,11 +1,12 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-    User, Mail, Phone, MapPin, School, GraduationCap, 
-    Calendar, Shield, Info, CheckCircle2, AlertCircle 
+import {
+    User, Mail, Phone, MapPin, School, GraduationCap,
+    Calendar, Shield, Info, CheckCircle2, AlertCircle
 } from "lucide-react";
 import { UserDto } from "../types";
 import { format } from "date-fns";
@@ -70,56 +71,77 @@ export function AdminUserDetailModal({ user, isOpen, onClose }: AdminUserDetailM
                                 {user.email}
                             </p>
                         </div>
-                        
+
                         <div className="flex flex-col items-end gap-2">
-                           <div className="flex flex-wrap gap-1 justify-end">
+                            <div className="flex flex-wrap gap-1 justify-end">
                                 {user.roles.map(role => (
                                     <Badge key={role} variant="secondary" className="font-bold py-1">
                                         {role === 'Admin' ? 'مشرف' : role === 'Student' ? 'طالب' : role === 'Service' ? 'مقدم خدمة' : role}
                                     </Badge>
                                 ))}
-                           </div>
-                           {user.isBlocked && (
-                               <Badge variant="destructive" className="font-bold">محظور</Badge>
-                           )}
+                            </div>
+                            {user.isBlocked && (
+                                <Badge variant="destructive" className="font-bold">محظور</Badge>
+                            )}
                         </div>
                     </div>
 
-                    <ScrollArea className="h-[400px] pr-1">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
+                    <ScrollArea className="h-[450px] pr-1">
+                        <div className={cn(
+                            "grid gap-6 pb-4",
+                            user.roles.includes('Student') ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
+                        )}>
                             <div className="space-y-4">
                                 <h3 className="text-sm font-bold text-primary flex items-center gap-2 px-2">
                                     <User className="w-4 h-4" /> المعلومات الشخصية
                                 </h3>
-                                {dataSection(User, "الجنس", user.gender === 'Male' ? 'ذكر' : 'أنثى')}
-                                {dataSection(Calendar, "تاريخ الميلاد", 
-                                    user.dateOfBirth ? format(new Date(user.dateOfBirth), "PPP", { locale: ar }) : "—"
-                                )}
-                                {dataSection(Phone, "رقم الهاتف", user.phoneNumber || user.phonenumber)}
-                                {dataSection(MapPin, "عنوان السكن الحالي", user.currentAddress)}
-                                {dataSection(MapPin, "مكان الميلاد", user.birthAddress)}
-                            </div>
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-bold text-primary flex items-center gap-2 px-2">
-                                    <School className="w-4 h-4" /> المعلومات الأكاديمية
-                                </h3>
-                                {dataSection(School, "الجامعة", user.universityName)}
-                                {dataSection(GraduationCap, "الكلية", user.collegeName)}
-                                {dataSection(Calendar, "السنة الدراسية", user.academicYear)}
-                                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                                    <p className="text-xs text-primary font-bold mb-2 flex items-center gap-1">
-                                        <Info className="w-3 h-3" /> ملاحظة تعريفية
-                                    </p>
-                                    <p className="text-sm leading-relaxed text-muted-foreground italic">
-                                        "{user.introductionNote || "لا توجد ملاحظة"}"
-                                    </p>
+                                <div className={cn(
+                                    "grid gap-4",
+                                    !user.roles.includes('Student') && "grid-cols-1 md:grid-cols-2"
+                                )}>
+                                    {dataSection(User, "الجنس", user.gender === 'Male' ? 'ذكر' : 'أنثى')}
+                                    {dataSection(Calendar, "تاريخ الميلاد",
+                                        user.dateOfBirth ? format(new Date(user.dateOfBirth), "PPP", { locale: ar }) : "—"
+                                    )}
+                                    {dataSection(Phone, "رقم الهاتف", user.phoneNumber || user.phonenumber)}
+                                    {dataSection(MapPin, "عنوان السكن الحالي", user.currentAddress)}
+                                    {dataSection(MapPin, "مكان الميلاد", user.birthAddress)}
                                 </div>
                             </div>
+
+                            {user.roles.includes('Student') ? (
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-bold text-primary flex items-center gap-2 px-2">
+                                        <School className="w-4 h-4" /> المعلومات الأكاديمية
+                                    </h3>
+                                    {dataSection(School, "الجامعة", user.universityName)}
+                                    {dataSection(GraduationCap, "الكلية", user.collegeName)}
+                                    {dataSection(Calendar, "السنة الدراسية", user.academicYear)}
+                                    <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                                        <p className="text-xs text-primary font-bold mb-2 flex items-center gap-1">
+                                            <Info className="w-3 h-3" /> ملاحظة تعريفية
+                                        </p>
+                                        <p className="text-sm leading-relaxed text-muted-foreground italic">
+                                            "{user.introductionNote || "لا توجد ملاحظة"}"
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4 mt-2">
+                                    <h3 className="text-sm font-bold text-primary flex items-center gap-2 px-2">
+                                        <Info className="w-4 h-4" /> ملاحظة تعريفية
+                                    </h3>
+                                    <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 border-dashed">
+                                        <p className="text-base leading-relaxed text-muted-foreground italic text-center">
+                                            "{user.introductionNote || "لا توجد ملاحظة تعريفية مضافة لهذا المستخدم."}"
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {user.isAcceptedDate && (
-                            <div className="mt-2 p-4 rounded-xl bg-green-500/5 text-green-600 text-xs flex items-center gap-2 border border-green-500/10">
+                            <div className="mt-4 p-4 rounded-xl bg-green-500/5 text-green-600 text-xs flex items-center justify-center gap-2 border border-green-500/10">
                                 <CheckCircle2 className="w-4 h-4" />
                                 تم قبول هذا المستخدم في {format(new Date(user.isAcceptedDate), "PPP", { locale: ar })}
                             </div>

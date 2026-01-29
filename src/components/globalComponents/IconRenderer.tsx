@@ -16,20 +16,46 @@ export const IconRenderer: React.FC<IconRendererProps> = ({ name, className, siz
     // Map our predefined names to Lucide component names
     const iconMap: Record<string, keyof typeof LucideIcons> = {
         'hospital': 'Hospital',
+        'hospitals': 'Hospital',
         'utensils': 'Utensils',
+        'restaurant': 'Utensils',
+        'restaurants': 'Utensils',
         'bus': 'Bus',
+        'transportation': 'Bus',
         'shopping-cart': 'ShoppingCart',
+        'market': 'ShoppingCart',
+        'markets': 'ShoppingCart',
         'wrench': 'Wrench',
         'briefcase': 'Briefcase',
         'graduation-cap': 'GraduationCap',
+        'school': 'School',
+        'schools': 'School',
         'heart': 'Heart',
         'home': 'Home',
         'car': 'Car',
         'coffee': 'Coffee',
+        'cafe': 'Coffee',
+        'cafes': 'Coffee',
         'landmark': 'Landmark',
+        'pill': 'Pill',
+        'pharmacy': 'Pill',
+        'pharmacies': 'Pill',
     };
 
-    const lucideName = iconMap[name] || (name.charAt(0).toUpperCase() + name.slice(1)) as keyof typeof LucideIcons;
+    const normalizedName = name.toLowerCase().trim();
+    let lucideName = iconMap[normalizedName];
+
+    if (!lucideName) {
+        // Try singular if plural (basic check)
+        if (normalizedName.endsWith('s')) {
+            const singular = normalizedName.slice(0, -1);
+            lucideName = iconMap[singular];
+        }
+    }
+
+    if (!lucideName) {
+        lucideName = (normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)) as keyof typeof LucideIcons;
+    }
 
     const IconComponent = (LucideIcons[lucideName] as LucideIcon) || LucideIcons.HelpCircle;
 

@@ -1,18 +1,20 @@
 import * as signalR from "@microsoft/signalr";
 
 type MessageCallback = (message: any) => void;
-const accessTokenFactory=JSON.parse(localStorage.getItem("auth-storage") || "{}")?.state?.user?.token;
 class SignalRService {
   private connection: signalR.HubConnection | null = null;
   private messageReceivedCallback?: MessageCallback;
   private messageSentCallback?: MessageCallback;
-  
+
 
   constructor() {
-    const baseUrl = localStorage.getItem("baseUrl") ||import.meta.env.VITE_API_BASE_URL;
+    const baseUrl = localStorage.getItem("baseUrl") || import.meta.env.VITE_API_BASE_URL;
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${baseUrl}/chatHub`, {
-        accessTokenFactory: () => accessTokenFactory || ""
+        accessTokenFactory: () => {
+          const authStorage = JSON.parse(localStorage.getItem("auth-storage") || "{}");
+          return authStorage?.state?.user?.token || "";
+        }
       })
       .withAutomaticReconnect()
       .build();
@@ -67,7 +69,7 @@ class SignalRService {
     }
 
     if (this.connection.state === signalR.HubConnectionState.Connected) {
-        await this.connection.invoke("SendMessage", receiverId, content);
+      await this.connection.invoke("SendMessage", receiverId, content);
     }
   }
 

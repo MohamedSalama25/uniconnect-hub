@@ -34,7 +34,7 @@ export const HelpFilters = ({ selectedTypeId, setSelectedTypeId }: HelpFiltersPr
                 variant={selectedTypeId === 'all' ? "default" : "outline"}
                 className={`cursor-pointer px-6 py-3.5 text-sm font-black transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] flex items-center gap-3 rounded-2xl border-none ${selectedTypeId === 'all'
                     ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)] ring-2 ring-primary/20"
-                    : "bg-[#161b22] text-muted-foreground hover:bg-[#1c2128] hover:text-foreground shadow-lg shadow-black/20"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50 shadow-sm"
                     }`}
                 onClick={() => setSelectedTypeId('all')}
             >
@@ -52,7 +52,7 @@ export const HelpFilters = ({ selectedTypeId, setSelectedTypeId }: HelpFiltersPr
                         variant={isSelected ? "default" : "outline"}
                         className={`cursor-pointer px-6 py-3.5 text-sm font-black transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] flex items-center gap-3 rounded-2xl border-none ${isSelected
                             ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)] ring-2 ring-primary/20"
-                            : "bg-[#161b22] text-muted-foreground hover:bg-[#1c2128] hover:text-foreground shadow-lg shadow-black/20"
+                            : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50 shadow-sm"
                             }`}
                         onClick={() => setSelectedTypeId(type.id.toString())}
                     >

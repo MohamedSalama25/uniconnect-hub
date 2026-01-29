@@ -1,25 +1,18 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { currentStudent, accommodations } from '@/data/mockData';
 import { ProfileHeader } from '../components/ProfileHeader';
 import { ProfileInfoCards } from '../components/ProfileInfoCards';
 import { ProfileTabs } from '../components/ProfileTabs';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { currentStudent } from '@/data/mockData';
 
 export const ProfileTemplate = () => {
-    const { user, fullProfile } = useAuthStore();
+    const { user, fullProfile, isAuthenticated } = useAuthStore();
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState('posts');
-
-    useEffect(() => {
-        if (location.state?.tab) {
-            setActiveTab(location.state.tab);
-        }
-    }, [location.state]);
+    const [activeTab, setActiveTab] = useState('saved');
 
     const displayUser = fullProfile || currentStudent;
-    const savedAccommodations = accommodations.slice(0, 2);
 
     return (
         <DashboardLayout>
@@ -34,7 +27,6 @@ export const ProfileTemplate = () => {
                 <ProfileTabs
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
-                    savedAccommodations={savedAccommodations}
                 />
             </div>
         </DashboardLayout>

@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
         isOpen: false,
         title: "",
         description: "",
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     const openConfirm = (title: string, description: string, onConfirm: () => void, variant: any = "default") => {
@@ -60,12 +60,12 @@ export default function AdminUsersPage() {
         IsAccepted: filters.status === "pending" ? false : filters.status === "active" ? true : undefined,
     };
 
-    const { data, isLoading } = useAdminUsers(queryParams);
+    const { data, isLoading, isFetching } = useAdminUsers(queryParams);
     const { acceptUser, blockUser, assignRole, removeRole } = useAdminUserMutations();
 
     const users = data?.users?.data || [];
     const totalCount = data?.users?.count || 0;
-    
+
     // Derived stats from the single response
     const stats = {
         totalUsers: data?.totalUsers || 0,
@@ -94,7 +94,7 @@ export default function AdminUsersPage() {
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border-2 border-primary/10">
                             <AvatarImage src={user.profilePictureUrl || ""} alt={user.username} className="object-cover" />
-                            <AvatarFallback className="bg-primary/5 text-primary text-xs">{user.username.substring(0,2).toUpperCase()}</AvatarFallback>
+                            <AvatarFallback className="bg-primary/5 text-primary text-xs">{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col items-start text-right">
                             <span className="font-bold text-sm">
@@ -124,7 +124,7 @@ export default function AdminUsersPage() {
             }
         },
         {
-            accessorKey: "universityName",
+            accessorKey: "phonenumber",
             header: "رقم الهاتف",
             cell: ({ row }) => {
                 const user = row.original;
@@ -153,9 +153,9 @@ export default function AdminUsersPage() {
             header: "الحالة",
             cell: ({ row }) => {
                 const user = row.original;
-                if (user.isBlocked) return <Badge variant="destructive" className="h-6 px-2 text-[10px] font-bold">محظور</Badge>;
-                if (user.isAccepted) return <Badge className="bg-green-500 hover:bg-green-600 h-6 px-2 text-[10px] font-bold">نشط</Badge>;
-                return <Badge variant="outline" className="h-6 px-2 text-[10px] font-bold text-amber-600 border-amber-200 bg-amber-50">معلق</Badge>;
+                if (user.isBlocked) return <Badge variant="destructive" className="bg-rose-500/10 text-rose-600 border border-rose-200/50 hover:bg-rose-500/20 h-6 px-2 text-[10px] font-bold shadow-none">محظور</Badge>;
+                if (user.isAccepted) return <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border border-emerald-200/50 hover:bg-emerald-500/20 h-6 px-2 text-[10px] font-bold shadow-none">نشط</Badge>;
+                return <Badge variant="outline" className="h-6 px-2 text-[10px] font-bold text-amber-600 border-amber-200 bg-amber-500/10 hover:bg-amber-500/20 shadow-none border-none">معلق</Badge>;
             }
         }
     ];
@@ -190,7 +190,7 @@ export default function AdminUsersPage() {
             onClick: (user) => {
                 openConfirm(
                     user.isBlocked ? "تأكيد فك الحظر" : "تأكيد حظر المستخدم",
-                    user.isBlocked 
+                    user.isBlocked
                         ? `هل أنت متأكد من فك الحظر عن ${user.username}؟`
                         : `هل أنت متأكد من رغبتك في حظر ${user.username}؟ لن يتمكن من الوصول إلى حسابه.`,
                     () => blockUser({ userId: user.id, isBlocked: !user.isBlocked }),
@@ -206,7 +206,7 @@ export default function AdminUsersPage() {
                 const isAdmin = user.roles.includes("Admin");
                 openConfirm(
                     isAdmin ? "إزالة صلاحية مدير" : "تعيين كمدير للنظام",
-                    isAdmin 
+                    isAdmin
                         ? `هل أنت متأكد من إزالة صلاحيات الإدارة عن ${user.username}؟`
                         : `هل أنت متأكد من تعيين ${user.username} كمشرف للنظام؟ سيكون له كامل الصلاحيات.`,
                     () => {
@@ -228,7 +228,7 @@ export default function AdminUsersPage() {
                 const isService = user.roles.includes("Service");
                 openConfirm(
                     isService ? "إزالة دور مقدم الخدمة" : "تعيين كمقدم خدمة",
-                    isService 
+                    isService
                         ? `هل أنت متأكد من إزالة دور مقدم الخدمة عن ${user.username}؟`
                         : `هل أنت متأكد من تعيين ${user.username} كمقدم خدمة؟`,
                     () => {
@@ -248,7 +248,6 @@ export default function AdminUsersPage() {
     return (
         <DashboardLayout>
             <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-muted/30 " dir="rtl">
-                {isLoading && <CustomLoader />}
                 <div className="flex flex-col gap-2">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight">إدارة المستخدمين</h1>
                     <p className="text-muted-foreground text-sm md:text-base">
@@ -277,7 +276,7 @@ export default function AdminUsersPage() {
                             currentPage={pageIndex}
                             onPageChange={setPageIndex}
                             tableName="المستخدمين"
-                            isLoading={isLoading}
+                            isLoading={isLoading || isFetching}
                         />
                     </div>
                 </div>

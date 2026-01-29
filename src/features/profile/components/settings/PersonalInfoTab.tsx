@@ -1,4 +1,4 @@
-import { User, Mail, Phone, GraduationCap, AlignRight, Save } from 'lucide-react';
+import { User, Mail, Phone, GraduationCap, AlignRight, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +9,10 @@ interface PersonalInfoTabProps {
     formData: any;
     setFormData: (data: any) => void;
     handleSave: (section: string) => void;
+    isLoading?: boolean;
 }
 
-export const PersonalInfoTab = ({ formData, setFormData, handleSave }: PersonalInfoTabProps) => {
+export const PersonalInfoTab = ({ formData, setFormData, handleSave, isLoading }: PersonalInfoTabProps) => {
     return (
         <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
             <CardHeader className="bg-muted/30 pb-6 border-b text-right">
@@ -64,8 +65,8 @@ export const PersonalInfoTab = ({ formData, setFormData, handleSave }: PersonalI
                             <Input
                                 id="university"
                                 value={formData.university}
-                                readOnly
-                                className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right bg-muted/50"
+                                onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                                className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right"
                             />
                         </div>
                     </div>
@@ -83,9 +84,17 @@ export const PersonalInfoTab = ({ formData, setFormData, handleSave }: PersonalI
                     </div>
                 </div>
                 <div className="pt-4 flex justify-start">
-                    <Button onClick={() => handleSave('المعلومات الشخصية')} className="rounded-xl px-8 py-6 h-auto gap-2 text-lg font-bold shadow-lg shadow-primary/20">
-                        <Save className="w-5 h-5" />
-                        حفظ التغييرات
+                    <Button
+                        onClick={() => handleSave('المعلومات الشخصية')}
+                        disabled={isLoading}
+                        className="rounded-xl px-8 py-6 h-auto gap-2 text-lg font-bold shadow-lg shadow-primary/20"
+                    >
+                        {isLoading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <Save className="w-5 h-5" />
+                        )}
+                        {isLoading ? "جاري الحفظ..." : "حفظ التغييرات"}
                     </Button>
                 </div>
             </CardContent>

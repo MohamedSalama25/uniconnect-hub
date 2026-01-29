@@ -305,7 +305,7 @@ export const BookingsTemplate = () => {
                             currentPage={pageIndex}
                             onPageChange={setPageIndex}
                             tableName="الحجوزات"
-                            isLoading={isLoading}
+                            isLoading={isLoading || isFetching}
                         />
                     </div>
                 </div>

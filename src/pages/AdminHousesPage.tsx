@@ -43,6 +43,7 @@ const AdminHousesPage = () => {
     const navigate = useNavigate();
     const { user, fullProfile } = useAuthStore();
     const currentUserId = fullProfile?.id || (user as any)?.id;
+    const isAdmin = user?.roles?.includes("Admin");
 
     const [filterStatus, setFilterStatus] = useState<string>("all");
     const [selectedTypeId, setSelectedTypeId] = useState<string>("all");
@@ -67,7 +68,7 @@ const AdminHousesPage = () => {
         Search: searchTerm || undefined,
         pageIndex: pageIndex,
         pageSize: pageSize,
-        Status: filterStatus !== 'all' ? (filterStatus as any) : undefined,
+        Status: filterStatus !== 'all' ? (Number(filterStatus) as any) : undefined,
         TypeId: selectedTypeId !== 'all' ? Number(selectedTypeId) : undefined
     });
 
@@ -160,22 +161,28 @@ const AdminHousesPage = () => {
             header: "الحالة",
             cell: ({ row }) => {
                 const status = row.original.status;
-                if (status === 'Pending') return (
+                if (status === 'Pending' || status === 0) return (
                     <Badge className="bg-amber-500/10 text-amber-600 border border-border hover:bg-amber-500/20 gap-1.5 py-1 px-3 shadow-none">
                         <Clock className="w-3.5 h-3.5" />
                         قيد المراجعة
                     </Badge>
                 );
-                if (status === 'Accepted') return (
+                if (status === 'Accepted' || status === 1) return (
                     <Badge className="bg-emerald-500/10 text-emerald-600 border border-emerald-200/50 hover:bg-emerald-500/20 gap-1.5 py-1 px-3 shadow-none">
                         <CheckCircle className="w-3.5 h-3.5" />
                         مقبول
                     </Badge>
                 );
-                return (
+                if (status === 'Rejected' || status === 2) return (
                     <Badge className="bg-rose-500/10 text-rose-600 border border-rose-200/50 hover:bg-rose-500/20 gap-1.5 py-1 px-3 shadow-none">
                         <XCircle className="w-3.5 h-3.5" />
                         مرفوض
+                    </Badge>
+                );
+                return (
+                    <Badge className="bg-slate-500/10 text-slate-600 border border-slate-200/50 hover:bg-slate-500/20 gap-1.5 py-1 px-3 shadow-none">
+                        <XCircle className="w-3.5 h-3.5" />
+                        ملغي
                     </Badge>
                 );
             }
@@ -186,14 +193,14 @@ const AdminHousesPage = () => {
         {
             label: "وافق",
             onClick: (row) => handleAcceptReject(row.id, 'Accepted'),
-            show: (row) => row.status === 'Pending' && (user?.roles?.includes("Admin") || false),
+            show: (row) => isAdmin && row.status !== 'Accepted',
             disabled: (row) => processingId === row.id,
             classname: "text-green-600 hover:text-green-700"
         },
         {
             label: "رفض",
             onClick: (row) => handleAcceptReject(row.id, 'Rejected'),
-            show: (row) => row.status === 'Pending' && (user?.roles?.includes("Admin") || false),
+            show: (row) => isAdmin && String(row.createdUser?.id) !== String(currentUserId) && row.status !== 'Rejected',
             disabled: (row) => processingId === row.id,
             classname: "text-red-600 hover:text-red-700"
         },
@@ -279,8 +286,8 @@ const AdminHousesPage = () => {
                             </Select>
                         </div>
 
-                        <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner">
-                            {['all', 'Pending', 'Accepted', 'Rejected'].map((status) => (
+                        <div className="flex bg-muted/30 rounded-2xl p-1.5 gap-2 border border-muted/50 shadow-inner overflow-x-auto no-scrollbar">
+                            {['all', '0', '1', '2'].map((status) => (
                                 <button
                                     key={status}
                                     onClick={() => setFilterStatus(status)}
@@ -290,29 +297,25 @@ const AdminHousesPage = () => {
                                         }`}
                                 >
                                     {status === 'all' ? 'الكل' :
-                                        status === 'Pending' ? 'قيد المراجعة' :
-                                            status === 'Accepted' ? 'المقبولة' : 'المرفوضة'}
+                                        status === '0' ? 'قيد المراجعة' :
+                                            status === '1' ? 'المقبولة' :
+                                                status === '2' ? 'المرفوضة' : ""}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {housesLoading || housesFetching ? (
-                        <div className="flex flex-col items-center justify-center p-20 gap-4">
-                            <Loader className="w-10 h-10 animate-spin text-primary" />
-                        </div>
-                    ) : (
-                        <UniTable
-                            columns={columns}
-                            data={housesData?.data || []}
-                            actions={actions}
-                            totalItems={housesData?.count || 0}
-                            itemsPerPage={pageSize}
-                            currentPage={pageIndex}
-                            onPageChange={setPageIndex}
-                            tableName="إدارة السكن"
-                        />
-                    )}
+                    <UniTable
+                        columns={columns}
+                        data={housesData?.data || []}
+                        actions={actions}
+                        totalItems={housesData?.count || 0}
+                        itemsPerPage={pageSize}
+                        currentPage={pageIndex}
+                        onPageChange={setPageIndex}
+                        tableName="إدارة السكن"
+                        isLoading={housesLoading || housesFetching}
+                    />
                 </div>
 
                 <AddAccommodationDialog

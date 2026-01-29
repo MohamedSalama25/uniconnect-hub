@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
+import { AddHelpRequestDialog } from "@/features/help/components/AddHelpRequestDialog";
 
 const AdminHelpRequestDetailsPage = () => {
     const { id } = useParams();
@@ -25,13 +26,14 @@ const AdminHelpRequestDetailsPage = () => {
     const { data: request, isLoading, error } = useHelpRequestDetail(id, true);
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     const queryClient = useQueryClient();
 
     const handleApprove = async () => {
         if (!request) return;
         try {
-            await helpRequestService.updateHelpRequestStatus(request, 'Accepted');
+            await helpRequestService.updateHelpRequestStatus(request.id, 'Accepted');
             toast.success("تم قبول طلب المساعدة بنجاح");
             navigate("/admin/help-requests");
         } catch (err) {
@@ -42,7 +44,7 @@ const AdminHelpRequestDetailsPage = () => {
     const handleReject = async () => {
         if (!request) return;
         try {
-            await helpRequestService.updateHelpRequestStatus(request, 'Rejected');
+            await helpRequestService.updateHelpRequestStatus(request.id, 'Rejected');
             toast.error("تم رفض طلب المساعدة");
             navigate("/admin/help-requests");
         } catch (err) {
@@ -120,6 +122,7 @@ const AdminHelpRequestDetailsPage = () => {
                     status={request.status}
                     isOwner={isOwner}
                     isAdmin={isAdmin}
+                    onEdit={() => setIsEditDialogOpen(true)}
                     onDelete={() => setIsDeleteDialogOpen(true)}
                 />
 
@@ -177,6 +180,13 @@ const AdminHelpRequestDetailsPage = () => {
                     variant="destructive"
                     confirmText="نعم، حذف"
                     cancelText="إلغاء"
+                />
+
+                <AddHelpRequestDialog
+                    open={isEditDialogOpen}
+                    onOpenChange={setIsEditDialogOpen}
+                    initialData={request}
+                    trigger={null}
                 />
             </div>
         </DashboardLayout>

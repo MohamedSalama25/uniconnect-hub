@@ -19,6 +19,30 @@ export interface UserDto {
     isBlocked: boolean;
     introductionNote: string;
     roles: string[];
+    cardPictureUrl?: string;
+    houseCount?: number;
+    acceptedHouseCount?: number;
+    notAcceptedHouseCount?: number;
+    houseRatingCount?: number;
+    houseAverageRating?: number;
+    helpRequestCount?: number;
+    helpRequestAccepted?: number;
+    servicesCount?: number;
+    servicesAccepted?: number;
+    servicesNotAccepted?: number;
+    servicesRatingCount?: number;
+    servicesAverageRating?: number;
+}
+
+export interface UserPostsResponse {
+    pageSize: number;
+    pageIndex: number;
+    count: number;
+    data: {
+        readHouses: any[]; // Avoid circular dependency by using any or specific partial types
+        readHelpRequests: any[];
+        readServices: any[];
+    }[];
 }
 
 export interface UserQueryParams {

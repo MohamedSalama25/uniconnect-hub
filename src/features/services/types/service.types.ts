@@ -76,3 +76,9 @@ export interface CreateServiceRequest {
     workingFrom: string;
     workingTo: string;
 }
+export interface ServiceRating {
+    id: number;
+    stars: number;
+    createdAt: string;
+    createdUser: UserDto;
+}

@@ -19,32 +19,39 @@ interface LocationViewerProps {
     lng: number;
     title?: string;
     className?: string;
+    height?: string;
+    hideHeader?: boolean;
 }
 
-export function LocationViewer({ lat, lng, title, className }: LocationViewerProps) {
+export function LocationViewer({ lat, lng, title, className, height = "250px", hideHeader = false }: LocationViewerProps) {
     const openGoogleMaps = () => {
         const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         window.open(url, '_blank');
     };
 
     return (
-        <div className={`space-y-3 ${className}`}>
-            <div className="flex items-center justify-between">
-                <h3 className="font-bold flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-primary" />
-                    الموقع على الخريطة
-                </h3>
-                <Button
-                    size="sm"
-                    onClick={openGoogleMaps}
-                    className="gap-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 rounded-full px-4 transition-all hover:scale-105 active:scale-95"
-                >
-                    <ExternalLink className="w-3 h-3" />
-                    احصل على الاتجاهات
-                </Button>
-            </div>
+        <div className={`space-y-3 ${className}`} style={{ height: hideHeader ? height : 'auto' }}>
+            {!hideHeader && (
+                <div className="flex items-center justify-between">
+                    <h3 className="font-bold flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-primary" />
+                        الموقع على الخريطة
+                    </h3>
+                    <Button
+                        size="sm"
+                        onClick={openGoogleMaps}
+                        className="gap-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 rounded-full px-4 transition-all hover:scale-105 active:scale-95"
+                    >
+                        <ExternalLink className="w-3 h-3" />
+                        احصل على الاتجاهات
+                    </Button>
+                </div>
+            )}
 
-            <div className="h-[250px] w-full rounded-xl overflow-hidden border shadow-sm relative z-0">
+            <div
+                className="w-full rounded-xl overflow-hidden border shadow-sm relative z-0"
+                style={{ height: height }}
+            >
                 <MapContainer
                     center={{ lat, lng }}
                     zoom={15}

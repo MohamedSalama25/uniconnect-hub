@@ -3,24 +3,17 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User, Phone, Mail, UserCheck, Shield, MessageCircle, Send, Loader2, Ban, ShieldAlert } from "lucide-react";
+import { User, Phone, Mail, UserCheck, Shield, MessageCircle, Ban, ShieldAlert, Loader2 } from "lucide-react";
 import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
 import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { signalRService } from "@/features/chat/services/signalr.service";
 import { useAdminUserMutations } from "@/features/admin-users/hooks/useAdminUserMutations";
 import { formatDateArabic } from "@/lib/utils";
 import { PostDetails } from "../types";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
+import { SendMessageDialog } from "@/components/globalComponents/SendMessageDialog";
+import { useNavigate } from "react-router-dom";
 
 interface AdminPostAuthorSidebarProps {
     post: PostDetails;
@@ -29,12 +22,11 @@ interface AdminPostAuthorSidebarProps {
 
 const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, user }) => {
     const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
-    const [message, setMessage] = useState("");
-    const [isSending, setIsSending] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const navigate = useNavigate();
 
-    const { user: currentUser, fullProfile } = useAuthStore();
-    const currentUserId = fullProfile?.id || (currentUser as any)?.id;
+    const { isAuthenticated, fullProfile } = useAuthStore();
+    const currentUserId = fullProfile?.id;
 
     const { blockUser, isPending: isMutationPending } = useAdminUserMutations();
 
@@ -47,19 +39,13 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
     const isBlocked = user?.isBlocked;
     const isSelf = String(user?.id) === String(currentUserId);
 
-    const handleSendMessage = async () => {
-        if (!message.trim() || !user?.id) return;
-        setIsSending(true);
-        try {
-            await signalRService.sendMessage(user.id, message);
-            toast.success("تم إرسال الرسالة بنجاح");
-            setIsMessageDialogOpen(false);
-            setMessage("");
-        } catch (error) {
-            toast.error("فشل في إرسال الرسالة");
-        } finally {
-            setIsSending(false);
+    const handleOpenMessage = () => {
+        if (!isAuthenticated) {
+            toast.error("يرجى تسجيل الدخول أولاً لإرسال رسالة");
+            navigate("/login");
+            return;
         }
+        setIsMessageDialogOpen(true);
     };
 
     const handleToggleBlock = () => {
@@ -98,7 +84,7 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                                     <Button
                                         variant="outline"
                                         className="rounded-xl gap-2 font-bold border-primary/20 hover:bg-primary/5 flex-1"
-                                        onClick={() => setIsMessageDialogOpen(true)}
+                                        onClick={handleOpenMessage}
                                     >
                                         <MessageCircle className="w-4 h-4" /> مراسلة
                                     </Button>
@@ -141,7 +127,7 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                             >
                                 <Button
                                     variant="ghost"
-                                    className="w-full rounded-xl gap-2 font-bold hover:bg-primary/5"
+                                    className="w-full rounded-xl gap-2 font-bold bg-green-500/10 text-green-700 hover:bg-green-500/20 hover:text-green-800"
                                 >
                                     <User className="w-4 h-4" /> فحص الملف الشخصي
                                 </Button>
@@ -162,56 +148,23 @@ const AdminPostAuthorSidebar: React.FC<AdminPostAuthorSidebarProps> = ({ post, u
                     </div>
                     <div className="flex justify-between w-full text-sm">
                         <span className="text-muted-foreground">الحساب موثق</span>
-                        <Badge className={cn(
-                            "border-none",
-                            user?.isAccepted ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"
-                        )}>
-                            {user?.isAccepted ? "نعم" : "لا"}
-                        </Badge>
+                        <div className="flex items-center">
+                            {user?.isAccepted ? (
+                                <Shield className="w-5 h-5 text-emerald-500 fill-emerald-500/20" />
+                            ) : (
+                                <ShieldAlert className="w-5 h-5 text-amber-500" />
+                            )}
+                        </div>
                     </div>
                 </CardFooter>
             </Card>
 
-            {/* Message Dialog */}
-            <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
-                <DialogContent className="sm:max-w-[500px] rounded-3xl p-6" dir="rtl">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                            <MessageCircle className="w-6 h-6 text-primary" />
-                            إرسال رسالة إلى {displayName}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                        <Textarea
-                            placeholder="اكتب رسالتك هنا..."
-                            className="min-h-[150px] rounded-2xl p-4 resize-none border-2 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                        />
-                    </div>
-                    <DialogFooter className="flex flex-row-reverse gap-3 sm:justify-start">
-                        <Button
-                            className="flex-1 rounded-xl h-12 font-bold gap-2"
-                            onClick={handleSendMessage}
-                            disabled={!message.trim() || isSending}
-                        >
-                            {isSending ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                <Send className="w-5 h-5" />
-                            )}
-                            إرسال الرسالة
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="flex-1 rounded-xl h-12 font-bold"
-                            onClick={() => setIsMessageDialogOpen(false)}
-                        >
-                            إلغاء
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <SendMessageDialog
+                open={isMessageDialogOpen}
+                onOpenChange={setIsMessageDialogOpen}
+                recipientId={user?.id || post.authorId}
+                recipientName={displayName}
+            />
 
             <ConfirmDialog
                 isOpen={isConfirmOpen}

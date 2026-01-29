@@ -6,7 +6,7 @@ import { MapFiltersPanel } from '../components/MapFiltersPanel';
 import { MapView } from '../components/MapView';
 
 export const MapTemplate = () => {
-    const [activeFilters, setActiveFilters] = useState<string[]>(['accommodations', 'services', 'transportation']);
+    const [activeFilters, setActiveFilters] = useState<string[]>(['accommodations', 'services']);
     const [showFilters, setShowFilters] = useState(true);
 
     const toggleFilter = (filterId: string) => {
