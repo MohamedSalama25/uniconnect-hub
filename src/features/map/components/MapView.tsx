@@ -319,7 +319,7 @@ const MapPinMarker = ({ item, type, gridPos, color, onNavigate, userLocation }: 
                 <PopoverContent className="p-0 border-none shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] rounded-[2rem] overflow-hidden w-72 animate-in fade-in zoom-in-95 backdrop-blur-xl bg-card/90" side="top" align="center" sideOffset={10}>
                     <div className="bg-card text-card-foreground">
                         {item.image && (
-                            <div className="h-32 w-full overflow-hidden">
+                            <div className="h-32 w-full overflow-hidden relative">
                                 <img src={item.image} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
                             </div>

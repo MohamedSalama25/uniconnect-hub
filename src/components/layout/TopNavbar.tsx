@@ -1,4 +1,5 @@
-import { Search, Bell, Moon, Sun, Menu, LogOut, Settings, User as UserIcon } from 'lucide-react';
+import { Search, Moon, Sun, Menu, LogOut, Settings, User as UserIcon } from 'lucide-react';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -128,30 +129,7 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
             </Button>
 
             {/* Notifications */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative rounded-xl">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -left-1 w-5 h-5 bg-accent text-accent-foreground text-xs rounded-full flex items-center justify-center font-medium">
-                    3
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-72">
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
-                  <span className="font-medium">رد جديد على طلبك</span>
-                  <span className="text-sm text-muted-foreground">منذ 5 دقائق</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
-                  <span className="font-medium">تم حجز موعد المعاينة</span>
-                  <span className="text-sm text-muted-foreground">منذ ساعة</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
-                  <span className="font-medium">رسالة جديدة من أحمد</span>
-                  <span className="text-sm text-muted-foreground">منذ 3 ساعات</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NotificationBell />
 
             {/* Profile */}
             <DropdownMenu>

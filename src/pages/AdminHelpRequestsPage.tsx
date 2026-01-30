@@ -68,7 +68,7 @@ const AdminHelpRequestsPage = () => {
     const totalCount = helpData?.count || 0;
 
     const stats = {
-        total: helpData?.totalHelpRequests || 0,
+        total: totalCount || 0,
         pending: helpData?.pendingHelpRequests || 0,
         completed: helpData?.acceptedHelpRequests || 0,
         rejected: helpData?.rejectedHelpRequests || 0,

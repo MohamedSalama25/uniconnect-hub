@@ -77,6 +77,24 @@ const AdminHousesPage = () => {
         try {
             await houseService.acceptHouse(id, status);
             toast.success(status === 'Accepted' ? "تم قبول المنشور بنجاح" : "تم رفض المنشور");
+
+            // Send notification to the user
+            const house = housesData?.data.find(h => h.id === id);
+            if (house && house.createdUser?.id) {
+                try {
+                    const { notificationService } = await import('@/features/notifications/services/notification.service');
+                    await notificationService.sendNotification({
+                        userId: house.createdUser.id,
+                        title: status === 'Accepted' ? 'تم قبول سكنك' : 'تم رفض سكنك',
+                        message: status === 'Accepted'
+                            ? `تم قبول سكنك "${house.name}" وهو الآن متاح للجميع.`
+                            : `عذراً، تم رفض سكنك "${house.name}". يرجى مراجعة الشروط والمحاولة مرة أخرى.`
+                    });
+                } catch (notifError) {
+                    console.error('Failed to send notification', notifError);
+                }
+            }
+
             refetchHouses();
         } catch (error: any) {
             toast.error("فشل في تحديث حالة المنشور");

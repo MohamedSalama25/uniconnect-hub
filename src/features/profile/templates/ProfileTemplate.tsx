@@ -18,8 +18,10 @@ export const ProfileTemplate = () => {
         <DashboardLayout>
             <div className="space-y-6 animate-fade-in text-right relative">
                 <div className="space-y-0">
-                    <ProfileHeader user={displayUser} onEditClick={() => setActiveTab('settings')} />
-                    <div className="bg-card px-6 pb-6 rounded-b-2xl -mt-6 pt-6 shadow-card">
+                    <div className='mb-5'>
+                        <ProfileHeader user={displayUser} onEditClick={() => setActiveTab('settings')} />
+                    </div>
+                    <div className="bg-card px-6 pb-2 rounded-xl pt-2 shadow-card ">
                         <ProfileInfoCards user={displayUser} />
                     </div>
                 </div>

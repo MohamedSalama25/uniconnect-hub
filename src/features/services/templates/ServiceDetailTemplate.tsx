@@ -19,7 +19,7 @@ import {
 import { UserProfileTrigger } from "@/components/globalComponents/UserProfileTrigger";
 import { Service, TimeSpan } from "@/features/services/types/service.types";
 import { LocationViewer } from "@/components/globalComponents/LocationViewer";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { AddServiceRatingForm } from "../components/AddServiceRatingForm";
 import { ServiceRatingsList } from "../components/ServiceRatingsList";
@@ -189,7 +189,7 @@ export const ServiceDetailTemplate = ({ service }: ServiceDetailTemplateProps) =
                                     <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-3xl hover:bg-muted/50 transition-all cursor-pointer group border border-border/50">
                                         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-2xl group-hover:bg-primary group-hover:text-white transition-all shadow-sm overflow-hidden">
                                             {service.createdUser?.profilePictureUrl ? (
-                                                <img src={service.createdUser.profilePictureUrl} alt="" className="w-full h-full object-cover" />
+                                                <img src={formatImageUrl(service.createdUser?.profilePictureUrl) || "https://github.com/shadcn.png"} alt="" className="w-full h-full object-cover" />
                                             ) : (
                                                 (service.createdUser?.username || "م")[0]
                                             )}
