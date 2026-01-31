@@ -330,7 +330,7 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
                                 <FormLabel>الجنس</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
-                                        <SelectTrigger className="text-right rounded-xl py-6">
+                                        <SelectTrigger dir="rtl" className="text-right rounded-xl py-6">
                                             <SelectValue placeholder="اختر الجنس" />
                                         </SelectTrigger>
                                     </FormControl>

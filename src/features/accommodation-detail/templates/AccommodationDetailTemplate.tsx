@@ -146,7 +146,7 @@ export const AccommodationDetailTemplate = ({ accommodation, isLoading: isPageLo
                         {/* Ratings & Reviews Section */}
                         <div className="space-y-10 pt-8 border-t">
                             {!isOwner && !hasAlreadyRated && isAuthenticated && (
-                                <AddRatingForm houseId={Number(accommodation.id)} />
+                                <AddRatingForm houseId={Number(accommodation.id)} ownerId={accommodation.createdUser?.id || accommodation.createdById} />
                             )}
                             <AccommodationReviews
                                 houseId={Number(accommodation.id)}

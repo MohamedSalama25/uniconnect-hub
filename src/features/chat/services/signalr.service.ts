@@ -82,6 +82,21 @@ class SignalRService {
     this.messageReceivedCallback = undefined;
   }
 
+  onNotificationReceived(callback: MessageCallback) {
+    if (this.connection) {
+      this.connection.on("ReceiveNotification", (notification) => {
+        console.log("Notification received:", notification);
+        callback(notification);
+      });
+    }
+  }
+
+  offNotificationReceived() {
+    if (this.connection) {
+      this.connection.off("ReceiveNotification");
+    }
+  }
+
   onMessageSent(callback: MessageCallback) {
     this.messageSentCallback = callback;
   }

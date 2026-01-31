@@ -5,6 +5,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { currentStudent } from '@/data/mockData';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { useNavigate } from 'react-router-dom';
 
@@ -19,6 +29,9 @@ export const ProfileSettings = () => {
     const { user, fullProfile, setUserDetails, logout } = useAuthStore();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+    const isStudent = user?.roles?.includes('Student');
 
     const [formData, setFormData] = useState({
         firstName: fullProfile?.firstName || '',
@@ -74,7 +87,11 @@ export const ProfileSettings = () => {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogoutClick = () => {
+        setShowLogoutDialog(true);
+    };
+
+    const confirmLogout = () => {
         logout();
         navigate('/welcome');
     };
@@ -102,7 +119,7 @@ export const ProfileSettings = () => {
                     <div className="mt-4 pt-4 border-t px-2">
                         <Button
                             variant="ghost"
-                            onClick={handleLogout}
+                            onClick={handleLogoutClick}
                             className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 px-4 py-3 rounded-xl"
                         >
                             <LogOut className="w-4 h-4 ml-2" />
@@ -118,6 +135,7 @@ export const ProfileSettings = () => {
                             setFormData={setFormData}
                             handleSave={handleSave}
                             isLoading={isLoading}
+                            isStudent={isStudent}
                         />
                     </TabsContent>
 
@@ -138,6 +156,23 @@ export const ProfileSettings = () => {
                     </TabsContent>
                 </div>
             </Tabs>
+
+            <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-right">هل أنت متأكد من تسجيل الخروج؟</AlertDialogTitle>
+                        <AlertDialogDescription className="text-right">
+                            سيتم تسجيل خروجك من الحساب الحالي. ستحتاج إلى تسجيل الدخول مرة أخرى للوصول إلى حسابك.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="flex-row-reverse justify-start gap-2">
+                        <AlertDialogCancel className="mt-0">إلغاء</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            تسجيل الخروج
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

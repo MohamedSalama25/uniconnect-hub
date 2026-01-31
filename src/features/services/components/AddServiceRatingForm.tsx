@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { serviceService } from "../services/service.service";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { notificationService } from "@/features/notifications/services/notification.service";
 
 interface AddServiceRatingFormProps {
     serviceId: number;
@@ -22,12 +23,42 @@ export function AddServiceRatingForm({ serviceId, onSuccess, variant = "default"
     const mutation = useMutation({
         mutationFn: (data: { serviceId: number; stars: number }) =>
             serviceService.addRating(data),
-        onSuccess: () => {
+        onSuccess: async () => {
             toast.success("تم إضافة تقييمك بنجاح");
             setStars(0);
             queryClient.invalidateQueries({ queryKey: ['service-detail', serviceId.toString()] });
             queryClient.invalidateQueries({ queryKey: ['service-ratings', serviceId] });
             onSuccess?.();
+
+            try {
+                // Notify Admins
+                const { adminUsersService } = await import('@/features/admin-users/services/admin-users.service');
+                const adminsResponse = await adminUsersService.getAllUsers({ Role: 'Admin', pageSize: 100 });
+
+                adminsResponse.users.data.forEach(admin => {
+                    notificationService.sendNotification({
+                        userId: admin.id,
+                        title: "تقييم جديد للخدمة",
+                        message: `تم إضافة تقييم جديد لخدمة رقم ${serviceId}. يرجى المراجعة.`
+                    });
+                });
+            } catch (error) {
+                console.error("Failed to notify admins", error);
+            }
+
+            try {
+                // Notify Service Owner
+                const service = await serviceService.getServiceById(serviceId);
+                if (service.createdUser?.id) {
+                    notificationService.sendNotification({
+                        userId: service.createdUser.id,
+                        title: "تقييم جديد لخدمتك",
+                        message: `تم إضافة تقييم جديد لخدمتك: ${service.name}`
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to notify service owner", error);
+            }
         },
         onError: () => {
             toast.error("فشل في إضافة التقييم");

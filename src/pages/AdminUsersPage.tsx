@@ -211,9 +211,9 @@ export default function AdminUsersPage() {
                         : `هل أنت متأكد من تعيين ${user.username} كمشرف للنظام؟ سيكون له كامل الصلاحيات.`,
                     () => {
                         if (isAdmin) {
-                            removeRole({ username: user.username, role: "Admin" });
+                            removeRole({ userId: user.id, username: user.username, role: "Admin" });
                         } else {
-                            assignRole({ username: user.username, role: "Admin" });
+                            assignRole({ userId: user.id, username: user.username, role: "Admin" });
                         }
                     },
                     isAdmin ? "warning" : "default"
@@ -233,9 +233,9 @@ export default function AdminUsersPage() {
                         : `هل أنت متأكد من تعيين ${user.username} كمقدم خدمة؟`,
                     () => {
                         if (isService) {
-                            removeRole({ username: user.username, role: "Service" });
+                            removeRole({ userId: user.id, username: user.username, role: "Service" });
                         } else {
-                            assignRole({ username: user.username, role: "Service" });
+                            assignRole({ userId: user.id, username: user.username, role: "Service" });
                         }
                     },
                     isService ? "warning" : "default"

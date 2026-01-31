@@ -33,9 +33,11 @@ export const adminUsersService = {
     return response.data;
   },
 
-  acceptUser: async (userId: string): Promise<UserActionResponse> => {
+  acceptUser: async (userId: string, isAccepted: boolean = true): Promise<UserActionResponse> => {
     const url = API_CONFIG.ENDPOINTS.USERS.ACCEPT(userId);
-    const response = await clientAxios.put(url);
+    const response = await clientAxios.put(url, null, {
+      params: { isAccepted }
+    });
     return response.data;
   },
 

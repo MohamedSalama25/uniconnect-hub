@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/globalComponents/ConfirmDialog";
 import { Switch } from "@/components/ui/switch";
+import { notificationService } from "@/features/notifications/services/notification.service";
 
 const AdminRatingsPage = () => {
     const queryClient = useQueryClient();
@@ -24,10 +25,68 @@ const AdminRatingsPage = () => {
     const publishMutation = useMutation({
         mutationFn: ({ id, status }: { id: number; status: boolean }) =>
             houseService.togglePublishRating(id, status),
-        onSuccess: () => {
+        onSuccess: async (_, variables) => {
             toast.success("تم تحديث حالة النشر بنجاح");
             queryClient.invalidateQueries({ queryKey: ["admin-ratings"] });
             setConfirmToggle(null);
+
+            if (variables.status) {
+                // Publishing (Accepting)
+                try {
+                    const rating = ratings?.find(r => r.id === variables.id);
+                    if (rating && rating.houseId) {
+                        const house = await houseService.getHouseById(rating.houseId);
+
+                        // Notify Owner
+                        if (house.createdUser?.id) {
+                            notificationService.sendNotification({
+                                userId: house.createdUser.id,
+                                title: "تم نشر تقييم جديد",
+                                message: `وافق المسؤول على نشر تقييم جديد لسكنك: ${house.name}`
+                            });
+                        }
+
+                        // Notify Rater
+                        if (rating.userId) {
+                            notificationService.sendNotification({
+                                userId: rating.userId,
+                                title: "تم قبول تقييمك",
+                                message: `مبارك! تم الموافقة على تقييمك للسكن: ${house.name} ونشره للعامة.`
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Failed to notify acceptance", error);
+                }
+            } else {
+                // Unpublishing (Rejecting/Hiding)
+                try {
+                    const rating = ratings?.find(r => r.id === variables.id);
+                    if (rating && rating.houseId) {
+                        const house = await houseService.getHouseById(rating.houseId);
+
+                        // Notify Owner (Optional but requested)
+                        if (house.createdUser?.id) {
+                            notificationService.sendNotification({
+                                userId: house.createdUser.id,
+                                title: "تحديث بخصوص التقييمات",
+                                message: `لم يتم الموافقة على أحد التقييمات المقدمة لسكنك: ${house.name}`
+                            });
+                        }
+
+                        // Notify Rater
+                        if (rating.userId) {
+                            notificationService.sendNotification({
+                                userId: rating.userId,
+                                title: "حالة التقييم",
+                                message: `عذراً، لم يتم نشر تقييمك للسكن: ${house.name}. قد يكون مخالفاً لسياسات النشر.`
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Failed to notify rejection", error);
+                }
+            }
         },
         onError: () => {
             toast.error("فشل في تحديث حالة النشر");

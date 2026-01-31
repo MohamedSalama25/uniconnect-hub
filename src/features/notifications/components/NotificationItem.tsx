@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Notification } from '@/features/notifications/types/notification.types';
@@ -12,8 +13,9 @@ interface NotificationItemProps {
 export function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps) {
     return (
         <div
+            dir="rtl"
             className={cn(
-                "flex flex-col gap-1 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors",
+                "flex flex-col gap-1 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors text-right",
                 !notification.isRead && "bg-muted/30"
             )}
         >
@@ -42,7 +44,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
                 )}
             </div>
             <span className="text-xs text-muted-foreground/60">
-                {formatDistanceToNow(new Date(notification.sentAt), { addSuffix: true })}
+                {formatDistanceToNow(new Date(notification.sentAt), { addSuffix: true, locale: ar })}
             </span>
         </div>
     );

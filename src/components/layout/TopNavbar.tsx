@@ -1,4 +1,14 @@
 import { Search, Moon, Sun, Menu, LogOut, Settings, User as UserIcon } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -28,6 +38,7 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
     return localStorage.getItem('theme') === 'dark';
   });
   const [searchOpen, setSearchOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const { user, fullProfile, logout, profileUpdateTick } = useAuthStore();
   const navigate = useNavigate();
 
@@ -54,7 +65,11 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
     }
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const confirmLogout = async () => {
     try {
       if (user?.token) {
         await authService.logout()
@@ -156,7 +171,7 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
                   <Settings className="w-4 h-4" />
                   <span>الإعدادات</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem dir="rtl" onClick={handleLogout} className="text-destructive gap-2">
+                <DropdownMenuItem dir="rtl" onClick={handleLogoutClick} className="text-destructive gap-2">
                   <LogOut className="w-4 h-4" />
                   <span>تسجيل الخروج</span>
                 </DropdownMenuItem>
@@ -166,6 +181,23 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
         </div>
       </header>
       <GlobalSearch open={searchOpen} setOpen={setSearchOpen} />
+
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-right">هل أنت متأكد من تسجيل الخروج؟</AlertDialogTitle>
+            <AlertDialogDescription className="text-right">
+              سيتم تسجيل خروجك من الحساب الحالي. ستحتاج إلى تسجيل الدخول مرة أخرى للوصول إلى حسابك.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse justify-start gap-2">
+            <AlertDialogCancel className="mt-0">إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              تسجيل الخروج
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

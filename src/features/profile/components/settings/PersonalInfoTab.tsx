@@ -10,9 +10,10 @@ interface PersonalInfoTabProps {
     setFormData: (data: any) => void;
     handleSave: (section: string) => void;
     isLoading?: boolean;
+    isStudent?: boolean;
 }
 
-export const PersonalInfoTab = ({ formData, setFormData, handleSave, isLoading }: PersonalInfoTabProps) => {
+export const PersonalInfoTab = ({ formData, setFormData, handleSave, isLoading, isStudent }: PersonalInfoTabProps) => {
     return (
         <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
             <CardHeader className="bg-muted/30 pb-6 border-b text-right">
@@ -58,18 +59,20 @@ export const PersonalInfoTab = ({ formData, setFormData, handleSave, isLoading }
                             />
                         </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="university" className="text-sm font-bold">الجامعة</Label>
-                        <div className="relative">
-                            <GraduationCap className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input
-                                id="university"
-                                value={formData.university}
-                                onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                                className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right"
-                            />
+                    {isStudent && (
+                        <div className="space-y-2">
+                            <Label htmlFor="university" className="text-sm font-bold">الجامعة</Label>
+                            <div className="relative">
+                                <GraduationCap className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                    id="university"
+                                    value={formData.university}
+                                    onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                                    className="pr-10 h-12 rounded-xl focus-visible:ring-primary text-right"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="introductionNote" className="text-sm font-bold">نبذة تعريفية</Label>
