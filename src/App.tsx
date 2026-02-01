@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,20 +31,26 @@ import LocationPrompt from "./components/globalComponents/LocationPrompt";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { GlobalImageViewer } from "./components/globalComponents/GlobalImageViewer";
 import { AIAssistant } from "./components/assistant/AIAssistant";
-
 import ProviderBookingsPage from "./pages/ProviderBookingsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import AdminRatingsPage from "./pages/AdminRatingsPage";
 
-
 const queryClient = new QueryClient();
+
+import { toast } from "sonner";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error("يجب تسجيل الدخول أولاً");
+    }
+  }, [isAuthenticated]);
+
   if (!isAuthenticated) {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

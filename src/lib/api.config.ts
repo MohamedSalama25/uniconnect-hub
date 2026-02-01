@@ -19,6 +19,7 @@ export const API_CONFIG = {
         },
         USERS: {
             GET_ALL: "/api/Users/users",
+            GET_ALL_ADMINS: "/api/Users/users/admins",
             ASSIGN_ROLE: "/api/Users/assignRole",
             REMOVE_ROLE: "/api/Users/removeRole",
             ACCEPT: (userId: string) => `/api/Users/${userId}/accept`,

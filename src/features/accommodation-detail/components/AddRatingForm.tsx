@@ -7,6 +7,8 @@ import { houseService } from "@/features/accommodation-list/services/house.servi
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationService } from "@/features/notifications/services/notification.service";
+import { API_CONFIG } from "@/lib/api.config";
+import clientAxios from "@/lib/axios";
 
 interface AddRatingFormProps {
     houseId: number;
@@ -33,10 +35,10 @@ export function AddRatingForm({ houseId, ownerId, onSuccess }: AddRatingFormProp
             try {
                 // Notify Admins
                 // We dynamically import to avoid circular dependencies if any, though unlikely here
-                const { adminUsersService } = await import('@/features/admin-users/services/admin-users.service');
-                const adminsResponse = await adminUsersService.getAllUsers({ Role: 'Admin', pageSize: 100 });
 
-                adminsResponse.users.data.forEach(admin => {
+                const adminsResponse = await clientAxios.get(API_CONFIG.ENDPOINTS.USERS.GET_ALL_ADMINS);
+
+                adminsResponse.data.users.data.forEach(admin => {
                     notificationService.sendNotification({
                         userId: admin.id,
                         title: "مراجعة تقييم جديد",
