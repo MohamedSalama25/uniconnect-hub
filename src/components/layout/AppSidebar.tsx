@@ -31,9 +31,6 @@ const navItems = [
   { to: '/chat', icon: MessageCircle, label: 'المحادثات' },
   { to: '/help', icon: HelpCircle, label: 'طلبات المساعدة' },
   { to: '/profile', icon: User, label: 'الملف الشخصي' },
-  { to: '/admin/houses', icon: Building, label: 'إدارة السكن' },
-  { to: '/admin/services', icon: Briefcase, label: 'إدارة الخدمات' },
-  { to: '/admin/help-requests', icon: HelpCircle, label: 'ادارة الطلبات' },
 ];
 
 export function AppSidebar() {
@@ -46,6 +43,9 @@ export function AppSidebar() {
   const finalNavItems = [
     ...navItems,
     ...(isAdmin ? [
+      { to: '/admin/houses', icon: Building, label: 'إدارة السكن' },
+      { to: '/admin/services', icon: Briefcase, label: 'إدارة الخدمات' },
+      { to: '/admin/help-requests', icon: HelpCircle, label: 'ادارة الطلبات' },
       { to: '/admin/users', icon: User, label: 'المستخدمين' },
       { to: '/admin/ratings', icon: Star, label: 'التقييمات' },
       { to: '/admin/settings', icon: Settings, label: 'الإعدادات' }

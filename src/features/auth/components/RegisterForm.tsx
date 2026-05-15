@@ -303,7 +303,7 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
                             <FormItem className="text-right">
                                 <FormLabel>رقم الهاتف</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="05xxxxxxxx" {...field} className="text-right rounded-xl py-6" />
+                                    <Input placeholder="01xxxxxxxxx" {...field} className="text-right rounded-xl py-6" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -394,7 +394,7 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
                             <FormItem className="text-right">
                                 <FormLabel>مكان الميلاد</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="مثال: الرياض" {...field} className="text-right rounded-xl py-6" />
+                                    <Input placeholder="مثال: كفر الشيخ" {...field} className="text-right rounded-xl py-6" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -408,7 +408,7 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
                             <FormItem className="text-right">
                                 <FormLabel>العنوان الحالي</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="مثال: حي الملك فهد" {...field} className="text-right rounded-xl py-6" />
+                                    <Input placeholder="مثال: حي الجامعة، كفر الشيخ" {...field} className="text-right rounded-xl py-6" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -424,7 +424,7 @@ export const RegisterForm = ({ selectedRole, onBack }: RegisterFormProps) => {
                                     <FormItem className="text-right">
                                         <FormLabel>اسم الجامعة</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="جامعة الملك سعود" {...field} className="text-right rounded-xl py-6" />
+                                            <Input placeholder="جامعة كفر الشيخ" {...field} className="text-right rounded-xl py-6" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
