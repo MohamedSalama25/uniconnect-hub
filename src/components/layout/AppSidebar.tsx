@@ -38,17 +38,21 @@ export function AppSidebar() {
   const { user } = useAuthStore();
   const location = useLocation();
 
-  const isAdmin = user?.roles?.includes('Admin') || "";
+  const roles = user?.roles ?? [];
+  const isAdmin = roles.includes('Admin');
+  const isServiceProvider = roles.includes('Provider') || roles.includes('Service');
 
   const finalNavItems = [
     ...navItems,
-    ...(isAdmin ? [
+    ...((isAdmin || isServiceProvider) ? [
       { to: '/admin/houses', icon: Building, label: 'إدارة السكن' },
       { to: '/admin/services', icon: Briefcase, label: 'إدارة الخدمات' },
-      { to: '/admin/help-requests', icon: HelpCircle, label: 'ادارة الطلبات' },
-      { to: '/admin/users', icon: User, label: 'المستخدمين' },
-      { to: '/admin/ratings', icon: Star, label: 'التقييمات' },
-      { to: '/admin/settings', icon: Settings, label: 'الإعدادات' }
+      { to: '/admin/help-requests', icon: HelpCircle, label: 'إدارة الطلبات' },
+      ...(isAdmin ? [
+        { to: '/admin/users', icon: User, label: 'المستخدمين' },
+        { to: '/admin/ratings', icon: Star, label: 'التقييمات' },
+        { to: '/admin/settings', icon: Settings, label: 'الإعدادات' }
+      ] : [])
     ] : [])
   ];
 

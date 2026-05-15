@@ -56,6 +56,34 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const RoleProtectedRoute = ({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles: string[];
+}) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const roles = user?.roles ?? [];
+  const isAllowed = allowedRoles.some((r) => roles.includes(r));
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error("يجب تسجيل الدخول أولاً");
+      return;
+    }
+    if (!isAllowed) {
+      toast.error("غير مصرح لك بدخول هذه الصفحة");
+    }
+  }, [isAuthenticated, isAllowed]);
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAllowed) return <Navigate to="/" replace />;
+
+  return <>{children}</>;
+};
+
 const App = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   return (
@@ -98,15 +126,15 @@ const App = () => {
             <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><HelpRequests /></ProtectedRoute>} />
-            <Route path="/admin/houses" element={<ProtectedRoute><AdminHousesPage /></ProtectedRoute>} />
-            <Route path="/admin/post/:id" element={<ProtectedRoute><AdminPostDetailsPage /></ProtectedRoute>} />
-            <Route path="/admin/services" element={<ProtectedRoute><AdminServicesPage /></ProtectedRoute>} />
-            <Route path="/admin/service/:id" element={<ProtectedRoute><AdminServiceDetailsPage /></ProtectedRoute>} />
-            <Route path="/admin/help-requests" element={<ProtectedRoute><AdminHelpRequestsPage /></ProtectedRoute>} />
-            <Route path="/admin/help/:id" element={<ProtectedRoute><AdminHelpRequestDetailsPage /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute><AdminUsersPage /></ProtectedRoute>} />
-            <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
-            <Route path="/admin/ratings" element={<ProtectedRoute><AdminRatingsPage /></ProtectedRoute>} />
+            <Route path="/admin/houses" element={<RoleProtectedRoute allowedRoles={["Admin", "Provider", "Service"]}><AdminHousesPage /></RoleProtectedRoute>} />
+            <Route path="/admin/post/:id" element={<RoleProtectedRoute allowedRoles={["Admin", "Provider", "Service"]}><AdminPostDetailsPage /></RoleProtectedRoute>} />
+            <Route path="/admin/services" element={<RoleProtectedRoute allowedRoles={["Admin", "Provider", "Service"]}><AdminServicesPage /></RoleProtectedRoute>} />
+            <Route path="/admin/service/:id" element={<RoleProtectedRoute allowedRoles={["Admin", "Provider", "Service"]}><AdminServiceDetailsPage /></RoleProtectedRoute>} />
+            <Route path="/admin/help-requests" element={<RoleProtectedRoute allowedRoles={["Admin", "Provider", "Service"]}><AdminHelpRequestsPage /></RoleProtectedRoute>} />
+            <Route path="/admin/help/:id" element={<RoleProtectedRoute allowedRoles={["Admin", "Provider", "Service"]}><AdminHelpRequestDetailsPage /></RoleProtectedRoute>} />
+            <Route path="/admin/users" element={<RoleProtectedRoute allowedRoles={["Admin"]}><AdminUsersPage /></RoleProtectedRoute>} />
+            <Route path="/admin/settings" element={<RoleProtectedRoute allowedRoles={["Admin"]}><AdminSettingsPage /></RoleProtectedRoute>} />
+            <Route path="/admin/ratings" element={<RoleProtectedRoute allowedRoles={["Admin"]}><AdminRatingsPage /></RoleProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/provider/bookings" element={<ProtectedRoute><ProviderBookingsPage /></ProtectedRoute>} />
 
