@@ -107,7 +107,7 @@ export const OTPVerificationDialog = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md" dir="rtl">
                 <DialogHeader className="text-right">
-                    <DialogTitle className="flex items-center gap-2 justify-end text-2xl">
+                    <DialogTitle className="flex items-center gap-2 justify-start text-2xl">
                         <Mail className="w-6 h-6 text-primary " />
                         تحقق من بريدك الإلكتروني
                     </DialogTitle>
