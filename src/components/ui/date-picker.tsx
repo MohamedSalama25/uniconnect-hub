@@ -69,6 +69,9 @@ export function DatePicker({
                     initialFocus
                     locale={ar}
                     className="bg-background"
+                    captionLayout="dropdown-buttons"
+                    fromYear={1900}
+                    toYear={2100}
                 />
             </PopoverContent>
         </Popover>

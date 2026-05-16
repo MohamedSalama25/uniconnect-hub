@@ -1,21 +1,27 @@
 import { Building, MapPin, Phone } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface ProfileInfoCardsProps {
     user: any;
 }
 
 export const ProfileInfoCards = ({ user }: ProfileInfoCardsProps) => {
+    const { user: authUser } = useAuthStore();
+    const isStudent = authUser?.roles?.includes('Student');
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl text-right">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                    <Building className="w-5 h-5" />
+        <div className={`grid grid-cols-1 ${isStudent ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mt-6`}>
+            {isStudent && (
+                <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl text-right">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <Building className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-sm text-muted-foreground">الجامعة</p>
+                        <p className="font-medium">{user.universityName || (user as any).university}</p>
+                    </div>
                 </div>
-                <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">الجامعة</p>
-                    <p className="font-medium">{user.universityName || (user as any).university}</p>
-                </div>
-            </div>
+            )}
 
             <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl text-right">
                 <div className="p-2 rounded-lg bg-accent/10 text-accent">
